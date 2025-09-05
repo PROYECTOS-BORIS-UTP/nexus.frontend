@@ -1,0 +1,25 @@
+<mat-nav-list>
+    @for (item of items; track item.label) {
+        @if (item.children && item.children.length > 0) {
+            <mat-expansion-panel *ngIf="item.children && item.children.length > 0" class="submenu-expansion-panel">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <span><mat-icon *ngIf="item.icon" [style.Color]="item.color">{{ item.icon }}</mat-icon> {{ item.label
+                            }}</span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <app-submenu-item [items]="item.children"></app-submenu-item>
+            </mat-expansion-panel>
+        } @else {
+
+            <a *ngIf="!item.children || item.children.length === 0" mat-list-item [routerLink]="item.route"
+                routerLinkActive="active-submenu-link">
+
+                <span matListItemTitle><mat-icon *ngIf="item.icon" [style.Color]="item.color">{{ item.icon }}</mat-icon> {{
+                    item.label }}</span>
+            </a>
+        }
+
+    }
+</mat-nav-list>

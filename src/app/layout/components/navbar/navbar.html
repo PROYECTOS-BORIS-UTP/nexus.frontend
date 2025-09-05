@@ -1,0 +1,33 @@
+<mat-toolbar color="primary">
+	<button
+		mat-button 
+		[matMenuTriggerFor]="uiKitMenu" 
+		#menuTrigger="matMenuTrigger"
+	>
+		UI Kits
+		<mat-icon>expand_more</mat-icon>
+	</button>
+
+	<span class="spacer"></span>
+	<span>Quantum App</span>
+</mat-toolbar>
+
+<mat-menu
+	#uiKitMenu="matMenu"
+	class="mega-menu-panel" 
+	(mouseleave)="closeMegaMenu(menuTrigger)"
+>	
+	<div (click)="$event.stopPropagation()">
+		<mat-list>
+		<a mat-list-item routerLink="/ui-kits/alerts">
+			<mat-icon>notifications</mat-icon> Alerts
+		</a>
+		<a mat-list-item routerLink="/ui-kits/accordions">
+			<mat-icon>view_day</mat-icon> Accordions
+		</a>
+		<a mat-list-item routerLink="/ui-kits/badges">
+			<mat-icon>badge</mat-icon> Badges
+		</a>
+		</mat-list>
+	</div>
+</mat-menu>

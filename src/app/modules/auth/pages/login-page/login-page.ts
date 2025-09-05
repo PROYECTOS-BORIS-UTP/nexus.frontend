@@ -7,19 +7,22 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
+import { IAuthenticactionRequest } from '../../interfaces/IAuth.interface';
+import { Auth } from '../../services/auth';
+import { Router } from '@angular/router';
 
 @Component({
 	selector: 'app-login-page',
 	imports: [
 		CommonModule
-		,FormsModule
-		,ReactiveFormsModule
-		,MatListModule
-		,MatGridListModule
-		,MatIconModule
-		,MatFormFieldModule
-		,MatInputModule
-		,MatButtonModule
+		, FormsModule
+		, ReactiveFormsModule
+		, MatListModule
+		, MatGridListModule
+		, MatIconModule
+		, MatFormFieldModule
+		, MatInputModule
+		, MatButtonModule
 	],
 	templateUrl: './login-page.html',
 	styleUrl: './login-page.scss'
@@ -27,21 +30,33 @@ import { MatListModule } from '@angular/material/list';
 export class LoginPage {
 	formLogin: FormGroup;
 	isAnimated = false;
-	// appearance: MatFormFieldAppearance = 'standard';
 
 	constructor(
-		private fb: FormBuilder
+		private fb: FormBuilder,
+		private authService: Auth,
+		private router: Router
 	) {
 		this.formLogin = this.fb.group({
-			email: ['', [Validators.required, Validators.email]],
-			password: ['', Validators.required]
+			vUsuario: ['', [Validators.required, Validators.email]],
+			vPassword: ['', Validators.required]
 		});
 	}
 
-	onSubmit() {
-		if (this.formLogin.valid) {
-			console.log('Login info:', this.formLogin.value);
-		}
+	onAuthentication() {
+		const payload: IAuthenticactionRequest = {
+			vUsuario: this.formLogin.get("vUsuario")?.value,
+			vPassword: this.formLogin.get("vPassword")?.value
+		};
+
+		this.authService.Authentication(payload).subscribe({
+			next: (response) => {
+				this.authService.saveSession(response.aData);
+				this.router.navigate(['/dashboard']);
+			},
+			error: (err) => {
+				console.error('Ha ocurrido un error:', err);
+			}
+		});
 	}
 
 	onStartClick() {

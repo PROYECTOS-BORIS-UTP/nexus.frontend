@@ -1,0 +1,66 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+// Resetea estilos de mat-nav-list para que no haya padding extra
+mat-nav-list {
+    padding-top: 0;
+}
+
+// Estilos para los paneles desplegables
+.submenu-expansion-panel {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+
+    // Cabecera del panel
+    .mat-expansion-panel-header {
+        padding: 0 16px;
+        // font-size: 0.9rem;
+        height: 48px;
+
+        &:hover {
+            background: #f5f5f5;
+        }
+    }
+
+    // Contenido del panel, con indentación para los hijos
+    ::ng-deep .mat-expansion-panel-body {
+        padding: 0 0 0 20px;
+    }
+}
+
+// Estilos para los enlaces finales (los que no tienen hijos)
+a[mat-list-item] {
+    padding-left: 16px;
+    font-size: 0.9rem;
+    height: 44px;
+    color: #333;
+
+    &:hover {
+        background: #f5f5f5;
+    }
+}
+
+// Estilo del enlace activo en el submenú
+.active-submenu-link {
+    // color: #a808ed; // Un color que coincida con tu paleta
+    font-weight: 500;
+    background-color: #f0e9ff;
+
+    .mat-icon {
+        // color: #a808ed;
+        vertical-align: top;
+    }
+}
+
+// Estilos comunes para íconos en el submenú
+.mat-icon {
+    margin-right: 16px;
+    color: #666;
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+    vertical-align: top;
+}

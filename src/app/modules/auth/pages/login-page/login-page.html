@@ -1,7 +1,7 @@
 <mat-grid-list cols="12" rowHeight="fit" class="sectLogin">
     <mat-grid-tile [colspan]="isAnimated ? 9 : 3" class="boxFormLogin">
         <div>
-            <form [formGroup]="formLogin" (ngSubmit)="onSubmit()">
+            <form [formGroup]="formLogin">
                 <div class="boxHead">
                     <h3 class="title">INICIAR SESIÓN</h3>
 
@@ -17,20 +17,20 @@
                 <div class="boxBody">
                     <mat-form-field class="inputField">
                         <mat-label>Email</mat-label>
-                        <input matInput formControlName="email" />
+                        <input matInput formControlName="vUsuario" />
                         <mat-icon matPrefix>mail</mat-icon>
                     </mat-form-field>
 
                     <mat-form-field class="inputField">
                         <mat-label>Password</mat-label>
-                        <input matInput type="password" formControlName="password" />
+                        <input matInput type="password" formControlName="vPassword" />
                         <mat-icon matPrefix>lock</mat-icon>
                     </mat-form-field>
                 </div>
 
                 <div class="boxFoot">
                     <a class="forgotLink" href="#">Forget your password?</a>
-                    <button mat-flat-button color="primary" class="btnSubmit">
+                    <button mat-flat-button color="primary" class="btnSubmit" (click)="onAuthentication()">
                         Sign In
                     </button>
                 </div>
