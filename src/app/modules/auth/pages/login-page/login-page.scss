@@ -1,0 +1,224 @@
+.sectLogin {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+}
+
+.boxFormLogin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .boxHead {
+        text-align: center;
+
+        .title {
+            color: #ff0080;
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .socialList {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px auto;
+
+            .mat-list-item {
+                width: 40px;
+                height: 40px;
+                background: #eee;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                &:nth-of-type(1) {
+                    background: #0c63db;
+                }
+
+                &:nth-of-type(2) {
+                    background: #eb1c24;
+                }
+
+                &:nth-of-type(3) {
+                    background: #0095e0;
+                }
+            }
+        }
+
+        .subtitle {
+            color: #878787;
+            font-weight: 300;
+            margin-bottom: 24px;
+        }
+    }
+
+    .boxBody {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+
+        .inputField {
+            width: 100%;
+            // background: #eeeded;
+            border-radius: 40px;
+            // padding-left: 10px;
+            margin-bottom: 20px;
+
+            .mat-form-field-wrapper {
+                padding-bottom: 5px;
+            }
+
+            .mat-input-element {
+                padding: 6px 0;
+                position: relative;
+                top: -4px;
+            }
+
+            .mat-form-field-underline {
+                display: none;
+            }
+
+            ::ng-deep .mat-mdc-text-field-wrapper {
+                border-radius: 25px;
+            }
+
+            ::ng-deep .mdc-line-ripple {
+                display: none;
+            }
+
+            ::ng-deep .mdc-line-ripple::before {
+                border: 0;
+            }
+        }
+    }
+
+    .boxFoot {
+        text-align: center;
+
+        .forgotLink {
+            color: #878787;
+            font-weight: 300;
+            display: block;
+            margin: 20px 0;
+        }
+
+        .btnSubmit {
+            background: linear-gradient(90deg, #99004d 0%, #ff0080 100%);
+            border-radius: 50px;
+            width: 100%;
+            max-width: 200px;
+            padding: 30px 30px;
+            font-weight: bold;
+            font-size: 16px;
+            text-transform: none;
+            color: white;
+            box-shadow: none;
+            transition: all ease 0.3s;
+
+            &:hover {
+                filter: brightness(1.4);
+            }
+        }
+    }
+}
+
+.boxFondoPage {
+    background-image: url('./img/fondopage.svg');
+    background-position: right bottom;
+    background-repeat: no-repeat;
+    background-size: cover;
+    transition: all ease 1.5s;
+}
+
+:host .boxShapeSecondary {
+    position: absolute;
+    z-index: 10;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-image: url('./img/shapemain.svg'); // ← ruta relativa
+
+    &.shrink {
+        width: 25% !important; // ← efecto visual
+        right: 0;
+        transition: all ease 1.5s;
+
+        ::ng-deep .mat-grid-tile-content {
+            width: 100% !important;
+        }
+    }
+
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background-image: url('./img/shapesecondary.svg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        z-index: -1;
+    }
+
+    ::ng-deep .mat-grid-tile-content {
+        width: 50%;
+        height: 100%;
+        transition: all ease .5s;
+        flex-flow: column;
+
+        & div {
+            width: 100%;
+        }
+    }
+}
+
+/***************************************/
+.boxShapeSecondaryText {
+    text-align: center;
+    color: white;
+
+    & h1 {
+        font-size: 45px;
+        font-weight: 700;
+        margin-bottom: 45px;
+        line-height: 1;
+    }
+
+    & h4 {
+        font-size: 25px;
+        font-weight: 500;
+        margin-bottom: 20px;
+        margin-top: 25px;
+    }
+}
+
+.btnIniciarAnimation {
+    width: 100%;
+    display: flex;
+    max-width: 300px;
+    margin: 0px auto;
+    margin-top: 40px;
+    padding: 30px 30px;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: none;
+    color: white !important;
+    box-shadow: none;
+    border: 2px solid #ffffff !important;
+    transition: all ease 0.3s;
+
+    &:hover {
+        filter: brightness(1.4);
+        transition: all ease 0.3s;
+    }
+}
