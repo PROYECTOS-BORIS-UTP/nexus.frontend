@@ -1,0 +1,14 @@
+.spacer {
+    flex: 1 1 auto;
+    /* Empuja los elementos a los lados */
+}
+
+/* Aplica estilos directamente al panel del mega menú */
+::ng-deep .mega-menu-panel {
+    min-width: 250px;
+
+    // Quita el padding por defecto del panel de menú para que la lista o tarjeta ocupe todo
+    .mat-mdc-menu-content {
+        padding: 0;
+    }
+}

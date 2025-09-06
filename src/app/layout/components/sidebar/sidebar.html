@@ -1,0 +1,26 @@
+<div class="sidebar-container">
+    <div class="logo-wrapper">
+        <img src="./assets/img/isotipo.png" alt="Nexus Logo" />
+    </div>
+
+    <mat-nav-list>
+        @for (item of menuItems; track item.id; let i = $index) {
+            <app-menu-item
+                [item]="item"
+                [isActive]="isSubmenuOpen && selectedMenu === item"
+                (itemClick)="toggleSubmenu(item)"
+                [class]="'item-' + i">
+            </app-menu-item>
+        }
+    </mat-nav-list>
+</div>
+
+<div class="submenu-panel" [class.open]="isSubmenuOpen" #submenuPanel>
+    @if (selectedMenu && selectedMenu.children) {
+        <h3 class="submenu-title" [style.background-color]="selectedMenu.color">
+            {{ selectedMenu.tooltip }}
+        </h3>
+        <mat-divider></mat-divider>        
+        <app-submenu-item [items]="selectedMenu.children"></app-submenu-item>
+    }
+</div>
