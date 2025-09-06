@@ -1,0 +1,74 @@
+:host {
+    display: flex; // Permite que el sidebar y el panel de submenú se alineen correctamente
+    height: 100%;
+}
+
+.sidebar-container {
+    width: 100px; // Ancho fijo para la barra principal
+    height: 100%;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    position: relative; // Necesario para el posicionamiento de elementos hijos
+    z-index: 100; // Asegura que esté por encima del contenido principal
+}
+
+.logo-wrapper {
+    text-align: center;
+    height: 104px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #180035;
+
+    img {
+        max-width: 62.76px;
+    }
+}
+
+// Estilos base para la lista de navegación principal
+.mat-mdc-nav-list {
+    padding: 0 16px;
+    padding-top: 50px;
+    height: calc(100vh - 64px);
+    background: #3b0879;
+    
+    app-menu-item {
+        display: flex;
+    }
+}
+
+// Estilos del panel que se desliza
+.submenu-panel {
+    position: fixed;
+    top: 0;
+    left: 100px; // Se alinea justo al lado del sidebar principal
+    width: 250px;
+    height: 100%;
+    background-color: #ffffff;
+    // border-right: 1px solid #e0e0e0;
+    box-shadow: 4px 0 10px -5px rgb(0 0 0 / 19%); // Sombra sutil
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    visibility: hidden;
+    z-index: 90;
+    overflow-y: auto;
+
+    &.open {
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    .submenu-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin: 0;
+        padding: 16px;
+    }
+}
+
+// El estilo del tooltip debe estar en un lugar global o aquí si solo se usa en este contexto
+.tooltip-on-top {
+    z-index: 9999;
+}

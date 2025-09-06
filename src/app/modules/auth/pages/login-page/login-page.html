@@ -1,0 +1,54 @@
+<mat-grid-list cols="12" rowHeight="fit" class="sectLogin">
+    <mat-grid-tile [colspan]="isAnimated ? 9 : 3" class="boxFormLogin">
+        <div>
+            <form [formGroup]="formLogin">
+                <div class="boxHead">
+                    <h3 class="title">INICIAR SESIÓN</h3>
+
+                    <mat-list class="socialList">
+                        <mat-list-item><mat-icon>facebook</mat-icon></mat-list-item>
+                        <mat-list-item><mat-icon>facebook</mat-icon></mat-list-item>
+                        <mat-list-item><mat-icon>facebook</mat-icon></mat-list-item>
+                    </mat-list>
+
+                    <h5 class="subtitle">Or use email account</h5>
+                </div>
+
+                <div class="boxBody">
+                    <mat-form-field class="inputField">
+                        <mat-label>Email</mat-label>
+                        <input matInput formControlName="vUsuario" />
+                        <mat-icon matPrefix>mail</mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field class="inputField">
+                        <mat-label>Password</mat-label>
+                        <input matInput type="password" formControlName="vPassword" />
+                        <mat-icon matPrefix>lock</mat-icon>
+                    </mat-form-field>
+                </div>
+
+                <div class="boxFoot">
+                    <a class="forgotLink" href="#">Forget your password?</a>
+                    <button mat-flat-button color="primary" class="btnSubmit" (click)="onAuthentication()">
+                        Sign In
+                    </button>
+                </div>
+            </form>
+        </div>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="isAnimated ? 3 : 9" class="boxFondoPage">
+
+    </mat-grid-tile>
+</mat-grid-list>
+
+<mat-grid-tile class="boxShapeSecondary" [class.shrink]="isAnimated">
+    <div class="boxShapeSecondaryText">
+        <h1>BIENVENIDO DE NUEVO</h1>
+        <h4>Mantente conentado con nosotros</h4>
+        <h4>Incia sesión con tu cuenta</h4>
+    </div>
+    <div>
+        <button matButton="outlined" extended color="primary" class="btnIniciarAnimation" (click)="onStartClick()"> <mat-icon>favorite</mat-icon> INICIAR </button>
+    </div>
+</mat-grid-tile>
