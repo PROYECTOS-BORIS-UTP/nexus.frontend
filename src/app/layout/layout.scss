@@ -1,0 +1,17 @@
+.main-layout-container {
+    display: flex;
+    height: 100vh;
+}
+
+.main-content-area {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 24px;
+    overflow-y: auto; // Permite scroll en el contenido principal
+}
