@@ -6,6 +6,11 @@ import { MenuItem } from "./components/menu-item/menu-item";
 import { SubmenuItem } from "./components/submenu-item/submenu-item";
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
+import { Router } from '@angular/router';
+import { Auth } from '../../../modules/auth/services/auth';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialog } from '../../../shared/components/dialogs/confirm-dialog/confirm-dialog';
 
 @Component({
 	selector: 'app-sidebar',
@@ -16,12 +21,19 @@ import { CommonModule } from '@angular/common';
 		MatMenuModule,
 		SubmenuItem,
 		MatTooltipModule,
+		MatIcon
 	],
 	templateUrl: './sidebar.html',
 	styleUrl: './sidebar.scss'
 })
 export class Sidebar {
 	@ViewChild('submenuPanel') submenuPanel!: ElementRef;
+
+	constructor(
+		private dialog: MatDialog,
+		private authService: Auth, // Tu servicio de Auth
+		private router: Router
+	) { }
 
 	isSubmenuOpen = false;
 	selectedMenu: IMenuItem | null = null;
@@ -30,7 +42,7 @@ export class Sidebar {
 	menuItems: IMenuItem[] = [
 		{
 			id: 1
-			,icon: 'dashboard'
+			, icon: 'dashboard'
 			, title: 'DS'
 			, tooltip: 'Dashboard'
 			, color: '#a808ed'
@@ -38,7 +50,7 @@ export class Sidebar {
 		},
 		{
 			id: 2
-			,icon: 'groups_3'
+			, icon: 'groups_3'
 			, title: 'RH'
 			, tooltip: 'Recursos Humanos'
 			, color: '#4ac3c2'
@@ -71,7 +83,7 @@ export class Sidebar {
 		},
 		{
 			id: 3
-			,icon: 'local_shipping'
+			, icon: 'local_shipping'
 			, title: 'LO'
 			, tooltip: 'Logística'
 			, color: '#6744ff'
@@ -88,7 +100,7 @@ export class Sidebar {
 		},
 		{
 			id: 4
-			,icon: 'credit_score'
+			, icon: 'credit_score'
 			, title: 'FI'
 			, tooltip: 'Finanzas'
 			, color: '#ff9044'
@@ -96,7 +108,7 @@ export class Sidebar {
 		},
 		{
 			id: 5
-			,icon: 'settings'
+			, icon: 'settings'
 			, title: 'CO'
 			, tooltip: 'Configuración'
 			, color: '#44a2ff'
@@ -122,6 +134,21 @@ export class Sidebar {
 			]
 		},
 	];
+
+	//#region LOGOUT
+	/*
+	* Esta es la función que llama tu botón
+	*/
+	abrirDialogoLogout(): void {
+		const dialogRef = this.dialog.open(ConfirmDialog);
+		dialogRef.afterClosed().subscribe(resultado => {
+			if (resultado === true) {
+				this.authService.logout();
+				this.router.navigate(['/login']);
+			}
+		});
+	}
+	//#endRegion
 
 
 	toggleSubmenu(item: IMenuItem) {
