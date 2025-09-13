@@ -3,6 +3,10 @@
     /* Empuja los elementos a los lados */
 }
 
+mat-toolbar {
+    height: 95px;
+}
+
 /* Aplica estilos directamente al panel del mega menú */
 ::ng-deep .mega-menu-panel {
     min-width: 250px;

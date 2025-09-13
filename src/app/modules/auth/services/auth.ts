@@ -15,15 +15,17 @@ export class Auth {
 
 	constructor(private http: HttpClient) { }
 
+	//#region AUTHNETICATION
 	/*
-   * Envía las credenciales al backend para iniciar sesión.
-   * @param credentials Objeto con vUsuario y vPassword.
-   * @returns Un Observable con la respuesta completa de la API, fuertemente tipada.
-   */
+	* Envía las credenciales al backend para iniciar sesión.
+	* @param credentials Objeto con vUsuario y vPassword.
+	* @returns Un Observable con la respuesta completa de la API, fuertemente tipada.
+	*/
 	Authentication(credentials: IAuthenticactionRequest): Observable<IApiResponse<IAuthenticationResponse>> {
 		return this.http.post<IApiResponse<IAuthenticationResponse>>(`${this.URL_BASE}${ENDPOINTS.AUTH}${AUTH.AUTHENTICATION}`, credentials);
 	}
 
+	//#region SAVE SESSION
 	/*
 	 * Guarda el token y los datos del usuario en el localStorage.
 	 * @param authData El objeto aData de la respuesta de la API.
@@ -34,6 +36,7 @@ export class Auth {
 		localStorage.setItem('user', JSON.stringify(authData.user));
 	}
 
+	//#region GET TOKEN
 	/*
 	 * Obtiene el token del usuario desde el localStorage.
 	 */
@@ -41,6 +44,7 @@ export class Auth {
 		return localStorage.getItem('token');
 	}
 
+	//#region GET USER
 	/*
 	 * Obtiene los datos del usuario desde el localStorage.
 	 */
@@ -52,6 +56,7 @@ export class Auth {
 		return null;
 	}
 
+	//#region LOGOUT
 	/*
 	 * Elimina los datos de la sesión del localStorage para cerrar sesión.
 	 */

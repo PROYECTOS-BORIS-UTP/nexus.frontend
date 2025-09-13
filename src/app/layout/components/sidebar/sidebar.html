@@ -13,6 +13,10 @@
             </app-menu-item>
         }
     </mat-nav-list>
+
+    <div class="btnLogout">
+        <button matButton (click)="abrirDialogoLogout()"><mat-icon>exit_to_app</mat-icon></button>
+    </div>
 </div>
 
 <div class="submenu-panel" [class.open]="isSubmenuOpen" #submenuPanel>
