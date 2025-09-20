@@ -4,7 +4,7 @@
     </div>
 
     <mat-nav-list>
-        @for (item of menuItems; track item.iIdOpcion; let i = $index) {
+        @for (item of menuItems$ | async; track item.iIdOpcion; let i = $index) {
             <app-menu-item
                 [item]="item"
                 [isActive]="isSubmenuOpen && selectedMenu?.iIdOpcion === item.iIdOpcion"
@@ -25,6 +25,10 @@
             {{ selectedMenu.vTooltip }}
         </h3>
         <mat-divider></mat-divider>
-        <app-submenu-item [items]="selectedMenu.children"></app-submenu-item>
+        
+        <app-submenu-item 
+            [items]="selectedMenu.children"
+            (linkClicked)="closeSubmenu()">
+        </app-submenu-item>
     }
 </div>

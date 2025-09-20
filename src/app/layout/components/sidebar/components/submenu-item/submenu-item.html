@@ -5,19 +5,30 @@
             <mat-expansion-panel class="submenu-expansion-panel">
                 <mat-expansion-panel-header>
                     <mat-panel-title>
-                        <mat-icon *ngIf="item.vIcono" [style.color]="item.vColor">{{ item.vIcono }}</mat-icon>
+                        @if (item.vIcono) {
+                            <mat-icon [style.color]="item.vColor">{{ item.vIcono }}</mat-icon>
+                        }
                         <span class="menu-label">{{ item.vOpcion }}</span>
                     </mat-panel-title>
                 </mat-expansion-panel-header>
 
-                <app-submenu-item [items]="item.children"></app-submenu-item>
+                <app-submenu-item 
+                    [items]="item.children" 
+                    (linkClicked)="onLinkClicked()">
+                </app-submenu-item>
 
             </mat-expansion-panel>
         }
 
         @else {
-            <a mat-list-item [routerLink]="item.vRuta" routerLinkActive="active-submenu-link">
-                <mat-icon *ngIf="item.vIcono" [style.color]="item.vColor">{{ item.vIcono }}</mat-icon>
+            <a
+                mat-list-item 
+                [routerLink]="item.vRuta" 
+                routerLinkActive="active-submenu-link"
+                (click)="onLinkClicked()">
+                @if (item.vIcono) {
+                    <mat-icon [style.color]="item.vColor">{{ item.vIcono }}</mat-icon>
+                }
                 <span class="menu-label">{{ item.vOpcion }}</span>
             </a>
         }

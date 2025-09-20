@@ -13,6 +13,7 @@ import { ConfirmDialog } from '../../../shared/components/dialogs/confirm-dialog
 
 import { IOpcionByUserRequest, IOpcionByUserResponse } from '../../interfaces/ISideBar.interface';
 import { Layout } from '../../services/layout';
+import { Observable } from 'rxjs';
 
 @Component({
 	selector: 'app-sidebar',
@@ -23,7 +24,7 @@ import { Layout } from '../../services/layout';
 		MatMenuModule,
 		SubmenuItem,
 		MatTooltipModule,
-		MatIcon
+		MatIcon,
 	],
 	templateUrl: './sidebar.html',
 	styleUrl: './sidebar.scss'
@@ -41,6 +42,11 @@ export class Sidebar {
 	selectedMenu: IOpcionByUserResponse | null = null;
 	menuItems: IOpcionByUserResponse[] = [];
 
+	menuItems$: Observable<IOpcionByUserResponse[]>;
+
+	constructor() {
+		this.menuItems$ = this.layoutService.menuItems$;
+	}
 
 	ngOnInit(): void {
 		this.loadMenuOptions();
@@ -60,21 +66,12 @@ export class Sidebar {
 			return;
 		}
 
-		const payload: IOpcionByUserRequest = {
-			iIdUsuario: user.iIdUsuario
-		};
+		const payload: IOpcionByUserRequest = { iIdUsuario: user.iIdUsuario };
 
-		this.layoutService.getOpcionByUser(payload).subscribe({
-			next: (response) => {
-				if (response.bStatus) {
-					this.menuItems = response.aData;
-				} else {
-					console.error("Error al cargar menú:", response.vMessage);
-				}
-			},
+		this.layoutService.loadMenuOptions(payload).subscribe({
 			error: (err) => {
 				const apiError = err.error;
-				console.error(`Error ${apiError.vStatus}: ${apiError.vMessage}`, err);
+				console.error(`Error ${apiError?.vStatus}: ${apiError?.vMessage}`, err);
 			}
 		});
 	}
@@ -133,4 +130,9 @@ export class Sidebar {
 			this.selectedMenu = null;
 		}
 	}
+
+	closeSubmenu(): void {
+        this.isSubmenuOpen = false;
+        this.selectedMenu = null;
+    }
 }
