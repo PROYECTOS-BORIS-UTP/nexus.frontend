@@ -1,25 +1,25 @@
 <mat-nav-list>
-    @for (item of items; track item.label) {
+    @for (item of items; track item.iIdOpcion) {
+
         @if (item.children && item.children.length > 0) {
-            <mat-expansion-panel *ngIf="item.children && item.children.length > 0" class="submenu-expansion-panel">
+            <mat-expansion-panel class="submenu-expansion-panel">
                 <mat-expansion-panel-header>
                     <mat-panel-title>
-                        <span><mat-icon *ngIf="item.icon" [style.Color]="item.color">{{ item.icon }}</mat-icon> {{ item.label
-                            }}</span>
+                        <mat-icon *ngIf="item.vIcono" [style.color]="item.vColor">{{ item.vIcono }}</mat-icon>
+                        <span class="menu-label">{{ item.vOpcion }}</span>
                     </mat-panel-title>
                 </mat-expansion-panel-header>
 
                 <app-submenu-item [items]="item.children"></app-submenu-item>
+
             </mat-expansion-panel>
-        } @else {
-
-            <a *ngIf="!item.children || item.children.length === 0" mat-list-item [routerLink]="item.route"
-                routerLinkActive="active-submenu-link">
-
-                <span matListItemTitle><mat-icon *ngIf="item.icon" [style.Color]="item.color">{{ item.icon }}</mat-icon> {{
-                    item.label }}</span>
-            </a>
         }
 
+        @else {
+            <a mat-list-item [routerLink]="item.vRuta" routerLinkActive="active-submenu-link">
+                <mat-icon *ngIf="item.vIcono" [style.color]="item.vColor">{{ item.vIcono }}</mat-icon>
+                <span class="menu-label">{{ item.vOpcion }}</span>
+            </a>
+        }
     }
 </mat-nav-list>
