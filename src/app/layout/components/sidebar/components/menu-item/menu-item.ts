@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { IMenuItem } from '../../interfaces/IMenu.interface';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
+import { IOpcionByUserResponse } from '../../../../interfaces/ISideBar.interface';
 
 @Component({
 	selector: 'app-menu-item',
@@ -17,10 +17,10 @@ import { CommonModule } from '@angular/common';
 	styleUrl: './menu-item.scss'
 })
 export class MenuItem {
-	@Input() item!: IMenuItem;
+	@Input() item!: IOpcionByUserResponse;
 	@Input() isActive: boolean = false;
-	@Output() itemClick = new EventEmitter<IMenuItem>();
-
+	@Output() itemClick = new EventEmitter<IOpcionByUserResponse>();
+	
 	onItemClicked(): void {
 		this.itemClick.emit(this.item);
 	}

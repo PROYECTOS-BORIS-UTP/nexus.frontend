@@ -1,5 +1,4 @@
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
-import { IMenuItem } from './interfaces/IMenu.interface';
+import { Component, ElementRef, HostListener, inject, ViewChild } from '@angular/core';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MenuItem } from "./components/menu-item/menu-item";
@@ -12,6 +11,10 @@ import { Auth } from '../../../modules/auth/services/auth';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from '../../../shared/components/dialogs/confirm-dialog/confirm-dialog';
 
+import { IOpcionByUserRequest, IOpcionByUserResponse } from '../../interfaces/ISideBar.interface';
+import { Layout } from '../../services/layout';
+import { Observable } from 'rxjs';
+
 @Component({
 	selector: 'app-sidebar',
 	imports: [
@@ -21,7 +24,7 @@ import { ConfirmDialog } from '../../../shared/components/dialogs/confirm-dialog
 		MatMenuModule,
 		SubmenuItem,
 		MatTooltipModule,
-		MatIcon
+		MatIcon,
 	],
 	templateUrl: './sidebar.html',
 	styleUrl: './sidebar.scss'
@@ -29,111 +32,49 @@ import { ConfirmDialog } from '../../../shared/components/dialogs/confirm-dialog
 export class Sidebar {
 	@ViewChild('submenuPanel') submenuPanel!: ElementRef;
 
-	constructor(
-		private dialog: MatDialog,
-		private authService: Auth, // Tu servicio de Auth
-		private router: Router
-	) { }
+	// Inyección de dependencias moderna con inject()
+	private readonly dialog = inject(MatDialog);
+	private readonly authService = inject(Auth);
+	private readonly layoutService = inject(Layout);
+	private readonly router = inject(Router);
 
 	isSubmenuOpen = false;
-	selectedMenu: IMenuItem | null = null;
+	selectedMenu: IOpcionByUserResponse | null = null;
+	menuItems: IOpcionByUserResponse[] = [];
 
-	// --- ARRAY ACTUALIZADO ---
-	menuItems: IMenuItem[] = [
-		{
-			id: 1
-			, icon: 'dashboard'
-			, title: 'DS'
-			, tooltip: 'Dashboard'
-			, color: '#a808ed'
-			, route: '/dashboard'
-		},
-		{
-			id: 2
-			, icon: 'groups_3'
-			, title: 'RH'
-			, tooltip: 'Recursos Humanos'
-			, color: '#4ac3c2'
-			, children: [
-				{
-					label: 'Colaboradores'
-					, icon: 'groups_3'
-					, route: '/seguridad'
-					// children: [
-					//     { label: 'Usuarios', route: '/seguridad/usuarios', icon: 'person' },
-					//     { label: 'Perfiles', route: '/seguridad/perfiles', icon: 'group' }
-					// ]
-				},
-				{
-					label: 'Organigrama'
-					, icon: 'groups_3'
-					, route: '/seguridad'
-					, children: [
-						{
-							label: 'Usuarios', route: '/seguridad/usuarios', icon: 'person'
-							// ,children: [
-							// 	{ label: 'Usuarios', route: '/seguridad/usuarios', icon: 'person' },
-							// 	{ label: 'Perfiles', route: '/seguridad/perfiles', icon: 'group' }
-							// ]
-						},
-						{ label: 'Perfiles', route: '/seguridad/perfiles', icon: 'group' }
-					]
-				}
-			]
-		},
-		{
-			id: 3
-			, icon: 'local_shipping'
-			, title: 'LO'
-			, tooltip: 'Logística'
-			, color: '#6744ff'
-			, children: [
-				{
-					label: 'Proveedores',
-					route: '/seguridad',
-					children: [
-						{ label: 'Usuarios', route: '/seguridad/usuarios', icon: 'person' },
-						{ label: 'Perfiles', route: '/seguridad/perfiles', icon: 'group' }
-					]
-				},
-			]
-		},
-		{
-			id: 4
-			, icon: 'credit_score'
-			, title: 'FI'
-			, tooltip: 'Finanzas'
-			, color: '#ff9044'
-			, children: []
-		},
-		{
-			id: 5
-			, icon: 'settings'
-			, title: 'CO'
-			, tooltip: 'Configuración'
-			, color: '#44a2ff'
-			, children: [
-				{
-					label: 'Seguridad'
-					, icon: 'security'
-					// ,route: '/seguridad'
-					, children: [
-						{ label: 'Usuarios', route: '/seguridad/usuario', icon: 'person' },
-						{ label: 'Perfiles', route: '/seguridad/usuario', icon: 'group' }
-					]
-				},
-				{
-					label: 'Maestras'
-					, icon: 'cast_for_education'
-					, route: '/maestras'
-					, children: [
-						{ label: 'Usuarios', route: '/seguridad/usuario', icon: 'person' },
-						{ label: 'Perfiles', route: '/seguridad/usuario', icon: 'group' }
-					]
-				},
-			]
-		},
-	];
+	menuItems$: Observable<IOpcionByUserResponse[]>;
+
+	constructor() {
+		this.menuItems$ = this.layoutService.menuItems$;
+	}
+
+	ngOnInit(): void {
+		this.loadMenuOptions();
+	}
+
+	//#region CARGAR OPCIONES DEL MENÚ
+	/*
+	 * @description Carga las opciones del menú desde el backend.
+	 */
+	private loadMenuOptions(): void {
+		const user = this.authService.getUser();
+
+		if (!user || !user.iIdUsuario) {
+			console.error("No se pudo obtener el ID del usuario para cargar el menú.");
+			this.authService.logout();
+			this.router.navigate(['/login']);
+			return;
+		}
+
+		const payload: IOpcionByUserRequest = { iIdUsuario: user.iIdUsuario };
+
+		this.layoutService.loadMenuOptions(payload).subscribe({
+			error: (err) => {
+				const apiError = err.error;
+				console.error(`Error ${apiError?.vStatus}: ${apiError?.vMessage}`, err);
+			}
+		});
+	}
 
 	//#region LOGOUT
 	/*
@@ -150,17 +91,23 @@ export class Sidebar {
 	}
 	//#endRegion
 
-
-	toggleSubmenu(item: IMenuItem) {
-		// Si se hace clic en un item sin hijos, no hacemos nada aquí
+	//#region TOGGLE SUBMENU
+	/*
+	 * @description Maneja la apertura y cierre del submenú.
+	 * @param item El ítem del menú que fue clickeado.
+	 */
+	toggleSubmenu(item: IOpcionByUserResponse) {
 		if (!item.children || item.children.length === 0) {
 			this.isSubmenuOpen = false;
 			this.selectedMenu = null;
+			if(item.vRuta) {
+				this.router.navigate([item.vRuta]);
+			}
 			return;
 		}
 
 		// Lógica para abrir/cerrar el panel
-		if (this.selectedMenu === item && this.isSubmenuOpen) {
+		if (this.selectedMenu?.iIdOpcion === item.iIdOpcion && this.isSubmenuOpen) {
 			this.isSubmenuOpen = false;
 			this.selectedMenu = null;
 		} else {
@@ -175,11 +122,7 @@ export class Sidebar {
 		if (!this.isSubmenuOpen) {
 			return;
 		}
-
-		// Cierra el panel si el clic es fuera de él
 		const clickedInsidePanel = this.submenuPanel.nativeElement.contains(event.target);
-
-		// También verifica que no se haya hecho clic en uno de los botones del menú principal
 		const clickedOnMenuItem = (event.target as HTMLElement).closest('app-menu-item');
 
 		if (!clickedInsidePanel && !clickedOnMenuItem) {
@@ -187,4 +130,9 @@ export class Sidebar {
 			this.selectedMenu = null;
 		}
 	}
+
+	closeSubmenu(): void {
+        this.isSubmenuOpen = false;
+        this.selectedMenu = null;
+    }
 }
