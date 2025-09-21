@@ -1,29 +1,29 @@
 @if (!item.children || item.children.length === 0) {
     <a
         mat-list-item
-        [matTooltip]="item.tooltip"
+        [matTooltip]="item.vTooltip"
         matTooltipPosition="right"
         matTooltipClass="tooltip-on-top"
-        [routerLink]="item.route"
+        [routerLink]="item.vRuta"
         routerLinkActive="active-link"
-        [style.background-color]="item.color"
+        [style.background-color]="item.vColor"
     >
-        <mat-icon>{{ item.icon }}</mat-icon>
-        <span>{{ item.title }}</span>
+        <mat-icon>{{ item.vIcono }}</mat-icon>
+        <span>{{ item.vTitulo }}</span>
     </a>
 }
 
 @if (item.children && item.children.length > 0) {
     <a 
         mat-list-item
-        [matTooltip]="item.tooltip"
+        [matTooltip]="item.vTooltip"
         matTooltipPosition="right"
         matTooltipClass="tooltip-on-top"
         (click)="onItemClicked()"
         [class.active-link]="isActive"
-        [style.background-color]="item.color"
+        [style.background-color]="item.vColor"
     >
-        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-        <span matListItemTitle>{{ item.title }}</span>
+        <mat-icon matListItemIcon>{{ item.vIcono }}</mat-icon>
+        <span matListItemTitle>{{ item.vTitulo }}</span>
     </a>
 }
