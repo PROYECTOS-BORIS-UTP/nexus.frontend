@@ -1,1 +1,75 @@
 <p>usuario-page works!</p>
+
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z8 demo-table">
+  <!-- ID Usuario -->
+  <ng-container matColumnDef="idUsuario">
+    <th mat-header-cell *matHeaderCellDef>ID</th>
+    <td mat-cell *matCellDef="let user">{{ user.idUsuario }}</td>
+  </ng-container>
+
+  <!-- Usuario -->
+  <ng-container matColumnDef="vUsuario">
+    <th mat-header-cell *matHeaderCellDef>Usuario</th>
+    <td mat-cell *matCellDef="let user">{{ user.vUsuario }}</td>
+  </ng-container>
+
+  <!-- Activo -->
+  <ng-container matColumnDef="bActivo">
+    <th mat-header-cell *matHeaderCellDef>Activo</th>
+    <td mat-cell *matCellDef="let user">{{ user.bActivo ? 'Sí' : 'No' }}</td>
+  </ng-container>
+
+  <!-- Tipo Usuario -->
+  <ng-container matColumnDef="idTipoUsuario">
+    <th mat-header-cell *matHeaderCellDef>Tipo Usuario</th>
+    <td mat-cell *matCellDef="let user">{{ user.idTipoUsuario }}</td>
+  </ng-container>
+
+  <!-- Persona -->
+  <ng-container matColumnDef="idPersona">
+    <th mat-header-cell *matHeaderCellDef>Persona</th>
+    <td mat-cell *matCellDef="let user">{{ user.idPersona || '---' }}</td>
+  </ng-container>
+
+  <!-- Tipo Persona -->
+  <ng-container matColumnDef="idTipoPersona">
+    <th mat-header-cell *matHeaderCellDef>Tipo Persona</th>
+    <td mat-cell *matCellDef="let user">{{ user.idTipoPersona }}</td>
+  </ng-container>
+
+  <!-- Cambiar Contraseña -->
+  <ng-container matColumnDef="bChangePassword">
+    <th mat-header-cell *matHeaderCellDef>Cambiar Password</th>
+    <td mat-cell *matCellDef="let user">{{ user.bChangePassword ? 'Sí' : 'No' }}</td>
+  </ng-container>
+
+  <!-- Header y Rows -->
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr
+    mat-row
+    (click)="toggleRow(row)"
+    [class.demo-row-is-clicked]="clickedRows.has(row)"
+    *matRowDef="let row; columns: displayedColumns;">
+  </tr>
+</table>
+
+<div>
+  <h3>Click Log</h3>
+</div>
+
+@if (!clickedRows.size) {
+<div>Clicked rows will be logged here</div>
+}
+
+<tr
+  mat-row
+  (click)="clickedRows.add(row)"
+  [class.demo-row-is-clicked]="clickedRows.has(row)"
+  *matRowDef="let row; columns: displayedColumns"
+></tr>
+
+<ul>
+  @for (clickedRow of clickedRows; track clickedRow) {
+  <li>Clicked on {{ clickedRow.vUsuario }}</li>
+  }
+</ul>
