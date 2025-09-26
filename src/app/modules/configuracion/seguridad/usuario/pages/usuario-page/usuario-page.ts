@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
+import { MatIcon, MatIconModule } from "../../../../../../../../node_modules/@angular/material/icon-module.d";
+import { MatButtonModule } from '@angular/material/button';
 
 export interface Usuario {
   idUsuario: number;
@@ -34,7 +36,7 @@ const ELEMENT_DATA: Usuario[] = [
 
 @Component({
   selector: 'app-usuario-page',
-  imports: [MatTableModule],
+  imports: [MatTableModule, MatIconModule, MatButtonModule],
   templateUrl: './usuario-page.html',
   styleUrl: './usuario-page.scss',
 })
@@ -47,10 +49,17 @@ export class UsuarioPage {
     'idPersona',
     'idTipoPersona',
     'bChangePassword',
+    'acciones'
   ];
   dataSource = ELEMENT_DATA;
 
   clickedRows = new Set<Usuario>();
+
+  editarUsuario(user: any) {
+  console.log('Editando usuario:', user);
+
+  // modal
+}
 
   toggleRow(row: Usuario) {
     if (this.clickedRows.has(row)) {

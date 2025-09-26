@@ -1,17 +1,100 @@
+// Paleta personalizada
+$primary-purple: #6a1b9a; // morado principal
+$secondary-purple: #9c27b0; // morado más claro
+$terceary-purple: #a770ef; // morado degradado
+$light-purple: #f3e5f5; // fondo suave
+$white: #ffffff; // blanco
+$gray: #e0e0e0; // gris claro
+$text-dark: #2c2c2c; // texto principal oscuro
+
 .demo-table {
   width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+  font-family: 'Poppins', sans-serif;
 }
 
-.mat-mdc-row .mat-mdc-cell {
-  border-bottom: 1px solid transparent;
-  border-top: 1px solid transparent;
+.mat-mdc-table {
+  background: transparent;
+}
+
+.mat-mdc-header-row {
+  background: linear-gradient(90deg, $primary-purple, $secondary-purple, $terceary-purple);
+  color: $white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  border-radius: 12px;
+}
+
+.mat-mdc-header-cell {
+  padding: 16px;
+  border: none;
+}
+
+.mat-mdc-row {
+  background: $white;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba($primary-purple, 0.12);
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+.mat-mdc-row:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 8px 20px rgba($primary-purple, 0.25);
   cursor: pointer;
 }
 
-.mat-mdc-row:hover .mat-mdc-cell {
-  border-color: currentColor;
+.mat-mdc-cell {
+  padding: 16px 20px;
+  font-size: 0.95rem;
+  color: $text-dark;
+  border: none;
 }
 
 .demo-row-is-clicked {
+  background: linear-gradient(90deg, rgba($secondary-purple, 0.1), rgba($terceary-purple, 0.15));
   font-weight: bold;
+  border-left: 5px solid $secondary-purple;
+  box-shadow: inset 4px 0 12px rgba($terceary-purple, 0.25);
+}
+
+/* Click Log */
+h3 {
+  color: $primary-purple;
+  margin-top: 20px;
+  font-weight: 600;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+
+  li {
+    background: linear-gradient(90deg, rgba($primary-purple, 0.12), rgba($secondary-purple, 0.18));
+    color: $primary-purple;
+    margin: 6px 0;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba($primary-purple, 0.15);
+  }
+}
+
+
+button[mat-icon-button] {
+  color: $secondary-purple; // tu morado bonito
+  transition: transform 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    color: $terceary-purple;
+    transform: scale(1.2); // efecto zoom
+  }
+}
+
+.mat-icon {
+  font-size: 20px;
 }
