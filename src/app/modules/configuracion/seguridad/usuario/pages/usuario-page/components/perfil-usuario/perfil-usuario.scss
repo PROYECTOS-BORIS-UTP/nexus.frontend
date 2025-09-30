@@ -1,0 +1,14 @@
+// src/app/components/perfil-avatar/perfil-avatar.component.scss
+.avatar-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 12px;
+    border: 2px solid white; // Borde blanco para el efecto de superposición
+    box-sizing: border-box;
+}
