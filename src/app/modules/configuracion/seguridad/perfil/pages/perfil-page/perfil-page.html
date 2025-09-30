@@ -1,1 +1,63 @@
-<p>perfil-page works!</p>
+<!-- <p>perfil-page works!</p> -->
+<div class="perfil-page-container">
+
+  <!-- Cabecera -->
+  <div class="header-section">
+    <div class="row-content">
+      <div class="data-cell id-col">
+        <h2 class="page-title-minimal">Gestión de Perfiles</h2>
+      </div>
+    </div>
+
+    <div class="search-bar-wrapper minimal">
+      <input
+        id="filtro"
+        type="text"
+        placeholder="Buscar por usuario, perfil o descripción..."
+        [(ngModel)]="filtroBusqueda"
+        (input)="aplicarFiltro()"
+        class="search-input-minimal"
+      >
+      <i class="fas fa-search search-icon"></i>
+    </div>
+  </div>
+
+  <!-- Encabezados de columnas -->
+  <div class="column-headers">
+    <div class="header-item id-col">ID</div>
+    <div class="header-item user-col">Usuario</div>
+    <div class="header-item perfil-col">Perfil</div>
+    <div class="header-item desc-col">Descripción</div>
+    <div class="header-item activo-col">Estado</div>
+    <div class="header-item actions-col">Acciones</div>
+  </div>
+
+  <!-- Lista de perfiles -->
+  <div class="list-container">
+    <div *ngFor="let p of perfilesMostrados" class="perfil-row-card">
+      <div class="row-content">
+        <div class="data-cell id-col">{{ p.idUsuario }}</div>
+        <div class="data-cell user-col">{{ p.usuario }}</div>
+        <div class="data-cell perfil-col">{{ p.perfil }}</div>
+        <div class="data-cell desc-col">{{ p.descripcion }}</div>
+
+        <div class="data-cell activo-col">
+          <span [ngClass]="p.activo ? 'badge active-minimal' : 'badge inactive-minimal'">
+            {{ p.activo ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+
+        <div class="data-cell actions-col">
+          <button class="action-button-minimal" (click)="editarPerfil(p)">
+            <i class="fas fa-ellipsis-h"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Si no hay resultados -->
+    <div *ngIf="perfilesMostrados.length === 0" class="no-results-minimal">
+      No se encontraron perfiles que coincidan con "{{ filtroBusqueda }}".
+    </div>
+  </div>
+</div>

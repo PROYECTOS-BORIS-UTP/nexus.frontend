@@ -1,0 +1,170 @@
+$color-texto: #333333;
+$color-fondo: #f9f9f9; 
+$color-primario: #5d3f9b; 
+$color-borde: #eeeeee;
+$color-activo: #00c853; 
+$color-inactivo: #ff7043; 
+
+.perfil-page-container {
+  padding: 30px;
+  background-color: $color-fondo;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+// --- Cabecera y Búsqueda ---
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 0 25px;
+}
+
+.page-title-minimal {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: $color-texto;
+  text-align: left;
+}
+
+.search-bar-wrapper.minimal {
+  position: relative;
+  width: 350px;
+  // ✅ CORRECCIÓN: Margen para separar del borde derecho del contenedor.
+  margin-right: 20px; 
+
+  .search-input-minimal {
+    width: 100%;
+    padding: 10px 15px 10px 40px; 
+    border: 1px solid $color-borde;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
+    transition: border-color 0.3s;
+
+    &:focus {
+      border-color: $color-primario;
+      box-shadow: 0 0 0 3px rgba($color-primario, 0.2);
+      outline: none;
+    }
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 0.9rem;
+  }
+}
+
+// --- Encabezados de Columna (Guía visual) ---
+.column-headers {
+  display: flex;
+  // Este padding define el espacio inicial y final de la guía de columnas.
+  padding: 0 25px; 
+  margin-bottom: 10px;
+  color: #777;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+// --- Tarjetas de Perfil (Las filas de datos) ---
+.perfil-row-card {
+  background-color: white;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  // ✅ CORRECCIÓN CLAVE: Quitamos el padding horizontal, solo dejamos el vertical.
+  padding: 15px 0; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s, transform 0.3s;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px); 
+  }
+
+  .row-content {
+    display: flex;
+    align-items: center;
+    // ✅ CORRECCIÓN CLAVE: Aplicamos el padding horizontal aquí (0 25px) 
+    // para que COINCIDA exactamente con el padding del .column-headers.
+    padding: 0 25px; 
+  }
+  
+  .data-cell {
+    padding: 0 10px;
+    color: $color-texto;
+    font-size: 0.95rem;
+    text-align: left; 
+  }
+}
+
+// --- Definición de Anchos y Alineación de Columna ---
+// Se mantiene la alineación explícita para asegurar el orden.
+.id-col {
+  flex: 0 0 5%;
+  text-align: center; 
+}
+.user-col {
+  flex: 0 0 15%;
+}
+.perfil-col {
+  flex: 0 0 15%;
+}
+.desc-col {
+  flex: 1 1 auto; 
+}
+.activo-col {
+  flex: 0 0 120px;
+  text-align: center; 
+}
+.actions-col {
+  flex: 0 0 80px;
+  text-align: right; 
+}
+
+// --- Estilos de Badge y Botón de Acción ---
+.badge {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  &.active-minimal {
+    background-color: rgba($color-activo, 0.1);
+    color: $color-activo;
+  }
+  &.inactive-minimal {
+    background-color: rgba($color-inactivo, 0.1);
+    color: $color-inactivo;
+  }
+}
+
+.action-button-minimal {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 1.1rem;
+  padding: 5px;
+  cursor: pointer;
+  transition: color 0.2s;
+  
+  &:hover {
+    color: $color-primario;
+  }
+}
+
+.no-results-minimal {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-style: italic;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
