@@ -1,0 +1,41 @@
+::ng-deep {
+    .mat-mdc-table {
+        background-color: #ffffff !important;
+
+        thead {
+            background-color: #f5f6f9 !important;
+
+            th {
+                border-bottom: 0;
+                color: #2f2f3b;
+                padding: 10px;
+                font-size: 14px;
+                font-weight: 500;
+                border-bottom-color: #e9edf1;
+                cursor: pointer;
+                position: relative;
+            }
+        }
+
+        tbody {
+            td {
+                border-bottom: 1px solid rgba(82, 82, 108, .1);
+                padding: 12px;
+                color: #2f2f3b;
+            }
+        }
+    }
+
+    .mat-mdc-paginator {
+        background-color: #ffffff !important;
+    }
+
+    .perfiles-container {
+        display: flex;
+
+        // A cada avatar que no sea el primero, le aplicamos un margen negativo
+        app-perfil-usuario+app-perfil-usuario {
+            margin-left: -12px;
+        }
+    }
+}

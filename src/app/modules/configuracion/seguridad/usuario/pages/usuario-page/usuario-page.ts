@@ -1,6 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
@@ -8,12 +8,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import { EstadoUsuario } from './components/estado-usuario/estado-usuario';
 import { PerfilUsuario } from './components/perfil-usuario/perfil-usuario';
+import { TableAction, TableGeneric } from '../../../../../../common/components/table-generic/table-generic';
 
 // Interfaces actualizadas
 export interface Perfil {
@@ -47,62 +47,72 @@ const ELEMENT_DATA: Usuario[] = [
     { iIdUsuario: 1, vNombreCompleto: 'Boris Gonzales', vEmail: 'boris.gonzales@example.com', dFechaCreacion: '15 Sep, 2023', aPerfiles: [PERFILES.ADMIN], oEstado: { iIdEstado: 1, vNombreEstado: 'Activo' } },
     { iIdUsuario: 2, vNombreCompleto: 'Ana García', vEmail: 'ana.garcia@example.com', dFechaCreacion: '20 Oct, 2022', aPerfiles: [PERFILES.G_COMERCIAL], oEstado: { iIdEstado: 1, vNombreEstado: 'Activo' } },
     { iIdUsuario: 3, vNombreCompleto: 'Carlos Torres', vEmail: 'carlos.torres@example.com', dFechaCreacion: '05 Ene, 2023', aPerfiles: [PERFILES.J_ALMACEN, PERFILES.J_LOGISTICA], oEstado: { iIdEstado: 2, vNombreEstado: 'Inactivo' } },
-    { iIdUsuario: 4, vNombreCompleto: 'Lucía Mendoza', vEmail: 'lucia.mendoza@example.com', dFechaCreacion: '11 Ago, 2021', aPerfiles: [PERFILES.G_FINANZAS, PERFILES.ADMIN], oEstado: { iIdEstado: 1, vNombreEstado: 'Activo' }},
+    { iIdUsuario: 4, vNombreCompleto: 'Lucía Mendoza', vEmail: 'lucia.mendoza@example.com', dFechaCreacion: '11 Ago, 2021', aPerfiles: [PERFILES.G_FINANZAS, PERFILES.ADMIN], oEstado: { iIdEstado: 1, vNombreEstado: 'Activo' } },
     { iIdUsuario: 5, vNombreCompleto: 'Javier Roca', vEmail: 'javier.roca@example.com', dFechaCreacion: '28 Mar, 2022', aPerfiles: [PERFILES.J_CERT], oEstado: { iIdEstado: 3, vNombreEstado: 'Pendiente' } },
 ];
 
 
 @Component({
-	selector: 'app-usuario-page',
-	imports: [
-		CommonModule
-		, MatTableModule
-		, MatProgressBarModule
-		, MatChipsModule
-		, MatIconModule
-		, MatButtonModule
-		, MatMenuModule
-		, MatFormFieldModule
-		, MatCheckboxModule
-		, MatInputModule
-		, MatPaginatorModule
-		, EstadoUsuario
-		, PerfilUsuario
-	],
-	templateUrl: './usuario-page.html',
-	styleUrl: './usuario-page.scss'
+    selector: 'app-usuario-page',
+    imports: [
+        CommonModule
+        , MatTableModule
+        , MatProgressBarModule
+        , MatChipsModule
+        , MatIconModule
+        , MatButtonModule
+        , MatMenuModule
+        , MatFormFieldModule
+        , MatCheckboxModule
+        , MatInputModule
+        , MatPaginatorModule
+        , EstadoUsuario
+        , PerfilUsuario
+        , TableGeneric
+    ],
+    templateUrl: './usuario-page.html',
+    styleUrl: './usuario-page.scss'
 })
 export class UsuarioPage {
 
-	aDisplayedColumns: string[] = ['select', 'nombre', 'email', 'fechaCreacion', 'perfil', 'estado'];
-    oDataSource = new MatTableDataSource<Usuario>(ELEMENT_DATA);
-    oSelection = new SelectionModel<Usuario>(true, []);
+    // 1. Columnas que se mostrarán (sin la de acciones)
+    aDisplayedColumns: string[] = ['select', 'nombre', 'email', 'fechaCreacion', 'perfil', 'estado'];
 
-    @ViewChild(MatSort) oSort!: MatSort;
-    @ViewChild(MatPaginator) oPaginator!: MatPaginator;
+    // 2. Datos para la tabla
+    data: Usuario[] = ELEMENT_DATA;
 
-	ngAfterViewInit() {
-        this.oDataSource.sort = this.oSort;
-        this.oDataSource.paginator = this.oPaginator;
-    }
+    // 3. Modelo de selección para los checkboxes
+    selection = new SelectionModel<Usuario>(true, []);
 
-    applyFilter(event: Event) {
-        const vFilterValue = (event.target as HTMLInputElement).value;
-        this.oDataSource.filter = vFilterValue.trim().toLowerCase();
-        if (this.oDataSource.paginator) {
-            this.oDataSource.paginator.firstPage();
-        }
-    }
+    // 4. Definición de las acciones para la botonera
+    userActions: TableAction[] = [
+        { name: 'edit', label: 'Editar Usuario', icon: 'edit' },
+        { name: 'delete', label: 'Eliminar Usuario', icon: 'delete' },
+    ];
 
+    // --- Lógica de Selección ---
     isAllSelected() {
-        const iNumSelected = this.oSelection.selected.length;
-        const iNumRows = this.oDataSource.data.length;
-        return iNumSelected === iNumRows;
+        return this.selection.selected.length === this.data.length;
     }
 
     toggleAllRows() {
-        this.isAllSelected() ?
-            this.oSelection.clear() :
-            this.oDataSource.data.forEach(row => this.oSelection.select(row));
+        this.isAllSelected()
+            ? this.selection.clear()
+            : this.data.forEach(row => this.selection.select(row));
+    }
+
+    // --- Manejador de Acciones ---
+    onActionClicked(event: { action: string, element: Usuario }): void {
+        console.log('Acción:', event.action, 'en el elemento:', event.element);
+        switch (event.action) {
+            case 'edit':
+                // Lógica para editar el usuario...
+                alert(`Editando a ${event.element.vNombreCompleto}`);
+                break;
+            case 'delete':
+                // Lógica para eliminar el usuario...
+                alert(`Eliminando a ${event.element.vNombreCompleto}`);
+                break;
+        }
     }
 }
