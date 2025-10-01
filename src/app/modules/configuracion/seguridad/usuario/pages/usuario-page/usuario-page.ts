@@ -103,7 +103,7 @@ export class UsuarioPage {
 
     // --- Manejador de Acciones ---
     onActionClicked(event: { action: string, element: Usuario }): void {
-        console.log('Acción:', event.action, 'en el elemento:', event.element);
+        // console.log('Acción:', event.action, 'en el elemento:', event.element);
         switch (event.action) {
             case 'edit':
                 // Lógica para editar el usuario...

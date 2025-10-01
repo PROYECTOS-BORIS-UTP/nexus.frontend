@@ -27,6 +27,10 @@
             border: none !important;
         }
 
+        .mdc-evolution-chip__action {
+            margin: 0 auto !important;
+        }
+
         &.status-active {
             background-color: var(--status-active-bg) !important;
             .mdc-evolution-chip__text-label{

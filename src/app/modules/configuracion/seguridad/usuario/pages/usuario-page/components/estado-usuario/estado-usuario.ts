@@ -20,7 +20,7 @@ export class EstadoUsuario {
 
 	ngOnChanges() {
 		// Asignamos la clase basándonos en el ID del estado
-		console.log(this.iIdEstado);
+		// console.log(this.iIdEstado);
 		switch (this.iIdEstado) {
 			case 1: // Activo
 				this.vStatusClass = 'status-active';

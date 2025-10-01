@@ -79,7 +79,7 @@ export class PerfilPage {
 
 	// --- Manejador de Acciones ---
 	onActionClicked(event: { action: string, element: Perfil }): void {
-		console.log('Acción:', event.action, 'en el perfil:', event.element);
+		// console.log('Acción:', event.action, 'en el perfil:', event.element);
 		switch (event.action) {
 			case 'edit':
 				alert(`Editando el perfil: ${event.element.vNombrePerfil}`);
