@@ -222,3 +222,11 @@
         transition: all ease 0.3s;
     }
 }
+
+.error-message {
+    color: #f44336; // Rojo de Material Design
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
