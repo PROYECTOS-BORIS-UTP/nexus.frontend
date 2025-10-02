@@ -1,1 +1,60 @@
-<p>usuario-page works!</p>
+<div class="page-container">
+    <div class="controls-container">
+        <mat-form-field appearance="outline" class="search-field">
+            <input matInput (keyup)="table.applyFilter($event)" placeholder="Buscar Usuario">
+        </mat-form-field>
+    </div>
+
+    <app-table-generic
+        #table
+        [data]="data"
+        [displayedColumns]="aDisplayedColumns"
+        [selection]="selection"
+        [actions]="userActions"
+        (actionClicked)="onActionClicked($event)">
+
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+            <td mat-cell *matCellDef="let element"> {{element.vNombreCompleto}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+            <td mat-cell *matCellDef="let element"> {{element.vEmail}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="fechaCreacion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Miembro desde </th>
+            <td mat-cell *matCellDef="let element"> {{element.dFechaCreacion}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="perfil">
+            <th mat-header-cell *matHeaderCellDef> Perfiles </th>
+            <td mat-cell *matCellDef="let element">
+                <div class="perfiles-container">
+                    <app-perfil-usuario *ngFor="let perfil of element.aPerfiles" [oPerfil]="perfil" />
+                </div>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+            <td mat-cell *matCellDef="let element">
+                <app-estado-usuario [iIdEstado]="element.oEstado.iIdEstado" [vNombreEstado]="element.oEstado.vNombreEstado" />
+            </td>
+        </ng-container>
+    </app-table-generic>
+</div>
