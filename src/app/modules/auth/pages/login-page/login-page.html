@@ -30,6 +30,11 @@
 
                 <div class="boxFoot">
                     <a class="forgotLink" href="#">Forget your password?</a>
+                    @if (errorMessage) {
+                        <div class="error-message">
+                            {{ errorMessage }}
+                        </div>
+                    }                    
                     <button mat-flat-button color="primary" class="btnSubmit" (click)="onAuthentication()">
                         Sign In
                     </button>
