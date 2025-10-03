@@ -1,0 +1,79 @@
+.dashboard-container {
+    padding: 20px;
+}
+
+.kpi-card {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(0, 0, 0, 0.1) 5px 9px 24px -9px;
+}
+
+.kpi-icon-container {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+        color: rgb(168, 8, 237);
+    }
+}
+
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0;
+    margin-top: -10px;
+}
+
+.kpi-change {
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    color: #9fa59f;
+
+    mat-icon {
+        font-size: 1em;
+        width: 1em;
+        height: 1em;
+    }
+
+    span {
+        background: #e7faf1;
+        color: #04c46a;
+        font-weight: 500;
+        padding: 1px 4px;
+        border-radius: 13px;
+        margin-right: 5px;
+    }
+}
+
+// --- Nuevos estilos para el calendario ---
+.calendar-section {
+    margin-top: 30px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+
+    h3 {
+        margin: 0;
+        font-size: 1.5em;
+    }
+}
+
+.calendar-nav,
+.calendar-view-select {
+    display: flex;
+    gap: 10px;
+}
+
+// Estilo para el botón de vista activa
+.calendar-view-select .active {
+    background-color: #3f51b5; // Color primario de Angular Material
+    color: white;
+}

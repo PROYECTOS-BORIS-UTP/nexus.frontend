@@ -3,6 +3,7 @@
     <div class="main-content-area">
         <app-navbar />
         <main class="content">
+            <app-breadcrumb [items]="(breadcrumbService.breadcrumbs$ | async)!"></app-breadcrumb>
             <router-outlet></router-outlet>
         </main>
     </div>
