@@ -3,6 +3,13 @@
         <mat-form-field appearance="outline" class="search-field">
             <input matInput (keyup)="table.applyFilter($event)" placeholder="Buscar Usuario">
         </mat-form-field>
+
+        <div class="actions-container">
+            <button mat-raised-button color="primary" (click)="onAddUser()" class="btnAgregar">
+                <mat-icon>add</mat-icon>
+                <span>Agregar Usuario</span>
+            </button>
+        </div>
     </div>
 
     <app-table-generic
