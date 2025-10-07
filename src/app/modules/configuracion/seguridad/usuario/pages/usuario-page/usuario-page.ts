@@ -1,3 +1,4 @@
+
 import { SelectionModel } from '@angular/cdk/collections';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
@@ -14,6 +15,9 @@ import { MatTableModule } from '@angular/material/table';
 import { EstadoUsuario } from './components/estado-usuario/estado-usuario';
 import { PerfilUsuario } from './components/perfil-usuario/perfil-usuario';
 import { TableAction, TableGeneric } from '../../../../../../common/components/table-generic/table-generic';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Confirmacion } from '../../../../../../common/components/dialogs/confirmacion/confirmacion';
+import { UsuarioForm } from './dialogs/usuario-form/usuario-form';
 
 // Interfaces actualizadas
 export interface Perfil {
@@ -52,6 +56,37 @@ const ELEMENT_DATA: Usuario[] = [
 ];
 
 
+export interface Usuario {
+  idUsuario: number;
+  vUsuario: string;
+  bActivo: boolean;
+  idTipoUsuario: number;
+  idPersona: number | null;
+  idTipoPersona: number;
+  bChangePassword: boolean;
+}
+
+const ELEMENT_DATA: Usuario[] = [
+  {
+    idUsuario: 1,
+    vUsuario: 'bestradas',
+    bActivo: true,
+    idTipoUsuario: 1,
+    idPersona: null,
+    idTipoPersona: 1,
+    bChangePassword: false,
+  },
+  {
+    idUsuario: 2,
+    vUsuario: 'admin',
+    bActivo: true,
+    idTipoUsuario: 2,
+    idPersona: 5,
+    idTipoPersona: 1,
+    bChangePassword: true,
+  },
+];
+
 @Component({
     selector: 'app-usuario-page',
     imports: [
@@ -69,26 +104,47 @@ const ELEMENT_DATA: Usuario[] = [
         , EstadoUsuario
         , PerfilUsuario
         , TableGeneric
+        , MatDialogModule
     ],
     templateUrl: './usuario-page.html',
     styleUrl: './usuario-page.scss'
 })
 export class UsuarioPage {
+    displayedColumns: string[] = [
+      'idUsuario',
+      'vUsuario',
+      'bActivo',
+      'idTipoUsuario',
+      'idPersona',
+      'idTipoPersona',
+      'bChangePassword',
+      'acciones'
+    ];
+    dataSource = ELEMENT_DATA;
 
-    // 1. Columnas que se mostrarán (sin la de acciones)
+    clickedRows = new Set<Usuario>();
+
+    editarUsuario(user: any) {
+    console.log('Editando usuario:', user);
+
+    // modal
+    // Columnas que se mostrarán (sin la de acciones)
     aDisplayedColumns: string[] = ['select', 'nombre', 'email', 'fechaCreacion', 'perfil', 'estado'];
 
-    // 2. Datos para la tabla
+    // Datos para la tabla
     data: Usuario[] = ELEMENT_DATA;
 
-    // 3. Modelo de selección para los checkboxes
+    // Modelo de selección para los checkboxes
     selection = new SelectionModel<Usuario>(true, []);
 
-    // 4. Definición de las acciones para la botonera
+    // Definición de las acciones para la botonera
     userActions: TableAction[] = [
         { name: 'edit', label: 'Editar Usuario', icon: 'edit' },
         { name: 'delete', label: 'Eliminar Usuario', icon: 'delete' },
     ];
+
+
+    constructor(public dialog: MatDialog) { }
 
     // --- Lógica de Selección ---
     isAllSelected() {
@@ -103,16 +159,72 @@ export class UsuarioPage {
 
     // --- Manejador de Acciones ---
     onActionClicked(event: { action: string, element: Usuario }): void {
-        // console.log('Acción:', event.action, 'en el elemento:', event.element);
         switch (event.action) {
             case 'edit':
                 // Lógica para editar el usuario...
-                alert(`Editando a ${event.element.vNombreCompleto}`);
+                this.onEditUser(event.element);
                 break;
             case 'delete':
                 // Lógica para eliminar el usuario...
-                alert(`Eliminando a ${event.element.vNombreCompleto}`);
+                this.onDeleteUser(event.element);
                 break;
         }
+    }
+
+    onAddUser(): void {
+        const dialogRef = this.dialog.open(UsuarioForm, {
+            width: '500px',
+            disableClose: true, // Evita que se cierre al hacer clic afuera
+            data: {} // No pasamos datos de usuario porque es nuevo
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                console.log('Nuevo usuario a crear:', result);
+                // AQUÍ VA TU LÓGICA:
+                // 1. Llama a tu servicio para guardar el nuevo usuario en el backend.
+                // 2. Si es exitoso, actualiza la tabla (this.data).
+                alert('Usuario creado (simulado)');
+            }
+        });
+    }
+
+    onEditUser(usuario: Usuario): void {
+        const dialogRef = this.dialog.open(UsuarioForm, {
+            width: '500px',
+            disableClose: true,
+            data: { usuario: usuario } // Pasamos los datos del usuario para llenar el form
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                console.log('Usuario a actualizar:', result);
+                // AQUÍ VA TU LÓGICA:
+                // 1. Llama a tu servicio para actualizar el usuario en el backend.
+                // 2. Si es exitoso, actualiza la fila correspondiente en la tabla.
+                alert(`Editando a ${usuario.vNombreCompleto}`);
+            }
+        });
+    }
+
+    onDeleteUser(usuario: Usuario): void {
+        const dialogRef = this.dialog.open(Confirmacion, {
+            width: '400px',
+            data: {
+                titulo: 'Confirmar Eliminación',
+                mensaje: `¿Estás seguro de que deseas eliminar a "${usuario.vNombreCompleto}"?`,
+                mostrarCampoObservacion: true
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result && result.confirmado) {
+                console.log('Observación:', result.observacion);
+                // AQUÍ VA TU LÓGICA:
+                // 1. Llama a tu servicio para eliminar el usuario, pasando el ID y la observación.
+                // 2. Si es exitoso, quita el elemento de la tabla.
+                alert(`Eliminando a ${usuario.vNombreCompleto} por: ${result.observacion}`);
+            }
+        });
     }
 }

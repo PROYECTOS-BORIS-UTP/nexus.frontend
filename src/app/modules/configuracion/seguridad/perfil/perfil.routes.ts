@@ -5,5 +5,6 @@ export const PERFIL_ROUTES: Routes = [
     {
         path: ''
         ,component: PerfilPage
+        ,data: { breadcrumb: 'Perfiles', icon: 'badge' }
     }
 ];

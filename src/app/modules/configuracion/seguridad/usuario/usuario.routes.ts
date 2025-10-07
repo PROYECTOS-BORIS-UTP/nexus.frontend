@@ -5,5 +5,6 @@ export const USUARIO_ROUTES: Routes = [
     {
         path: ''
         ,component: UsuarioPage
+        , data: { breadcrumb: 'Usuarios', icon: 'group' }
     }
 ];

@@ -16,16 +16,19 @@ export const routes: Routes = [
         path: 'dashboard'
         ,children: MAIN_ROUTES
         ,canActivate: [ authGuard ]
+        , data: { breadcrumb: 'Dashboard', icon: 'dashboard' }
     },
     {
         path: 'seguridad'
         ,children: SEGURIDAD_ROUTES
         ,canActivate: [ authGuard ]
+        , data: { breadcrumb: 'Configuración', icon: 'settings' } 
     },
     {
         path: 'maestras'
         ,children: MAESTRAS_ROUTES
         ,canActivate: [ authGuard ]
+        , data: { breadcrumb: 'Configuración', icon: 'settings' } 
     },
     { path: '', redirectTo: '', pathMatch: 'full' },
     { path: '**', redirectTo: '' }

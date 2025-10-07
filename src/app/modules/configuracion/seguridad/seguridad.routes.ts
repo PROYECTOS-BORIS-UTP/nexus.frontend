@@ -11,10 +11,12 @@ export const SEGURIDAD_ROUTES: Routes = [
             {
                 path: 'usuario'
                 , children: USUARIO_ROUTES
+                , data: { breadcrumb: 'Seguridad', icon: 'security' }
             },
             {
                 path: 'perfil'
                 , children: PERFIL_ROUTES
+                , data: { breadcrumb: 'Seguridad', icon: 'security' }
             },
         ],
     }

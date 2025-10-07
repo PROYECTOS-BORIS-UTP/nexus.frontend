@@ -1,1 +1,61 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+    <mat-grid-list cols="4" rowHeight="150px" gutterSize="20px">
+        <mat-grid-tile *ngFor="let card of kpiCards">
+            <mat-card class="kpi-card">
+                <mat-card-header>
+                    <div mat-card-avatar class="kpi-icon-container">
+                        <mat-icon>{{card.icon}}</mat-icon>
+                    </div>
+                    <mat-card-title>{{card.title}}</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <p class="kpi-value">{{card.value}}</p>
+                    <p class="kpi-change">                        
+                        <span>
+                            <mat-icon>{{card.isPositive ? 'arrow_upward' : 'arrow_downward'}}</mat-icon> {{card.change | number:'1.2-2'}}%
+                        </span> en los últimos 30 días
+                    </p>
+                </mat-card-content>
+            </mat-card>
+        </mat-grid-tile>
+    </mat-grid-list>
+
+
+    <div class="calendar-section">
+        <div class="calendar-header">
+            <div class="calendar-nav">
+                <button mat-icon-button mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate">
+                    <mat-icon>chevron_left</mat-icon>
+                </button>
+                <button mat-stroked-button mwlCalendarToday [(viewDate)]="viewDate">Hoy</button>
+                <button mat-icon-button mwlCalendarNextView [view]="view" [(viewDate)]="viewDate">
+                    <mat-icon>chevron_right</mat-icon>
+                </button>
+            </div>
+
+            <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):'es' }}</h3>
+
+            <div class="calendar-view-select">
+                <button mat-stroked-button (click)="setView(CalendarView.Month)"
+                    [class.active]="view === CalendarView.Month">Mes</button>
+                <button mat-stroked-button (click)="setView(CalendarView.Week)"
+                    [class.active]="view === CalendarView.Week">Semana</button>
+                <button mat-stroked-button (click)="setView(CalendarView.Day)"
+                    [class.active]="view === CalendarView.Day">Día</button>
+            </div>
+        </div>
+
+        @switch (view) {
+            @case (CalendarView.Month) {
+                <mwl-calendar-month-view [viewDate]="viewDate" [events]="events" />
+            }
+            @case (CalendarView.Week) {
+                <mwl-calendar-week-view [viewDate]="viewDate" [events]="events" />
+            }
+            @case (CalendarView.Day) {
+                <mwl-calendar-day-view [viewDate]="viewDate" [events]="events" />
+            }
+        }
+    </div>
+
+</div>

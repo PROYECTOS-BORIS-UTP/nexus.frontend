@@ -1,0 +1,26 @@
+<nav class="breadcrumb-nav">
+    <ol class="breadcrumb-list">
+        <li *ngFor="let item of items; let last = last" class="breadcrumb-item" [class.active]="last">
+
+            @if (item.link && !last) {
+            <a [routerLink]="item.link" class="breadcrumb-link">
+                <div class="icon-wrapper">
+                    <mat-icon>{{ item.icon }}</mat-icon>
+                </div>
+                <span>{{ item.label }}</span>
+            </a>
+            } @else {
+            <span class="breadcrumb-text">
+                <div class="icon-wrapper">
+                    <mat-icon>{{ item.icon }}</mat-icon>
+                </div>
+                <span>{{ item.label }}</span>
+            </span>
+            }
+
+            @if (!last) {
+            <div class="separator"></div>
+            }
+        </li>
+    </ol>
+</nav>
