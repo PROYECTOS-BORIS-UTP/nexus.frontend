@@ -1,3 +1,4 @@
+
 import { SelectionModel } from '@angular/cdk/collections';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
@@ -55,6 +56,37 @@ const ELEMENT_DATA: Usuario[] = [
 ];
 
 
+export interface Usuario {
+  idUsuario: number;
+  vUsuario: string;
+  bActivo: boolean;
+  idTipoUsuario: number;
+  idPersona: number | null;
+  idTipoPersona: number;
+  bChangePassword: boolean;
+}
+
+const ELEMENT_DATA: Usuario[] = [
+  {
+    idUsuario: 1,
+    vUsuario: 'bestradas',
+    bActivo: true,
+    idTipoUsuario: 1,
+    idPersona: null,
+    idTipoPersona: 1,
+    bChangePassword: false,
+  },
+  {
+    idUsuario: 2,
+    vUsuario: 'admin',
+    bActivo: true,
+    idTipoUsuario: 2,
+    idPersona: 5,
+    idTipoPersona: 1,
+    bChangePassword: true,
+  },
+];
+
 @Component({
     selector: 'app-usuario-page',
     imports: [
@@ -78,7 +110,24 @@ const ELEMENT_DATA: Usuario[] = [
     styleUrl: './usuario-page.scss'
 })
 export class UsuarioPage {
+    displayedColumns: string[] = [
+      'idUsuario',
+      'vUsuario',
+      'bActivo',
+      'idTipoUsuario',
+      'idPersona',
+      'idTipoPersona',
+      'bChangePassword',
+      'acciones'
+    ];
+    dataSource = ELEMENT_DATA;
 
+    clickedRows = new Set<Usuario>();
+
+    editarUsuario(user: any) {
+    console.log('Editando usuario:', user);
+
+    // modal
     // Columnas que se mostrarán (sin la de acciones)
     aDisplayedColumns: string[] = ['select', 'nombre', 'email', 'fechaCreacion', 'perfil', 'estado'];
 
