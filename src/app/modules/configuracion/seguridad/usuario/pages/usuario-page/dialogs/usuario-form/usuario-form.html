@@ -1,0 +1,21 @@
+<h1 mat-dialog-title>{{ titulo }}</h1>
+
+<div mat-dialog-content [formGroup]="usuarioForm">
+    <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Nombre Completo</mat-label>
+        <input matInput formControlName="vNombreCompleto" placeholder="Ingrese el nombre">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full mt-4">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="vEmail" placeholder="Ingrese el correo electrónico">
+    </mat-form-field>
+
+</div>
+
+<div mat-dialog-actions align="end">
+    <button mat-button (click)="onCancelar()">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="onGuardar()" [disabled]="!usuarioForm.valid">
+        {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+    </button>
+</div>

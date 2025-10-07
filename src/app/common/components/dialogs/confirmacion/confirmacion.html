@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>{{ data.titulo }}</h1>
+
+<div mat-dialog-content>
+    <p>{{ data.mensaje }}</p>
+
+    <mat-form-field *ngIf="data.mostrarCampoObservacion" appearance="outline" class="w-full mt-4">
+        <mat-label>Observación (Motivo)</mat-label>
+        <textarea matInput [formControl]="observacionControl" placeholder="Escriba el motivo..."></textarea>
+    </mat-form-field>
+</div>
+
+<div mat-dialog-actions align="end">
+    <button mat-button (click)="onCancelar()">Cancelar</button>
+    <button mat-raised-button color="warn" (click)="onConfirmar()">Confirmar</button>
+</div>
