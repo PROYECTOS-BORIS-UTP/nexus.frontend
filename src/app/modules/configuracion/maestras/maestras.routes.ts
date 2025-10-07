@@ -10,6 +10,7 @@ export const MAESTRAS_ROUTES: Routes = [
             {
                 path: 'persona'
                 , children: PERSONA_ROUTES
+                , data: { breadcrumb: 'Persona', icon: 'person' }
             },
         ],
     }

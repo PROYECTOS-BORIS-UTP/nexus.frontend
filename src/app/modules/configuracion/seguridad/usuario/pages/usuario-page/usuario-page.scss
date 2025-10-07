@@ -1,229 +1,39 @@
-// Paleta personalizada
-$primary-purple: #2b0053;
-$secondary-purple: #4907b4;
-$terceary-purple: #5d05ff;
-
-$primary-sub: #6a1b9a;
-$secondary-sub: #9c27b0;
-
-$light-purple: #9d7fc4;
-$white: #ffffff;
-$text-dark: #333;
-
-//Encabezado
-.Encabezado {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 18px 22px;
-  background: $light-purple;
-  border-radius: 12px;
-  margin-bottom: 10px;
-  box-shadow: 0 3px 10px rgba($primary-purple, 0.12);
-  width: 180px;
-
-  span {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: $primary-purple;
-  }
-
-  mat-icon {
-    font-size: 28px;
-    color: $secondary-purple;
-  }
-}
-
-//subEncabezado
-.SubEncabezado {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.95rem;
-  color: $primary-sub;
-  background: linear-gradient(90deg, rgba(106, 27, 154, 0.08), rgba(167, 112, 239, 0.12));
-  padding: 14px 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(106, 27, 154, 0.12);
-  width: 500px;
-
-  span {
-    font-weight: 500;
-    color: $primary-purple;
-  }
-
-  mat-icon {
-    font-size: 18px;
-    color: $primary-sub;
-    vertical-align: middle;
-    transition: transform 0.2s ease, color 0.2s ease;
-
-    &:hover {
-      color: $secondary-sub;
-      transform: scale(1.2);
-    }
-  }
-
-  // separador con chevron_right más suave
-  mat-icon[svgicon='chevron_right'],
-  mat-icon:contains('chevron_right') {
-    font-size: 16px;
-    color: $light-purple;
-    margin: 0 4px;
-    transform: scale(1); // sin hover
-  }
-}
-
-
-//BUSCAR
-.Buscar_Filtro {
+.controls-container {
     display: flex;
+    justify-content: space-between; // Esto alinea los elementos a los extremos
     align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    background: $light-purple;
-    border-radius: 8px;
-    margin: 10px 0;
-    box-shadow: 0 2px 6px rgba($primary-purple, 0.1);
-    width: 500px;
+    padding: 16px 0; // Añade un poco de espacio vertical
+    flex-wrap: wrap; // Permite que los elementos pasen a la siguiente línea en pantallas pequeñas
+    gap: 16px; // Espacio entre el buscador y los botones
+}
 
-    label {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: $primary-purple;
+.search-field {
+    flex: 1 1 3.00px; // Permite que el campo de búsqueda crezca pero tenga una base de 300px
+
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper, .mat-mdc-form-field-bottom-align::before{
+        display: none !important;
     }
+}
 
-    input {
-      flex: 1;
-      padding: 6px 10px;
-      border: 1px solid $secondary-purple;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      color: $primary-purple;
-      outline: none;
-      transition: all 0.2s ease-in-out;
+.actions-container {
+    display: flex;
+    gap: 7px;
 
-      &::placeholder {
-        color: rgba($secondary-purple, 0.6);
-      }
+    .btnAgregar {
+        // 2. AGRANDAR EL BOTÓN:
+        // Aumentamos el padding horizontal (el segundo valor) para darle más espacio.
+        padding: 0 32px !important;
 
-      &:focus {
-        border-color: $primary-purple;
-        box-shadow: 0 0 4px rgba($primary-purple, 0.4);
-      }
+        // También puedes establecer un ancho mínimo si prefieres un tamaño más consistente.
+        min-width: 250px;
+
+        height: 48px;
+        font-size: 15px;
+
+        .mat-icon {
+            height: 22px;
+            width: 22px;
+            font-size: 22px;
+        }
     }
-  }
-
-//mixins
-@mixin gradient-bg($colors...) {
-  background: linear-gradient(80deg, $colors);
-}
-
-@mixin soft-shadow($color, $opacity: 0.15) {
-  box-shadow: 0 4px 12px rgba($color, $opacity);
-}
-
-@mixin transition-ease {
-  transition: all 0.25s ease;
-}
-
-@mixin hover-zoom($scale: 1.05, $color: null) {
-  &:hover {
-    transform: scale($scale);
-    @if $color != null {
-      color: $color;
-    }
-  }
-}
-
-// Tabla
-.demo-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 12px;
-  font-family: 'Poppins', sans-serif;
-}
-
-.mat-mdc-table {
-  background: transparent;
-}
-
-.mat-mdc-header-row {
-  @include gradient-bg($primary-purple, $secondary-purple, $terceary-purple);
-  color: $white;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 1px;
-  border-radius: 12px;
-}
-
-.mat-mdc-header-cell {
-  padding: 16px;
-  border: none;
-}
-
-.mat-mdc-row {
-  background: $white;
-  border-radius: 14px;
-  @include soft-shadow($primary-purple, 0.12);
-  @include transition-ease;
-  overflow: hidden;
-
-  &:hover {
-    transform: translateY(-3px) scale(1.01);
-    @include soft-shadow($primary-purple, 0.25);
-    cursor: pointer;
-  }
-}
-
-.mat-mdc-cell {
-  padding: 16px 20px;
-  font-size: 0.95rem;
-  color: $text-dark;
-  border: none;
-}
-
-.demo-row-is-clicked {
-  @include gradient-bg(rgba($secondary-purple, 0.1), rgba($terceary-purple, 0.15));
-  font-weight: bold;
-  border-left: 5px solid $secondary-purple;
-  box-shadow: inset 4px 0 12px rgba($terceary-purple, 0.25);
-}
-
-h3 {
-  color: $primary-purple;
-  margin-top: 20px;
-  font-weight: 600;
-}
-
-ul {
-  list-style: none;
-  padding-left: 0;
-
-  li {
-    @include gradient-bg(rgba($primary-purple, 0.12), rgba($secondary-purple, 0.18));
-    color: $primary-purple;
-    margin: 6px 0;
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    @include soft-shadow($primary-purple);
-  }
-}
-
-//  Boton con icono
-button[mat-icon-button] {
-  color: $secondary-purple;
-  transition: transform 0.2s ease, color 0.2s ease;
-
-  @include hover-zoom(1.2, $terceary-purple);
-}
-
-.mat-icon {
-  font-size: 20px;
 }
