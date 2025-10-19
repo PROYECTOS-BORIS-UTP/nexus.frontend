@@ -1,1 +1,76 @@
-<p>compania-page works!</p>
+<div class="page-container">
+    <h1 class="page-title">Gestión de Compañías</h1> <div class="controls-container">
+        <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar Compañía</mat-label>
+            <input
+                matInput
+                (keyup)="table.applyFilter($event)"
+                placeholder="Buscar por RUC o Razón Social"
+                aria-label="Campo de búsqueda de compañías"
+            />
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="actions-container">
+            <button mat-raised-button color="primary" (click)="onAddCompania()" class="btn-agregar">
+                <mat-icon>add</mat-icon>
+                <span>Agregar Compañía</span>
+            </button>
+        </div>
+    </div>
+
+    <app-table-generic
+        #table
+        [data]="data"
+        [displayedColumns]="aDisplayedColumns"
+        [selection]="selection"
+        [actions]="companiaActions" (actionClicked)="onActionClicked($event)">
+
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="codigo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Código </th>
+            <td mat-cell *matCellDef="let element"> {{element.vCodigo}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="ruc">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> RUC </th>
+            <td mat-cell *matCellDef="let element"> {{element.vRUC}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="razonSocial">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Razón Social </th>
+            <td mat-cell *matCellDef="let element"> {{element.vRazonSocial}} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="direccion">
+            <th mat-header-cell *matHeaderCellDef> Dirección </th>
+            <td mat-cell *matCellDef="let element"> {{element.vDireccion}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+            <td mat-cell *matCellDef="let element">
+                <mat-chip-row
+                    [color]="element.bActivo ? 'primary' : 'warn'"
+                    [highlighted]="true"
+                    class="status-chip"
+                >
+                    {{ element.bActivo ? 'Activo' : 'Inactivo' }}
+                </mat-chip-row>
+            </td>
+        </ng-container>
+        
+        </app-table-generic>
+</div>
