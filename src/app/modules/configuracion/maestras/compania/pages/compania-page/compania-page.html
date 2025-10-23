@@ -1,4 +1,3 @@
-
 <div class="page-container">
   <div class="controls-container">
     <mat-form-field appearance="outline" class="search-field">
@@ -6,16 +5,16 @@
       <input
         matInput
         (keyup)="table.applyFilter($event)"
-        placeholder="Buscar por DNI o Nombre completos"
-        aria-label="Campo de búsqueda de persona"
+        placeholder="Buscar por RUC o Razón Social"
+        aria-label="Campo de búsqueda de compañías"
       />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
 
     <div class="actions-container">
-      <button mat-raised-button color="primary" (click)="onAddPersona()" class="btn-agregar">
+      <button mat-raised-button color="primary" (click)="onAddCompania()" class="btn-agregar">
         <mat-icon>add</mat-icon>
-        <span>Agregar Persona</span>
+        <span>Agregar Compañía</span>
       </button>
     </div>
   </div>
@@ -25,7 +24,7 @@
     [data]="data"
     [displayedColumns]="aDisplayedColumns"
     [selection]="selection"
-    [actions]="personaActions"
+    [actions]="companiaActions"
     (actionClicked)="onActionClicked($event)"
   >
     <ng-container matColumnDef="select">
@@ -46,39 +45,34 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="nombrecompleto">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre Completo </th>
-      <td mat-cell *matCellDef="let element">{{ element.vNombreCompleto }}</td>
+    <ng-container matColumnDef="codigo">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Código</th>
+      <td mat-cell *matCellDef="let element">{{ element.vCodigo }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="dni">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>DNI</th>
-      <td mat-cell *matCellDef="let element">{{ element.vDNI }}</td>
+    <ng-container matColumnDef="ruc">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>RUC</th>
+      <td mat-cell *matCellDef="let element">{{ element.vRUC }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="fechaNacimiento">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha De Nacimiento</th>
-      <td mat-cell *matCellDef="let element">{{ element.dFechaNacimiento | date:'dd/MM/yyyy' }}</td>
+    <ng-container matColumnDef="razonSocial">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Razón Social</th>
+      <td mat-cell *matCellDef="let element">{{ element.vRazonSocial }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="correo">
-      <th mat-header-cell *matHeaderCellDef>Correo</th>
-      <td mat-cell *matCellDef="let element">{{ element.vCorreo }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="celular">
-      <th mat-header-cell *matHeaderCellDef>Celular</th>
-      <td mat-cell *matCellDef="let element">{{ element.vCelular1 }}</td>
+    <ng-container matColumnDef="direccion">
+      <th mat-header-cell *matHeaderCellDef>Dirección</th>
+      <td mat-cell *matCellDef="let element">{{ element.vDireccion }}</td>
     </ng-container>
 
     <ng-container matColumnDef="estado">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
       <td mat-cell *matCellDef="let element" class="estado-cell">
-        <app-estado-persona
+        <app-estado-compania
           [iIdEstado]="element.bActivo.iIdEstado"
           [vNombreEstado]="element.bActivo.vNombreEstado"
         >
-        </app-estado-persona>
+        </app-estado-compania>
       </td>
     </ng-container>
   </app-table-generic>

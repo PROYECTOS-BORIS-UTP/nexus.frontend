@@ -14,70 +14,25 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { Confirmacion } from '../../../../../../common/components/dialogs/confirmacion/confirmacion';
-import { PersonaForm } from './dialogs/persona-form/persona-form';
-import { EstadoPersona } from "./components/estado-persona/estado-persona";
+import { CompaniaForm } from './dialogs/compania-form/compania-form';
+import { EstadoCompania } from "./components/estado-compania/estado-compania";
 
 // Definición de la Interfaz Compañía 
-export interface Persona {
-    iIdPersona: number;
-    vNombreCompleto: string;
-    vDNI: string;
-    dFechaNacimiento: Date;
-    vCorreo: string;
-    vCelular1: String;
+export interface Compania {
+    iIdCompania: number;
+    vCodigo: string;
+    vRUC: string;
+    vRazonSocial: string;
     bActivo: { iIdEstado: number, vNombreEstado: 'Activo' | 'Inactivo'};
-
+    vDireccion: string;
 }
 
 // Datos de ejemplo
-const ELEMENT_DATA: Persona[] = [
-  {
-    iIdPersona: 1,
-    vNombreCompleto: 'Juan Rodriguez',
-    vDNI: '78452691',
-    dFechaNacimiento: new Date('1985-05-15'),
-    vCorreo: 'juanrodri@gmail.com',
-    vCelular1: '989412434',
-    bActivo: { iIdEstado: 2, vNombreEstado: 'Inactivo' },
-  },
-  {
-    iIdPersona: 2,
-    vNombreCompleto: 'Lucero Mendoza',
-    vDNI: '12525412',
-    dFechaNacimiento: new Date('1975-09-25'),
-    vCorreo: 'lucero.mendoza@gmail.com',
-    vCelular1: '987654321',
-    bActivo: { iIdEstado: 1, vNombreEstado: 'Activo' },
-  },
-  {
-    iIdPersona: 3,
-    vNombreCompleto: 'Tito Lara',
-    vDNI: '26343249',
-    dFechaNacimiento: new Date('1999-12-11'),
-    vCorreo: 'tito.lara@gmail.com',
-    vCelular1: '944123987',
-    bActivo: { iIdEstado: 2, vNombreEstado: 'Inactivo' },
-  },
-  {
-    iIdPersona: 4,
-    vNombreCompleto: 'Miguel Ignacio',
-    vDNI: '21425446',
-    dFechaNacimiento: new Date('2000-05-10'),
-    vCorreo: 'miguel.ignacio@gmail.com',
-    vCelular1: '955321654',
-    bActivo: { iIdEstado: 2, vNombreEstado: 'Inactivo' },
-  },
-  {
-    iIdPersona: 5,
-    vNombreCompleto: 'Michael Jackson',
-    vDNI: '11346374',
-    dFechaNacimiento: new Date('1980-08-19'),
-    vCorreo: 'michael.jackson@gmail.com',
-    vCelular1: '912345678',
-    bActivo: { iIdEstado: 1, vNombreEstado: 'Activo' },
-  },
+const ELEMENT_DATA: Compania[] = [
+    { iIdCompania: 1, vCodigo: '001', vRUC: '20123456781', vRazonSocial: 'Soluciones Globales S.A.C.', bActivo: {iIdEstado:1, vNombreEstado:'Activo'}, vDireccion: 'Av. Javier Prado 123' },
+    { iIdCompania: 2, vCodigo: '002', vRUC: '20987654321', vRazonSocial: 'Tecnología Integral E.I.R.L.', bActivo: {iIdEstado: 1, vNombreEstado:'Activo'}, vDireccion: 'Jr. Los Girasoles 456' },
+    { iIdCompania: 3, vCodigo: '003', vRUC: '10112233445', vRazonSocial: 'Inversiones Omega', bActivo: {iIdEstado: 2, vNombreEstado:'Inactivo'}, vDireccion: 'Calle Falsa 123' }
 ];
-
 
 @Component({
     selector: 'app-compania-page',
@@ -95,26 +50,26 @@ const ELEMENT_DATA: Persona[] = [
     MatInputModule,
     MatPaginatorModule,
     TableGeneric,
-    EstadoPersona
+    EstadoCompania
 ],
-    templateUrl: './persona-page.html',
-    styleUrl: './persona-page.scss'
+    templateUrl: './compania-page.html',
+    styleUrl: './compania-page.scss'
 })
-export class PersonaPage {
-// Columnas que se mostrarán.
+export class CompaniaPage {
+    // Columnas que se mostrarán.
    
-    aDisplayedColumns: string[] = ['select', 'nombrecompleto', 'dni', 'fechaNacimiento', 'correo', 'celular','estado'];
+    aDisplayedColumns: string[] = ['select', 'codigo', 'ruc', 'razonSocial', 'direccion', 'estado'];
 
     // Datos para la tabla
-    data: Persona[] = ELEMENT_DATA;
+    data: Compania[] = ELEMENT_DATA;
 
     // Modelo de selección para los checkboxes
-    selection = new SelectionModel<Persona>(true, []);
+    selection = new SelectionModel<Compania>(true, []);
 
     // Definición de las acciones para la botonera
-    personaActions: TableAction[] = [
-        { name: 'edit', label: 'Editar Persona', icon: 'edit' },
-        { name: 'delete', label: 'Eliminar Persona', icon: 'delete' },
+    companiaActions: TableAction[] = [
+        { name: 'edit', label: 'Editar Compañía', icon: 'edit' },
+        { name: 'delete', label: 'Eliminar Compañía', icon: 'delete' },
     ];
 
     constructor(public dialog: MatDialog) { }
@@ -131,22 +86,22 @@ export class PersonaPage {
     }
 
     // --- Manejador de Acciones ---
-    onActionClicked(event: { action: string, element:Persona }): void {
+    onActionClicked(event: { action: string, element: Compania }): void {
         switch (event.action) {
             case 'edit':
                 // Lógica para editar la compañía
-                this.onEditPersona(event.element);
+                this.onEditCompania(event.element);
                 break;
             case 'delete':
                 // Lógica para eliminar la compañía
-                this.onDeletePersona(event.element);
+                this.onDeleteCompania(event.element);
                 break;
         }
     }
 
-    onAddPersona(): void {
+    onAddCompania(): void {
         
-        const dialogRef = this.dialog.open(PersonaForm, {
+        const dialogRef = this.dialog.open(CompaniaForm, {
             width: '500px',
             disableClose: true,
             data: {} // Compañía nueva
@@ -154,33 +109,33 @@ export class PersonaPage {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                console.log('Nueva persona a crear:', result);
-                alert('Persona creada (simulado)');
+                console.log('Nueva compania a crear:', result);
+                alert('Compañía creada (simulado)');
             }
         });
     }
 
-    onEditPersona(persona: Persona): void {
-        const dialogRef = this.dialog.open(PersonaForm, {
+    onEditCompania(compania: Compania): void {
+        const dialogRef = this.dialog.open(CompaniaForm, {
             width: '500px',
             disableClose: true,
-            data: { persona: persona } // Pasamos los datos de la compañía para editar
+            data: { compania: compania } // Pasamos los datos de la compañía para editar
         });
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                console.log('Persona a actualizar:', result);
-                alert(`Editando a ${persona.vDNI}`);
+                console.log('Compania a actualizar:', result);
+                alert(`Editando a ${compania.vRazonSocial}`);
             }
         });
     }
 
-    onDeletePersona(compania: Persona): void {
+    onDeleteCompania(compania: Compania): void {
         const dialogRef = this.dialog.open(Confirmacion, {
             width: '400px',
             data: {
                 titulo: 'Confirmar Eliminación',
-                mensaje: `¿Estás seguro de que deseas eliminar la compañía "${compania.vDNI}"?`,
+                mensaje: `¿Estás seguro de que deseas eliminar la compañía "${compania.vRazonSocial}"?`,
                 mostrarCampoObservacion: true
             }
         });
@@ -188,7 +143,7 @@ export class PersonaPage {
         dialogRef.afterClosed().subscribe(result => {
             if (result && result.confirmado) {
                 console.log('Observación:', result.observacion);
-                alert(`Eliminando a ${compania.vDNI} por: ${result.observacion}`);
+                alert(`Eliminando a ${compania.vRazonSocial} por: ${result.observacion}`);
             }
         });
     }
