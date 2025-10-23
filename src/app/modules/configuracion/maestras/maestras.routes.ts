@@ -1,18 +1,21 @@
 import { Routes } from '@angular/router';
 import { Layout } from '../../../layout/layout';
-import { PERSONA_ROUTES } from './persona/persona.routes';
-
+import{COMPANIA_ROUTES} from './compania/compania.routes';
+import { PERSONA_ROUTES } from './persona/pages/persona-page/persona.routes';
 
 export const MAESTRAS_ROUTES: Routes = [
     {   
         path: ''
         ,component: Layout
         , children: [
-            {
-                path: 'persona'
-                , children: PERSONA_ROUTES
-                , data: { breadcrumb: 'Persona', icon: 'person' }
+            {    path: 'compania'
+                , children: COMPANIA_ROUTES
+                , data: { breadcrumb: 'Maestras', icon: 'woman' }
             },
+            {    path: 'persona'
+                , children: PERSONA_ROUTES
+                , data: { breadcrumb: 'Maestras', icon: 'woman' }
+            }
         ],
     }
 ];
