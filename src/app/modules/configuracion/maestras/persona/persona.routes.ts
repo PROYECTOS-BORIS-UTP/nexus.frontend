@@ -5,5 +5,6 @@ export const PERSONA_ROUTES: Routes = [
     {
         path: ''
         ,component: PersonaPage
+        ,data: { breadcrumb: 'Persona', icon: 'person' }
     }
 ];
