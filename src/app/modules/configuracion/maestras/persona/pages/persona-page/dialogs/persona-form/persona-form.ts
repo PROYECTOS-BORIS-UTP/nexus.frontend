@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Persona } from '../../persona-page';
+import { IPersonaResponse } from '../../../../interfaces/response/IPersonaResponse.interface';
 
 @Component({
   selector: 'app-persona-form',
@@ -29,7 +29,7 @@ export class PersonaForm {
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<PersonaForm>,
     // Inyectamos los datos que vienen desde el componente padre
-    @Inject(MAT_DIALOG_DATA) public data: { persona?: Persona }
+    @Inject(MAT_DIALOG_DATA) public data: { persona?: IPersonaResponse }
   ) {
     this.isEditMode = !!this.data.persona;
     this.titulo = this.isEditMode ? 'Editar Persona' : 'Agregar Nueva Persona';
