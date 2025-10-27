@@ -4,7 +4,7 @@ import { AfterContentInit, AfterViewInit, Component, ContentChildren, EventEmitt
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatTableModule, MatTableDataSource, MatColumnDef, MatTable } from '@angular/material/table';
 
@@ -23,20 +23,26 @@ export interface TableAction {
 	templateUrl: './table-generic.html',
 	styleUrl: './table-generic.scss'
 })
-export class TableGeneric implements OnChanges, AfterContentInit, AfterViewInit{
+export class TableGeneric<T> implements OnChanges, AfterContentInit, AfterViewInit {
 	@Input() data: any[] = [];
 	@Input() displayedColumns: string[] = [];
 	@Input() actions: TableAction[] = [];
 	@Input() selection?: SelectionModel<any>;
 
+	@Input() totalRecords: number = 0;
+	@Input() pageSizeOptions: number[] = [5, 10, 15];
+	@Input() initialPageSize: number = 5;
+
+
 	@Output() actionClicked = new EventEmitter<{ action: string, element: any }>();
+	@Output() pageChange = new EventEmitter<PageEvent>();
 
 	dataSource = new MatTableDataSource<any>();
 	internalDisplayedColumns: string[] = [];
 
 	@ViewChild(MatPaginator) paginator!: MatPaginator;
 	@ViewChild(MatSort) sort!: MatSort;
-	@ViewChild(MatTable, { static: true }) table!: MatTable<any>; // Referencia a la tabla
+	@ViewChild(MatTable, { static: true }) table!: MatTable<T>; // Referencia a la tabla
 
 	@ContentChildren(MatColumnDef) columnDefs!: QueryList<MatColumnDef>; // Referencia a las columnas proyectadas
 
@@ -51,8 +57,6 @@ export class TableGeneric implements OnChanges, AfterContentInit, AfterViewInit{
 
 	// Este hook se ejecuta cuando el contenido proyectado está listo.
 	ngAfterContentInit(): void {
-		// Registramos explícitamente cada definición de columna en la tabla.
-		// ESTO RESUELVE EL ERROR "Could not find column with id".
 		this.columnDefs.forEach(columnDef => {
 			this.table.addColumnDef(columnDef);
 		});
@@ -60,19 +64,29 @@ export class TableGeneric implements OnChanges, AfterContentInit, AfterViewInit{
 
 	// Este hook se ejecuta cuando la vista del componente está lista.
 	ngAfterViewInit(): void {
-		this.dataSource.paginator = this.paginator;
-		this.dataSource.sort = this.sort;
+		if (this.paginator) {
+			this.paginator.page.subscribe((event: PageEvent) => {
+				this.pageChange.emit(event);
+			});
+		}
+
+		if (this.sort) {
+			this.dataSource.sort = this.sort;
+		}
 	}
 
 	public applyFilter(event: Event) {
 		const filterValue = (event.target as HTMLInputElement).value;
 		this.dataSource.filter = filterValue.trim().toLowerCase();
-		if (this.dataSource.paginator) {
-			this.dataSource.paginator.firstPage();
-		}
 	}
 
-	protected onActionClick(actionName: string, element: any): void {
+	protected onActionClick(actionName: string, element: T): void {
 		this.actionClicked.emit({ action: actionName, element: element });
+	}
+
+	resetPaginator() {
+		if (this.paginator) {
+			this.paginator.pageIndex = 0;
+		}
 	}
 }

@@ -1,12 +1,53 @@
-.perfil-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    color: white;
+// .perfil-avatar {
+//     width: 32px;
+//     height: 32px;
+//     border-radius: 50%;
+//     color: white;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     font-weight: 500;
+//     font-size: 12px;
+//     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+// }
+
+.controls-container {
     display: flex;
+    justify-content: space-between; // Esto alinea los elementos a los extremos
     align-items: center;
-    justify-content: center;
-    font-weight: 500;
-    font-size: 12px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    padding: 16px 0; // Añade un poco de espacio vertical
+    flex-wrap: wrap; // Permite que los elementos pasen a la siguiente línea en pantallas pequeñas
+    gap: 16px; // Espacio entre el buscador y los botones
+}
+
+.search-field {
+    flex: 1 1 3.00px; // Permite que el campo de búsqueda crezca pero tenga una base de 300px
+
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper,
+    .mat-mdc-form-field-bottom-align::before {
+        display: none !important;
+    }
+}
+
+.actions-container {
+    display: flex;
+    gap: 7px;
+
+    .btnAgregar {
+        // 2. AGRANDAR EL BOTÓN:
+        // Aumentamos el padding horizontal (el segundo valor) para darle más espacio.
+        padding: 0 32px !important;
+
+        // También puedes establecer un ancho mínimo si prefieres un tamaño más consistente.
+        min-width: 250px;
+
+        height: 48px;
+        font-size: 15px;
+
+        .mat-icon {
+            height: 22px;
+            width: 22px;
+            font-size: 22px;
+        }
+    }
 }
