@@ -1,0 +1,80 @@
+<div class="page-container">
+    <div class="controls-container">
+        <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar Elemento</mat-label>
+            <input matInput (input)="applyFilter($event)" placeholder="Escribe código, abreviatura o descripción..."
+                #inputFilter>
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="actions-container">
+            <button mat-raised-button color="primary" (click)="onAddElementoSistema()" class="btnAgregar">
+                <mat-icon>add</mat-icon>
+                <span>Agregar Elemento</span>
+            </button>
+        </div>
+    </div>
+
+    @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <app-table-generic #table [data]="data()" [displayedColumns]="aDisplayedColumns" [selection]="selection"
+        [actions]="elementoSistemaActions" [totalRecords]="totalRecords()" [pageSizeOptions]="pageSizeOptions"
+        [initialPageSize]="currentPageSize" (actionClicked)="onActionClicked($event)"
+        (pageChange)="handlePageEvent($event)">
+
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Seleccionar todas las filas">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)" [aria-label]="'Seleccionar elemento ' + row.vAbreviatura">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vCodigo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Código </th>
+            <td mat-cell *matCellDef="let element"> {{element.vCodigo}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vAbreviatura">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Abreviatura </th>
+            <td mat-cell *matCellDef="let element"> {{element.vAbreviatura}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vDescripcion">
+            <th mat-header-cell *matHeaderCellDef> Descripción </th>
+            <td mat-cell *matCellDef="let element" [matTooltip]="element.vDescripcion">
+                {{ element.vDescripcion | slice:0:50 }}{{ element.vDescripcion && element.vDescripcion.length > 50 ?
+                '...' : '' }}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="iIdTipoElemento">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo Elem. ID </th>
+            <td mat-cell *matCellDef="let element" matTooltip="ID Tipo Elemento"> {{element.iIdTipoElemento}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="iIdCompania">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Compañía ID </th>
+            <td mat-cell *matCellDef="let element" matTooltip="ID Compañía"> {{element.iIdCompania}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="bActivo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+            <td mat-cell *matCellDef="let element">
+                <app-estado-general [iIdEstado]="element.bActivo ? 1 : 2"
+                    [vNombreEstado]="element.bActivo ? 'Activo' : 'Inactivo'">
+                </app-estado-general>
+            </td>
+        </ng-container>
+
+    </app-table-generic>
+
+</div>

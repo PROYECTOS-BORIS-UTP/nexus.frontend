@@ -3,14 +3,12 @@ import { Component, Input } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
-	selector: 'app-estado-usuario',
-	imports: [
-		CommonModule, MatChipsModule
-	],
-	templateUrl: './estado-usuario.html',
-	styleUrl: './estado-usuario.scss'
+	selector: 'app-estado-general',
+	imports: [ CommonModule, MatChipsModule],
+	templateUrl: './estado-general.html',
+	styleUrl: './estado-general.scss'
 })
-export class EstadoUsuario {
+export class EstadoGeneral {
 	// Inputs para recibir los datos del estado
 	@Input() iIdEstado: number = 0;
 	@Input() vNombreEstado: string = 'Desconocido';
