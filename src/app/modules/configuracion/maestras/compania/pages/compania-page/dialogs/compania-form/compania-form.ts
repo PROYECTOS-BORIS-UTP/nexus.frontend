@@ -5,7 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Compania } from '../../compania-page';
+import { CompaniaPage } from '../../compania-page';
+
 @Component({
   selector: 'app-compania-form',
   imports: [
@@ -28,7 +29,7 @@ constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<CompaniaForm>,
     // Inyectamos los datos que vienen desde el componente padre
-    @Inject(MAT_DIALOG_DATA) public data: { compania?: Compania }
+    @Inject(MAT_DIALOG_DATA) public data: { compania?: CompaniaPage }
   ) {
     this.isEditMode = !!this.data.compania;
     this.titulo = this.isEditMode ? 'Editar Compania' : 'Agregar Nueva Compania';

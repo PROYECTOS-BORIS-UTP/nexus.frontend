@@ -1,43 +1,70 @@
 <div class="page-container">
     <div class="controls-container">
         <mat-form-field appearance="outline" class="search-field">
-            <input matInput (keyup)="table.applyFilter($event)" placeholder="Buscar Perfil">
+            <mat-label>Buscar Perfil</mat-label>
+            <input matInput (input)="applyFilter($event)" placeholder="Escribe para buscar..." #inputFilter>
+            <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
+        
+        <div class="actions-container">
+            <button mat-raised-button color="primary" (click)="onAddPerfil()" class="btnAgregar">
+                <mat-icon>add</mat-icon>
+                <span>Agregar Perfil</span>
+            </button>
+        </div>
     </div>
 
-    <app-table-generic #table [data]="data" [displayedColumns]="aDisplayedColumns" [selection]="selection"
-        [actions]="profileActions" (actionClicked)="onActionClicked($event)">
+    @if (isLoading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <app-table-generic
+        #table
+        [data]="data()"
+        [displayedColumns]="aDisplayedColumns"
+        [selection]="selection"
+        [actions]="perfilActions"
+        [totalRecords]="totalRecords()"
+        [pageSizeOptions]="pageSizeOptions"
+        [initialPageSize]="currentPageSize"
+        (actionClicked)="onActionClicked($event)"
+        (pageChange)="handlePageEvent($event)">
 
         <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef>
-                <mat-checkbox (change)="$event ? toggleAllRows() : null"
-                    [checked]="selection.hasValue() && isAllSelected()">
-                </mat-checkbox>
-            </th>
-            <td mat-cell *matCellDef="let row">
-                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-                    [checked]="selection.isSelected(row)">
-                </mat-checkbox>
-            </td>
-        </ng-container>
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Seleccionar todas las filas">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)" [aria-label]="'Seleccionar perfil ' + row.vPerfil">
+                </mat-checkbox>
+            </td>
+        </ng-container>
 
-        <ng-container matColumnDef="iniciales">
-            <th mat-header-cell *matHeaderCellDef> Iniciales </th>
+        <ng-container matColumnDef="vPerfil">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Perfil </th>
+            <td mat-cell *matCellDef="let element"> {{element.vPerfil}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vDescripcion">
+            <th mat-header-cell *matHeaderCellDef> Descripción </th>
+            <td mat-cell *matCellDef="let element" [matTooltip]="element.vDescripcion">
+                {{ element.vDescripcion | slice:0:70 }}{{ element.vDescripcion.length > 70 ? '...' : '' }}
+            </td>
+        </ng-container>
+
+
+        <ng-container matColumnDef="bActivo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
             <td mat-cell *matCellDef="let element">
-                <div class="perfil-avatar" [style.background-color]="element.vColorPerfil">
-                    {{ element.vInicialesPerfil }}
-                </div>
+                <app-estado-general
+                    [iIdEstado]="element.bActivo ? 1 : 2"
+                    [vNombreEstado]="element.bActivo ? 'Activo' : 'Inactivo'">
+                </app-estado-general>
             </td>
-        </ng-container>
-
-        <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre del Perfil </th>
-            <td mat-cell *matCellDef="let element"> {{element.vNombrePerfil}} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
-            <td mat-cell *matCellDef="let element"> {{element.iIdPerfil}} </td>
         </ng-container>
 
     </app-table-generic>

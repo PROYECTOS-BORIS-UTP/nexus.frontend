@@ -5,7 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Usuario } from '../../usuario-page';
+import { IUsuarioResponse } from '../../../../interfaces/response/IUsuarioResponse.interface';
+
 
 @Component({
 	selector: 'app-usuario-form',
@@ -29,7 +30,7 @@ export class UsuarioForm {
 		private fb: FormBuilder,
 		public dialogRef: MatDialogRef<UsuarioForm>,
 		// Inyectamos los datos que vienen desde el componente padre
-		@Inject(MAT_DIALOG_DATA) public data: { usuario?: Usuario }
+		@Inject(MAT_DIALOG_DATA) public data: { usuario?: IUsuarioResponse }
 	) {
 		this.isEditMode = !!this.data.usuario;
 		this.titulo = this.isEditMode ? 'Editar Usuario' : 'Agregar Nuevo Usuario';

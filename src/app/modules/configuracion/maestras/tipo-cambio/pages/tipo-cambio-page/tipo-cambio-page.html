@@ -1,0 +1,73 @@
+<div class="page-container">
+    <div class="controls-container">
+        <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar Tipo Cambio</mat-label>
+            <input matInput (input)="applyFilter($event)" placeholder="Filtrar..." #inputFilter>
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="actions-container">
+            <button mat-raised-button color="primary" (click)="onAddTipoCambio()" class="btnAgregar">
+                <mat-icon>add</mat-icon>
+                <span>Agregar T.C.</span>
+            </button>
+        </div>
+    </div>
+
+    @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <app-table-generic #table [data]="data()" [displayedColumns]="aDisplayedColumns" [selection]="selection"
+        [actions]="tipoCambioActions" [totalRecords]="totalRecords()" [pageSizeOptions]="pageSizeOptions"
+        [initialPageSize]="currentPageSize" (actionClicked)="onActionClicked($event)"
+        (pageChange)="handlePageEvent($event)">
+
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Seleccionar todas las filas">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)"
+                    [aria-label]="'Seleccionar tipo de cambio del ' + (row.dFecha | date:'dd/MM/yyyy')">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dFecha">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha </th>
+            <td mat-cell *matCellDef="let element"> {{element.dFecha | date:'dd/MM/yyyy'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="monedaOrigen">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Moneda Origen </th>
+            <td mat-cell *matCellDef="let element" [matTooltip]="element.vMonedaOrigenDesc">
+                {{element.vMonedaOrigenSimbolo}} ({{element.vMonedaOrigenDesc | slice:0:15
+                }}{{element.vMonedaOrigenDesc.length > 15 ? '...' : ''}})
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="monedaDestino">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Moneda Destino </th>
+            <td mat-cell *matCellDef="let element" [matTooltip]="element.vMonedaDestinoDesc">
+                {{element.vMonedaDestinoSimbolo}} ({{element.vMonedaDestinoDesc | slice:0:15
+                }}{{element.vMonedaDestinoDesc.length > 15 ? '...' : ''}})
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dCompra">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Compra </th>
+            <td mat-cell *matCellDef="let element"> {{element.dCompra | number:'1.3-4'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dVenta">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Venta </th>
+            <td mat-cell *matCellDef="let element"> {{element.dVenta | number:'1.3-4'}} </td>
+        </ng-container>
+
+    </app-table-generic>
+</div>

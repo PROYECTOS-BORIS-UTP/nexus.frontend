@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { Perfil } from '../../usuario-page';
 
 @Component({
 	selector: 'app-perfil-usuario',
@@ -8,5 +7,5 @@ import { Perfil } from '../../usuario-page';
 	styleUrl: './perfil-usuario.scss'
 })
 export class PerfilUsuario {
-	@Input() oPerfil!: Perfil;
+	@Input() oPerfil!: any;
 }
