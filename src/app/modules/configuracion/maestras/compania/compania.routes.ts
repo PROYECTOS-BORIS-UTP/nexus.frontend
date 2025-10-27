@@ -5,6 +5,6 @@ export const COMPANIA_ROUTES: Routes = [
     {
         path: ''
         ,component: CompaniaPage        
-        , data: { breadcrumb: 'Compania', icon: 'house' }
+        , data: { breadcrumb: 'Compania', icon: 'apartment' }
     }
 ];
