@@ -1,5 +1,3 @@
-// src/app/modules/configuracion/elemento-sistema/pages/elemento-sistema-page/elemento-sistema-page.ts
-
 import { SelectionModel } from '@angular/cdk/collections';
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
@@ -23,6 +21,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { IElementoSistemaListadoRequest } from '../../interfaces/request/IElementoSistemaListadoRequest.interface';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
+import { IElementoSistemaCreateUpdateRequest } from '../../interfaces/request/IElementoSistemaCreateUpdateRequest.interface';
+import { ElementoSistemaForm } from './dialogs/elemento-sistema-form/elemento-sistema-form';
 
 @Component({
 	selector: 'app-elemento-sistema-page',
@@ -186,6 +186,13 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 	toggleAllRows(): void {
 		this.isAllSelected() ? this.selection.clear() : this.selection.select(...this.data());
 	}
+
+	checkboxLabel(row?: IElementoSistemaResponse): string {
+		if (!row) {
+			return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
+		}
+		return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.iIdElemento + 1}`;
+	}
 	// #endregion
 
 	// #region Manejo de Acciones de Fila
@@ -211,35 +218,74 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 	 * Abre diálogo para agregar elemento.
 	 */
 	onAddElementoSistema(): void {
-		// Debes crear el componente ElementoSistemaForm
-		// const dialogRef = this.dialog.open(ElementoSistemaForm, { width: '600px', disableClose: true, data: {} });
-		// dialogRef.afterClosed().subscribe(result => {
-		//   if (result) {
-		//     console.log('Nuevo elemento:', result);
-		//     // --- LLAMADA AL SERVICIO PARA CREAR ---
-		//     // this.elementoSistemaService.crearActualizarElementoSistema(result).subscribe(...);
-		//     this.snackBar.open('Elemento creado (simulado).', 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		//     this.cargarElementosSistema();
-		//   }
-		// });
-		alert('Funcionalidad "Agregar Elemento del Sistema" no implementada.'); // Placeholder
+		const dialogRef = this.dialog.open(ElementoSistemaForm, {
+			width: '100%',
+			maxWidth: '700px', // Ajusta según necesidad
+			disableClose: true,
+			data: { elemento: null } // Indica creación
+		});
+
+		dialogRef.afterClosed().subscribe((result: IElementoSistemaCreateUpdateRequest | undefined) => {
+			if (result) {
+				this.isLoading.set(true);
+				this.elementoSistemaService.crearActualizarElementoSistema(result).pipe(
+					tap(response => {
+						this.showSnackbar(response.vMensaje || 'Elemento creado exitosamente.', 'snackbar-success');
+						this.cargarElementosSistema();
+					}),
+					catchError(error => {
+						this.showSnackbar(error.message || 'Error al crear el elemento.', 'snackbar-error');
+						return of(null);
+					}),
+					finalize(() => this.isLoading.set(false))
+				).subscribe();
+			}
+		});
 	}
 
 	/*
 	 * Abre diálogo para editar elemento.
 	 */
 	onEditElementoSistema(elemento: IElementoSistemaResponse): void {
-		// const dialogRef = this.dialog.open(ElementoSistemaForm, { width: '600px', disableClose: true, data: { elemento: elemento } });
-		// dialogRef.afterClosed().subscribe(result => {
-		//   if (result) {
-		//     console.log('Elemento a actualizar:', result);
-		//     // --- LLAMADA AL SERVICIO PARA ACTUALIZAR ---
-		//     // this.elementoSistemaService.crearActualizarElementoSistema(result).subscribe(...);
-		//     this.snackBar.open(`Elemento "${elemento.vAbreviatura}" actualizado (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		//     this.cargarElementosSistema();
-		//   }
-		// });
-		alert(`Funcionalidad "Editar Elemento: ${elemento.vAbreviatura}" no implementada.`); // Placeholder
+		// ¡¡IMPORTANTE!! Verifica que 'elemento' (IElementoSistemaResponse) tenga TODOS los campos
+		// necesarios para 'IElementoSistemaCreateUpdateRequest'. Si faltan, debes añadirlos
+		// a IElementoSistemaResponse y a la respuesta del backend (SP de listado).
+		const elementoParaEditar: IElementoSistemaCreateUpdateRequest = {
+			iIdElemento: elemento.iIdElemento,
+			iIdElementoPadre: elemento.iIdElementoPadre,
+			vCodigo: elemento.vCodigo,
+			vAbreviatura: elemento.vAbreviatura,
+			vDescripcion: elemento.vDescripcion,
+			iSubGrupo: elemento.iSubGrupo,
+			bActivo: elemento.bActivo,
+			iIdTipoElemento: elemento.iIdTipoElemento,
+			iIdCompania: elemento.iIdCompania,
+			iIdPais: elemento.iIdPais,
+		};
+
+		const dialogRef = this.dialog.open(ElementoSistemaForm, {
+			width: '100%',
+			maxWidth: '700px',
+			disableClose: true,
+			data: { elemento: elementoParaEditar } // Pasa los datos mapeados
+		});
+
+		dialogRef.afterClosed().subscribe((result: IElementoSistemaCreateUpdateRequest | undefined) => {
+			if (result) {
+				this.isLoading.set(true);
+				this.elementoSistemaService.crearActualizarElementoSistema(result).pipe(
+					tap(response => {
+						this.showSnackbar(response.vMensaje || `Elemento "${elemento.vDescripcion}" actualizado.`, 'snackbar-success');
+						this.cargarElementosSistema();
+					}),
+					catchError(error => {
+						this.showSnackbar(error.message || 'Error al actualizar el elemento.', 'snackbar-error');
+						return of(null);
+					}),
+					finalize(() => this.isLoading.set(false))
+				).subscribe();
+			}
+		});
 	}
 
 	/*
@@ -250,20 +296,34 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 			width: '400px',
 			data: {
 				titulo: 'Confirmar Eliminación',
-				mensaje: `¿Estás seguro de eliminar el elemento "${elemento.vAbreviatura}"?`, // Usa vAbreviatura
-				mostrarCampoObservacion: false // O true si tu API lo requiere
+				mensaje: `¿Estás seguro de eliminar el elemento "${elemento.vDescripcion}"?`,
+				mostrarCampoObservacion: false
 			}
 		});
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result && result.confirmado) {
-				console.log('Eliminando elemento:', elemento.iIdElemento, 'Observación:', result.observacion);
-				// --- LLAMADA AL SERVICIO PARA ELIMINAR ---
-				// this.elementoSistemaService.eliminarElementoSistema(elemento.iIdElemento, result.observacion).subscribe(...);
-				this.snackBar.open(`Elemento "${elemento.vAbreviatura}" eliminado (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-warn'] });
-				this.cargarElementosSistema();
+				this.isLoading.set(true);
+				this.elementoSistemaService.eliminarElementoSistema(elemento.iIdElemento).pipe(
+					tap(response => {
+						this.showSnackbar(response.vMensaje || `Elemento "${elemento.vDescripcion}" eliminado.`, 'snackbar-warn');
+						this.cargarElementosSistema();
+					}),
+					catchError(error => {
+						this.showSnackbar(error.message || 'Error al eliminar el elemento.', 'snackbar-error');
+						return of(null);
+					}),
+					finalize(() => this.isLoading.set(false))
+				).subscribe();
 			}
 		});
 	}
 	// #endregion
+
+	private showSnackbar(message: string, panelClass: string = 'snackbar-info'): void {
+		this.snackBar.open(message, 'Cerrar', {
+			duration: 5000,
+			panelClass: [panelClass]
+		});
+	}
 }

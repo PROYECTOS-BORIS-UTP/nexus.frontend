@@ -1,22 +1,199 @@
-<h1 mat-dialog-title>{{ titulo }}</h1>
+<h2 mat-dialog-title>{{ tituloDialogo }}</h2>
 
-<div mat-dialog-content [formGroup]="PersonaForm">
-    <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Nombre Completo de la persona</mat-label>
-        <input matInput formControlName="vCodigo" placeholder="Ingrese el codigo">
-    </mat-form-field>
+<mat-dialog-content class="mat-typography">
+    <form [formGroup]="personaForm" class="persona-form-container">
 
-    <mat-form-field appearance="outline" class="w-full mt-4">
-        <mat-label>DNI</mat-label>
-        <input matInput formControlName="vRUC" placeholder="Ingrese la RUC">
-    </mat-form-field>
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Tipo Persona</mat-label>
+                <mat-select formControlName="iIdTipoPersona" required>
+                    @for(tipo of tiposPersona; track tipo.id) {
+                    <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+                    }
+                </mat-select>
+                @if (fc['iIdTipoPersona'].hasError('required')) {
+                <mat-error>Tipo de persona es requerido.</mat-error>
+                }
+            </mat-form-field>
 
-</div>
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Primer Nombre</mat-label>
+                <input matInput formControlName="vPrimerNombre" required maxlength="100">
+                @if (fc['vPrimerNombre'].hasError('required')) {
+                <mat-error>Primer nombre es requerido.</mat-error>
+                }
+                @if (fc['vPrimerNombre'].hasError('maxlength')) {
+                <mat-error>Máximo 100 caracteres.</mat-error>
+                }
+            </mat-form-field>
 
-<div mat-dialog-actions align="end">
-    <button mat-button (click)="onCancelar()">Cancelar</button>
-    <button mat-raised-button color="primary" (click)="onGuardar()" [disabled]="!PersonaForm.valid">
-        {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Segundo Nombre</mat-label>
+                <input matInput formControlName="vSegundoNombre" maxlength="100">
+                @if (fc['vSegundoNombre'].hasError('maxlength')) {
+                <mat-error>Máximo 100 caracteres.</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Apellido Paterno</mat-label>
+                <input matInput formControlName="vApellidoPaterno" required maxlength="100">
+                @if (fc['vApellidoPaterno'].hasError('required')) {
+                <mat-error>Apellido paterno es requerido.</mat-error>
+                }
+                @if (fc['vApellidoPaterno'].hasError('maxlength')) {
+                <mat-error>Máximo 100 caracteres.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Apellido Materno</mat-label>
+                <input matInput formControlName="vApellidoMaterno" required maxlength="100">
+                @if (fc['vApellidoMaterno'].hasError('required')) {
+                <mat-error>Apellido materno es requerido.</mat-error>
+                }
+                @if (fc['vApellidoMaterno'].hasError('maxlength')) {
+                <mat-error>Máximo 100 caracteres.</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>DNI</mat-label>
+                <input matInput formControlName="vDNI" maxlength="8">
+                @if (fc['vDNI'].hasError('minlength') || fc['vDNI'].hasError('maxlength') ) {
+                <mat-error>DNI debe tener 8 dígitos.</mat-error>
+                }
+                @if (fc['vDNI'].hasError('pattern') ) {
+                <mat-error>DNI debe contener solo números.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>RUC</mat-label>
+                <input matInput formControlName="vRUC" maxlength="11">
+                @if (fc['vRUC'].hasError('minlength') || fc['vRUC'].hasError('maxlength') ) {
+                <mat-error>RUC debe tener 11 dígitos.</mat-error>
+                }
+                @if (fc['vRUC'].hasError('pattern') ) {
+                <mat-error>RUC debe contener solo números.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Carnet Extranjería (CE)</mat-label>
+                <input matInput formControlName="vCE" maxlength="20">
+                @if (fc['vCE'].hasError('maxlength')) {
+                <mat-error>Máximo 20 caracteres.</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Fecha Nacimiento</mat-label>
+                <input matInput [matDatepicker]="pickerNacimiento" formControlName="dFechaNacimiento" readonly>
+                <mat-datepicker-toggle matSuffix [for]="pickerNacimiento"></mat-datepicker-toggle>
+                <mat-datepicker #pickerNacimiento></mat-datepicker>
+                @if (fc['dFechaNacimiento'].hasError('matDatepickerParse')) {
+                <mat-error>Fecha inválida.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Género</mat-label>
+                <mat-select formControlName="iIdGenero">
+                    <mat-option [value]="null">-- Ninguno --</mat-option>
+                    @for(gen of generos; track gen.id) {
+                    <mat-option [value]="gen.id">{{ gen.nombre }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Estado Civil</mat-label>
+                <mat-select formControlName="iIdEstadoCivil">
+                    <mat-option [value]="null">-- Ninguno --</mat-option>
+                    @for(ec of estadosCiviles; track ec.id) {
+                    <mat-option [value]="ec.id">{{ ec.nombre }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Correo Electrónico</mat-label>
+                <input matInput type="email" formControlName="vCorreo" maxlength="150">
+                @if (fc['vCorreo'].hasError('email')) {
+                <mat-error>Correo no válido.</mat-error>
+                }
+                @if (fc['vCorreo'].hasError('maxlength')) {
+                <mat-error>Máximo 150 caracteres.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Celular Principal</mat-label>
+                <input matInput formControlName="vCelular1" maxlength="20">
+                @if (fc['vCelular1'].hasError('pattern') ) {
+                <mat-error>Formato inválido.</mat-error>
+                }
+                @if (fc['vCelular1'].hasError('maxlength')) {
+                <mat-error>Máximo 20 caracteres.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Celular Secundario</mat-label>
+                <input matInput formControlName="vCelular2" maxlength="20">
+                @if (fc['vCelular2'].hasError('pattern') ) {
+                <mat-error>Formato inválido.</mat-error>
+                }
+                @if (fc['vCelular2'].hasError('maxlength')) {
+                <mat-error>Máximo 20 caracteres.</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Teléfono Fijo</mat-label>
+                <input matInput formControlName="vTelefono" maxlength="20">
+                @if (fc['vTelefono'].hasError('pattern') ) {
+                <mat-error>Formato inválido.</mat-error>
+                }
+                @if (fc['vTelefono'].hasError('maxlength')) {
+                <mat-error>Máximo 20 caracteres.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Ubigeo Nacimiento</mat-label>
+                <mat-select formControlName="iIdUbigeoNacimiento">
+                    <mat-option [value]="null">-- Ninguno --</mat-option>
+                    @for(ubigeo of ubigeos; track ubigeo.id) {
+                    <mat-option [value]="ubigeo.id">{{ ubigeo.nombre }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <div class="form-field placeholder"></div>
+        </div>
+
+        <div class="form-row">
+            <mat-checkbox formControlName="bActivo" class="form-field-checkbox">Activo</mat-checkbox>
+        </div>
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onCancel()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="onSave()" [disabled]="personaForm.invalid">
+        {{ personaExistente ? 'Actualizar' : 'Guardar' }}
     </button>
-</div>
-
+</mat-dialog-actions>
