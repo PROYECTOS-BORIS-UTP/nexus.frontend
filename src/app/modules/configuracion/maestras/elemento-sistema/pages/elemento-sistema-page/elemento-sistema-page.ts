@@ -64,13 +64,16 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 	currentPageIndex = 0;
 	// #endregion
 
+	currentParentElement = signal<IElementoSistemaResponse | null>(null); // Padre actual
+	breadcrumb = signal<IElementoSistemaResponse[]>([]);
+
 	// #region Referencias a Componentes Hijos
 	@ViewChild(TableGeneric) tableGeneric!: TableGeneric<IElementoSistemaResponse>;
 	// #endregion
 
 	// #region Configuración de la Tabla
 	// Define las columnas a mostrar según IElementoSistemaResponse
-	aDisplayedColumns: string[] = ['select', 'vCodigo', 'vAbreviatura', 'vDescripcion', 'iIdTipoElemento', 'iIdCompania', 'bActivo']; // Ajusta las columnas
+	aDisplayedColumns: string[] = ['select', 'vCodigo', 'vAbreviatura', 'vDescripcion', 'bActivo','viewChildren']; // Ajusta las columnas
 	selection = new SelectionModel<IElementoSistemaResponse>(true, []);
 	elementoSistemaActions: TableAction[] = [ // Acciones específicas
 		{ name: 'edit', label: 'Editar Elemento', icon: 'edit' },
@@ -97,21 +100,18 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 
 	// #region Carga de Datos
 	/*
-	 * Obtiene los elementos del sistema del servicio.
+	 * Obtiene los elementos del sistema del servicio, filtrando por padre si se especifica.
+	 * @param parentId ID del elemento padre (o null para el nivel raíz).
 	 */
-	cargarElementosSistema(): void {
+	cargarElementosSistema(parentId: number | null = this.currentParentElement()?.iIdElemento ?? null): void {
 		this.isLoading.set(true);
 		this.selection.clear();
 
 		const request: IElementoSistemaListadoRequest = {
 			iPageNumber: this.currentPageIndex + 1,
 			iPageSize: this.currentPageSize,
-			// Usaremos sTerminoBusqueda para filtrar por Código o Descripción
-			sTerminoBusqueda: this.currentFilterValue || undefined,
-			// Puedes añadir otros filtros aquí si es necesario
-			// iIdTipoElemento: ...,
-			// iIdCompania: ...,
-			// bActivo: ...,
+			// sTerminoBusqueda: this.currentFilterValue || undefined,
+			iIdElementoPadre: parentId,
 		};
 
 		this.elementoSistemaService.listarElementosSistema(request).pipe(
@@ -120,16 +120,71 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 				this.data.set(response.aRecords);
 			}),
 			catchError(error => {
-				console.error('Error al cargar elementos del sistema:', error);
-				this.snackBar.open(error.message || 'Error al cargar la lista de elementos.', 'Cerrar', {
-					duration: 5000, panelClass: ['snackbar-error']
-				});
+				this.showSnackbar(error.message || 'Error al cargar elementos del sistema.', 'snackbar-error');
 				this.data.set([]);
 				this.totalRecords.set(0);
 				return of(null);
 			}),
 			finalize(() => this.isLoading.set(false))
 		).subscribe();
+	}
+	// #endregion
+
+	// #region Navegación Jerárquica
+	/*
+	 * Carga los hijos del elemento seleccionado.
+	 * @param elemento El elemento padre cuyos hijos se mostrarán.
+	 */
+	viewChildren(elemento: IElementoSistemaResponse): void {
+		// Actualiza breadcrumb y padre actual
+		this.breadcrumb.update(b => [...b, elemento]);
+		this.currentParentElement.set(elemento);
+		// Resetea filtro y paginación
+		this.currentFilterValue = '';
+		// Resetea visualmente el input de filtro si tienes una referencia a él
+		// if (this.inputFilter) this.inputFilter.nativeElement.value = '';
+		this.resetPaginationAndLoad();
+	}
+
+	/*
+	* Navega al nivel superior en la jerarquía.
+	*/
+	goBack(): void {
+		if (this.breadcrumb().length > 0) {
+			// Quita el último elemento del breadcrumb
+			const newBreadcrumb = this.breadcrumb().slice(0, -1);
+			this.breadcrumb.set(newBreadcrumb);
+			// Establece el nuevo padre actual (o null si se vació el breadcrumb)
+			this.currentParentElement.set(newBreadcrumb.length > 0 ? newBreadcrumb[newBreadcrumb.length - 1] : null);
+			// Resetea filtro y paginación
+			this.currentFilterValue = '';
+			// if (this.inputFilter) this.inputFilter.nativeElement.value = '';
+			this.resetPaginationAndLoad();
+		}
+	}
+
+	/*
+	* Navega a un nivel específico del breadcrumb.
+	* @param index Índice del elemento en el breadcrumb al que navegar.
+	*/
+	goToBreadcrumbLevel(index: number): void {
+		const newBreadcrumb = this.breadcrumb().slice(0, index + 1);
+		this.breadcrumb.set(newBreadcrumb);
+		this.currentParentElement.set(newBreadcrumb[newBreadcrumb.length - 1]); // El padre es el último del nuevo breadcrumb
+		this.currentFilterValue = '';
+		// if (this.inputFilter) this.inputFilter.nativeElement.value = '';
+		this.resetPaginationAndLoad();
+	}
+
+	/*
+	 * Navega al nivel raíz (sin padre).
+	 */
+	goToRoot(): void {
+		this.breadcrumb.set([]);
+		this.currentParentElement.set(null);
+		this.currentFilterValue = '';
+		// if (this.inputFilter) this.inputFilter.nativeElement.value = '';
+		this.resetPaginationAndLoad();
 	}
 	// #endregion
 
@@ -163,10 +218,16 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 	/*
 	 * Aplica el filtro desde el input.
 	 */
-	applyFilter(event: Event): void {
-		const filterValue = (event.target as HTMLInputElement).value;
-		// Envía el término de búsqueda al Subject
+	applyFilter(filterValue: string): void {
 		this.filterSubject.next(filterValue.trim());
+	}
+	// #endregion
+
+	/** Resetea la paginación a la primera página y recarga los datos */
+	private resetPaginationAndLoad(): void {
+		this.tableGeneric?.resetPaginator(); // Resetea el paginador visual
+		this.currentPageIndex = 0; // Resetea el índice lógico
+		this.cargarElementosSistema(); // Carga los datos del nivel actual (con el filtro si existe)
 	}
 	// #endregion
 
@@ -222,21 +283,23 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 			width: '100%',
 			maxWidth: '700px', // Ajusta según necesidad
 			disableClose: true,
-			data: { elemento: null } // Indica creación
+			data: {
+				elemento: null,
+				idPadre: this.currentParentElement()?.iIdElemento ?? null
+			}
 		});
 
 		dialogRef.afterClosed().subscribe((result: IElementoSistemaCreateUpdateRequest | undefined) => {
 			if (result) {
 				this.isLoading.set(true);
+				// El 'iIdElementoPadre' ya debería venir seteado desde el formulario si se pasó
 				this.elementoSistemaService.crearActualizarElementoSistema(result).pipe(
 					tap(response => {
 						this.showSnackbar(response.vMensaje || 'Elemento creado exitosamente.', 'snackbar-success');
+						// Recarga los datos del nivel actual (donde se agregó el nuevo hijo)
 						this.cargarElementosSistema();
 					}),
-					catchError(error => {
-						this.showSnackbar(error.message || 'Error al crear el elemento.', 'snackbar-error');
-						return of(null);
-					}),
+					catchError(error => { /* ... sin cambios ... */ return of(null); }),
 					finalize(() => this.isLoading.set(false))
 				).subscribe();
 			}
@@ -247,9 +310,6 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 	 * Abre diálogo para editar elemento.
 	 */
 	onEditElementoSistema(elemento: IElementoSistemaResponse): void {
-		// ¡¡IMPORTANTE!! Verifica que 'elemento' (IElementoSistemaResponse) tenga TODOS los campos
-		// necesarios para 'IElementoSistemaCreateUpdateRequest'. Si faltan, debes añadirlos
-		// a IElementoSistemaResponse y a la respuesta del backend (SP de listado).
 		const elementoParaEditar: IElementoSistemaCreateUpdateRequest = {
 			iIdElemento: elemento.iIdElemento,
 			iIdElementoPadre: elemento.iIdElementoPadre,
@@ -267,7 +327,10 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 			width: '100%',
 			maxWidth: '700px',
 			disableClose: true,
-			data: { elemento: elementoParaEditar } // Pasa los datos mapeados
+			data: {
+				elemento: elementoParaEditar,
+				idPadre: elementoParaEditar.iIdElementoPadre
+			}
 		});
 
 		dialogRef.afterClosed().subscribe((result: IElementoSistemaCreateUpdateRequest | undefined) => {

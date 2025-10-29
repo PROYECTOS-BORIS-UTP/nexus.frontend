@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 // Interfaz para los datos inyectados
 export interface ElementoSistemaFormData {
 	elemento: IElementoSistemaCreateUpdateRequest | null;
+	idPadre?: number | null;
 }
 
 @Component({
@@ -45,13 +46,16 @@ export class ElementoSistemaForm implements OnInit {
 	paises: any[] = []; // Cargar países
 	// --- Fin Placeholders ---
 
+	private idPadreRecibido: number | null = null; // Variable para guardar el idPadre
+
 	constructor(
 		@Inject(MAT_DIALOG_DATA) public data: ElementoSistemaFormData
 	) {
 		this.elementoExistente = data?.elemento;
+		this.idPadreRecibido = data?.idPadre ?? null;
 
 		this.elementoSistemaForm = this.fb.group({
-			iIdElementoPadre: [null, [Validators.min(1)]], // Opcional
+			// iIdElementoPadre: [null, [Validators.min(1)]], // Opcional
 			vCodigo: ['', [Validators.required, Validators.maxLength(50)]],
 			vAbreviatura: ['', [Validators.required, Validators.maxLength(50)]],
 			vDescripcion: ['', [Validators.required, Validators.maxLength(250)]],
@@ -92,8 +96,6 @@ export class ElementoSistemaForm implements OnInit {
 		}
 
 		const formData = this.elementoSistemaForm.getRawValue();
-
-		// Asegura que iSubGrupo sea número
 		const subGrupoNum = Number(formData.iSubGrupo);
 
 		const dataToSend: IElementoSistemaCreateUpdateRequest = {
