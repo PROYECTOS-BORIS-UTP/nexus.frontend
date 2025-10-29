@@ -1,5 +1,38 @@
-::ng-deep {
-    .mat-mdc-dialog-container .mat-mdc-dialog-content {
-        overflow: visible !important;
-    }
+.persona-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; // Espacio entre filas
+}
+
+.form-row {
+    display: flex;
+    gap: 16px; // Espacio entre campos en la misma fila
+    flex-wrap: wrap; // Permite que los campos pasen a la siguiente línea si no caben
+}
+
+.form-field {
+    flex: 1; // Hace que los campos intenten ocupar el mismo espacio
+    min-width: 200px; // Ancho mínimo para evitar que se compriman demasiado
+}
+
+.form-field-checkbox {
+    padding-top: 10px; // Alinea un poco mejor con los otros campos
+    margin-bottom: 10px;
+}
+
+// Placeholder invisible para mantener alineación en filas incompletas
+.placeholder {
+    min-width: 200px;
+    visibility: hidden;
+}
+
+
+mat-dialog-content {
+    max-height: 70vh; // Evita que el diálogo sea demasiado alto
+    overflow-y: auto; // Agrega scroll si es necesario
+}
+
+// Estilos opcionales para mensajes de error
+mat-error {
+    font-size: 0.75em;
 }

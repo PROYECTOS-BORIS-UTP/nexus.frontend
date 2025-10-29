@@ -6,8 +6,10 @@ import { IPaginationRequest } from "../../../../../../core/interfaces/IPaginatio
  */
 export interface IElementoSistemaListadoRequest extends IPaginationRequest {
     iIdElemento?: number | null;
+    iIdElementoPadre?: number | null;
     sTerminoBusqueda?: string | null;
     iIdTipoElemento?: number | null;
     iIdCompania?: number | null;
+    iIdPais?: number | null;
     bActivo?: boolean | null;
 }

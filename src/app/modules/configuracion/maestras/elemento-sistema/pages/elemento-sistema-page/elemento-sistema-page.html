@@ -1,16 +1,47 @@
 <div class="page-container">
+
+    <div class="navigation-header">
+        <div class="breadcrumb-container">
+            <button mat-button color="primary" (click)="goToRoot()" matTooltip="Ir al Nivel Raíz">
+                <mat-icon>home</mat-icon> Raíz
+            </button>
+            @for (crumb of breadcrumb(); track crumb.iIdElemento; let i = $index) {
+            <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+            @if (i < breadcrumb().length - 1) { <button mat-button (click)="goToBreadcrumbLevel(i)">{{
+                crumb.vAbreviatura || crumb.vCodigo }}</button>
+                } @else {
+                <span class="breadcrumb-current">{{ crumb.vAbreviatura || crumb.vCodigo }}</span>
+                }
+                }
+        </div>
+
+        @if (currentParentElement()) {
+        <button mat-stroked-button color="accent" (click)="goBack()" class="btnRegresar">
+            <mat-icon>arrow_back</mat-icon>
+            Regresar
+        </button>
+        }
+    </div>
+
     <div class="controls-container">
         <mat-form-field appearance="outline" class="search-field">
-            <mat-label>Buscar Elemento</mat-label>
-            <input matInput (input)="applyFilter($event)" placeholder="Escribe código, abreviatura o descripción..."
-                #inputFilter>
+            <mat-label>Buscar en {{ currentParentElement() ? '"' + (currentParentElement()!.vAbreviatura ||
+                currentParentElement()!.vCodigo) + '"': 'Raíz' }}</mat-label>
+            <input matInput (input)="applyFilter($any($event.target).value)"
+                placeholder="Código, Abreviatura, Descripción..." #inputFilter [value]="currentFilterValue">
             <mat-icon matSuffix>search</mat-icon>
+            @if (currentFilterValue) {
+            <button mat-icon-button matSuffix (click)="inputFilter.value=''; applyFilter('')"
+                aria-label="Limpiar filtro">
+                <mat-icon>close</mat-icon>
+            </button>
+            }
         </mat-form-field>
 
         <div class="actions-container">
             <button mat-raised-button color="primary" (click)="onAddElementoSistema()" class="btnAgregar">
                 <mat-icon>add</mat-icon>
-                <span>Agregar Elemento</span>
+                <span>Agregar {{ currentParentElement() ? 'Hijo' : 'Elemento Raíz' }}</span>
             </button>
         </div>
     </div>
@@ -72,6 +103,14 @@
                 <app-estado-general [iIdEstado]="element.bActivo ? 1 : 2"
                     [vNombreEstado]="element.bActivo ? 'Activo' : 'Inactivo'">
                 </app-estado-general>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="viewChildren">
+            <th mat-header-cell *matHeaderCellDef aria-label="Ver Hijos"> Hijos </th>
+            <td mat-cell *matCellDef="let element">
+                <button mat-icon-button color="primary" (click)="viewChildren(element)" matTooltip="Ver Hijos">
+                    <mat-icon>account_tree</mat-icon> </button>
             </td>
         </ng-container>
 
