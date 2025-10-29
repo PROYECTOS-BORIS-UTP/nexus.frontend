@@ -100,8 +100,10 @@
         <ng-container matColumnDef="bActivo">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
             <td mat-cell *matCellDef="let element">
-                <app-estado-general [iIdEstado]="element.bActivo ? 1 : 2"
-                    [vNombreEstado]="element.bActivo ? 'Activo' : 'Inactivo'">
+                <app-estado-general
+                    [iIdEstado]="element.bActivo ? 1 : 2"
+                    [vNombreEstado]="element.bActivo ? 'Activo' : 'Inactivo'"
+                >
                 </app-estado-general>
             </td>
         </ng-container>
