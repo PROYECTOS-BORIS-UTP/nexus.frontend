@@ -21,6 +21,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { IPersonaListadoRequest } from '../../interfaces/request/IPersonaListadoRequest.interface';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
+import { PersonaForm } from './dialogs/persona-form/persona-form';
+import { IPersonaCreateUpdateRequest } from '../../interfaces/request/IPersonaCreateUpdateRequest.interface';
 
 @Component({
     selector: 'app-persona-page',
@@ -183,6 +185,13 @@ export class PersonaPage implements OnInit, OnDestroy {
     toggleAllRows(): void {
         this.isAllSelected() ? this.selection.clear() : this.selection.select(...this.data());
     }
+
+    checkboxLabel(row?: IPersonaResponse): string {
+        if (!row) {
+            return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
+        }
+        return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.iIdPersona + 1}`;
+    }
     // #endregion
 
     // #region Manejo de Acciones de Fila
@@ -208,35 +217,87 @@ export class PersonaPage implements OnInit, OnDestroy {
      * Abre diálogo para agregar persona.
      */
     onAddPersona(): void {
-        // Debes crear el componente PersonaForm
-        // const dialogRef = this.dialog.open(PersonaForm, { width: '700px', disableClose: true, data: {} });
-        // dialogRef.afterClosed().subscribe(result => {
-        //   if (result) {
-        //     console.log('Nueva persona:', result);
-        //     // --- LLAMADA AL SERVICIO PARA CREAR ---
-        //     // this.personaService.crearActualizarPersona(result).subscribe(...);
-        //     this.snackBar.open('Persona creada (simulado).', 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-        //     this.cargarPersonas();
-        //   }
-        // });
-        alert('Funcionalidad "Agregar Persona" no implementada.'); // Placeholder
+        // --- DESCOMENTA CUANDO CREES EL FORMULARIO ---
+        const dialogRef = this.dialog.open(PersonaForm, {
+            width: '100%', // Ajusta el ancho según tu formulario
+            maxWidth: '900px',
+            disableClose: true, // Evita cerrar haciendo clic fuera
+            data: { persona: null } // Pasa null para indicar creación
+        });
+
+        dialogRef.afterClosed().subscribe((result: IPersonaCreateUpdateRequest | undefined) => {
+            if (result) {
+                console.log('Datos para crear persona:', result);
+                this.isLoading.set(true);
+                this.personaService.crearActualizarPersona(result).pipe(
+                    tap(response => {
+                        this.showSnackbar(response.vMensaje || 'Persona creada exitosamente.', 'snackbar-success');
+                        this.cargarPersonas(); // Recargar la lista
+                    }),
+                    catchError(error => {
+                        console.error('Error al crear persona:', error);
+                        this.showSnackbar(error.message || 'Error al crear la persona.', 'snackbar-error');
+                        return of(null);
+                    }),
+                    finalize(() => this.isLoading.set(false))
+                ).subscribe();
+            }
+        });
     }
 
     /*
      * Abre diálogo para editar persona.
      */
     onEditPersona(persona: IPersonaResponse): void {
-        // const dialogRef = this.dialog.open(PersonaForm, { width: '700px', disableClose: true, data: { persona: persona } });
-        // dialogRef.afterClosed().subscribe(result => {
-        //   if (result) {
-        //     console.log('Persona a actualizar:', result);
-        //     // --- LLAMADA AL SERVICIO PARA ACTUALIZAR ---
-        //     // this.personaService.crearActualizarPersona(result).subscribe(...);
-        //     this.snackBar.open(`Persona "${persona.vNombreCompleto}" actualizada (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-        //     this.cargarPersonas();
-        //   }
-        // });
-        alert(`Funcionalidad "Editar Persona: ${persona.vNombreCompleto}" no implementada.`); // Placeholder
+        const personaParaEditar: IPersonaCreateUpdateRequest = {
+            // Mapea los campos de IPersonaResponse a IPersonaCreateUpdateRequest
+            // Asegúrate de incluir TODOS los campos necesarios por el DTO del backend
+            iIdPersona: persona.iIdPersona,
+            iIdTipoPersona: persona.iIdTipoPersona, // Necesitarás este dato en IPersonaResponse
+            vPrimerNombre: persona.vPrimerNombre, // Necesitarás este dato en IPersonaResponse
+            vSegundoNombre: persona.vSegundoNombre, // Necesitarás este dato en IPersonaResponse
+            vApellidoPaterno: persona.vApellidoPaterno, // Necesitarás este dato en IPersonaResponse
+            vApellidoMaterno: persona.vApellidoMaterno, // Necesitarás este dato en IPersonaResponse
+            dFechaNacimiento: persona.dFechaNacimiento ? new Date(persona.dFechaNacimiento).toISOString().split('T')[0] : null, // Formato YYYY-MM-DD si viene como Date
+            iIdUbigeoNacimiento: persona.iIdUbigeoNacimiento, // Necesitarás este dato en IPersonaResponse
+            iIdGenero: persona.iIdGenero, // Necesitarás este dato en IPersonaResponse
+            iIdEstadoCivil: persona.iIdEstadoCivil, // Necesitarás este dato en IPersonaResponse
+            vCorreo: persona.vCorreo,
+            vCelular1: persona.vCelular1,
+            vCelular2: persona.vCelular2, // Necesitarás este dato en IPersonaResponse
+            vTelefono: persona.vTelefono, // Necesitarás este dato en IPersonaResponse
+            vDNI: persona.vDNI,
+            vCE: persona.vCE, // Necesitarás este dato en IPersonaResponse
+            vRUC: persona.vRUC,
+            bActivo: persona.bActivo,
+        };
+
+
+        const dialogRef = this.dialog.open(PersonaForm, {
+            width: '700px',
+            disableClose: true,
+            data: { persona: personaParaEditar } // Pasa el objeto mapeado
+        });
+
+        dialogRef.afterClosed().subscribe((result: IPersonaCreateUpdateRequest | undefined) => {
+            if (result) {
+                console.log('Datos para actualizar persona:', result);
+                this.isLoading.set(true);
+                // Asegúrate que el result SÍ tenga el iIdPersona
+                this.personaService.crearActualizarPersona(result).pipe(
+                    tap(response => {
+                        this.showSnackbar(response.vMensaje || `Persona "${persona.vNombreCompleto}" actualizada.`, 'snackbar-success');
+                        this.cargarPersonas(); // Recargar la lista
+                    }),
+                    catchError(error => {
+                        console.error('Error al actualizar persona:', error);
+                        this.showSnackbar(error.message || 'Error al actualizar la persona.', 'snackbar-error');
+                        return of(null);
+                    }),
+                    finalize(() => this.isLoading.set(false))
+                ).subscribe();
+            }
+        });
     }
 
     /*
@@ -247,19 +308,38 @@ export class PersonaPage implements OnInit, OnDestroy {
             width: '400px',
             data: {
                 titulo: 'Confirmar Eliminación',
-                mensaje: `¿Estás seguro de eliminar a "${persona.vNombreCompleto}"?`,
-                mostrarCampoObservacion: false // O true si tu API lo requiere
+                mensaje: `¿Estás seguro de eliminar (dar de baja lógica) a "${persona.vNombreCompleto}"?`,
+                mostrarCampoObservacion: false // Cambia a true si necesitas enviar observación
             }
         });
 
         dialogRef.afterClosed().subscribe(result => {
             if (result && result.confirmado) {
-                console.log('Eliminando persona:', persona.iIdPersona, 'Observación:', result.observacion);
-                // --- LLAMADA AL SERVICIO PARA ELIMINAR ---
-                // this.personaService.eliminarPersona(persona.iIdPersona, result.observacion).subscribe(...);
-                this.snackBar.open(`Persona "${persona.vNombreCompleto}" eliminada (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-warn'] });
-                this.cargarPersonas();
+                console.log('Eliminando persona:', persona.iIdPersona);
+                this.isLoading.set(true);
+                this.personaService.eliminarPersona(persona.iIdPersona).pipe(
+                    tap(response => {
+                        this.showSnackbar(response.vMensaje || `Persona "${persona.vNombreCompleto}" eliminada.`, 'snackbar-warn');
+                        this.cargarPersonas(); // Recargar la lista
+                    }),
+                    catchError(error => {
+                        console.error('Error al eliminar persona:', error);
+                        this.showSnackbar(error.message || 'Error al eliminar la persona.', 'snackbar-error');
+                        return of(null);
+                    }),
+                    finalize(() => this.isLoading.set(false))
+                ).subscribe();
             }
+        });
+    }
+    // #endregion
+
+
+    // #region Utilidades (Snackbar)
+    private showSnackbar(message: string, panelClass: string = 'snackbar-info'): void {
+        this.snackBar.open(message, 'Cerrar', {
+            duration: 5000,
+            panelClass: [panelClass] // Puede ser 'snackbar-success', 'snackbar-warn', 'snackbar-error'
         });
     }
     // #endregion
