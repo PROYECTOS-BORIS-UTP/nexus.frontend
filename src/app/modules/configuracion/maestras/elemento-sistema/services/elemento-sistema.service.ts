@@ -10,6 +10,8 @@ import { handleHttpError } from '../../../../../core/utils/error-handler.utils';
 import { IElementoSistemaCreateUpdateRequest } from '../interfaces/request/IElementoSistemaCreateUpdateRequest.interface';
 import { IElementoSistemaCreateUpdateResponse } from '../interfaces/response/IElementoSistemaCreateUpdateResponse.interface';
 import { IElementoSistemaDeleteResponse } from '../interfaces/response/IElementoSistemaDeleteResponse.interface';
+import { IElementoSistemaListadoPorCodigoRequest } from '../interfaces/request/IElementoSistemaListadoPorCodigoRequest.interface';
+import { ISelectItem } from '../../../../../core/interfaces/ISelectItem.interface';
 
 
 @Injectable({
@@ -30,6 +32,27 @@ export class ElementoSistemaService {
     listarElementosSistema(request: IElementoSistemaListadoRequest): Observable<IPaginationResponse<IElementoSistemaResponse>> {
         const url = `${this.apiUrl}/ListadoElementosSistema`;
         return this.http.post<IApiResponse<IPaginationResponse<IElementoSistemaResponse>>>(url, request).pipe(
+            map(response => {
+                if (response.bStatus && response.aData) {
+                    return response.aData;
+                } else {
+                    throw new Error(response.vMessage || 'Error desconocido al obtener elementos del sistema');
+                }
+            }),
+            catchError(handleHttpError)
+        );
+    }
+
+
+    /*
+    * Obtiene la lista de elementos hijos activos por código padre.
+    * Mapea la respuesta al formato ISelectItem para usar en selects.
+    * @param request DTO con el vCodigoPadre.
+    * @returns Observable con un array de ISelectItem.
+    */
+    listarPorCodigoPadre(request: IElementoSistemaListadoPorCodigoRequest): Observable<ISelectItem[]> {
+        const url = `${this.apiUrl}/ListarPorCodigoPadre`;
+        return this.http.post<IApiResponse<ISelectItem[]>>(url, request).pipe(
             map(response => {
                 if (response.bStatus && response.aData) {
                     return response.aData;
