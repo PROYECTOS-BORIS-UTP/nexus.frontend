@@ -1,0 +1,78 @@
+<h2 mat-dialog-title>{{ tituloDialogo }}</h2>
+
+<mat-dialog-content class="mat-typography">
+    <form [formGroup]="elementoSistemaForm" class="elemento-sistema-form-container">
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Código</mat-label>
+                <input matInput formControlName="vCodigo" required maxlength="50">
+                @if (fc['vCodigo'].hasError('required')) { <mat-error>Código es requerido.</mat-error> }
+                @if (fc['vCodigo'].hasError('maxlength')) { <mat-error>Máximo 50 caracteres.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Abreviatura</mat-label>
+                <input matInput formControlName="vAbreviatura" required maxlength="50">
+                @if (fc['vAbreviatura'].hasError('required')) { <mat-error>Abreviatura es requerida.</mat-error> }
+                @if (fc['vAbreviatura'].hasError('maxlength')) { <mat-error>Máximo 50 caracteres.</mat-error> }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field description-field">
+                <mat-label>Descripción</mat-label>
+                <input matInput formControlName="vDescripcion" required maxlength="250">
+                @if (fc['vDescripcion'].hasError('required')) { <mat-error>Descripción es requerida.</mat-error> }
+                @if (fc['vDescripcion'].hasError('maxlength')) { <mat-error>Máximo 250 caracteres.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>SubGrupo</mat-label>
+                <input matInput type="number" formControlName="iSubGrupo" required>
+                @if (fc['iSubGrupo'].hasError('required')) { <mat-error>SubGrupo es requerido.</mat-error> }
+                @if (fc['iSubGrupo'].hasError('pattern')) { <mat-error>Debe ser un número.</mat-error> }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Tipo Elemento</mat-label>
+                <mat-select formControlName="iIdTipoElemento" required>
+                    @for(tipo of tiposElemento; track tipo.id) { <mat-option [value]="tipo.id">{{ tipo.nombre
+                        }}</mat-option> }
+                </mat-select>
+                @if (fc['iIdTipoElemento'].hasError('required')) { <mat-error>Tipo es requerido.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Compañía</mat-label>
+                <mat-select formControlName="iIdCompania" required>
+                    @for(comp of companias; track comp.id) { <mat-option [value]="comp.id">{{ comp.nombre
+                        }}</mat-option> }
+                </mat-select>
+                @if (fc['iIdCompania'].hasError('required')) { <mat-error>Compañía es requerida.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>País</mat-label>
+                <mat-select formControlName="iIdPais" required>
+                    @for(pais of paises; track pais.id) { <mat-option [value]="pais.id">{{ pais.nombre }}</mat-option> }
+                </mat-select>
+                @if (fc['iIdPais'].hasError('required')) { <mat-error>País es requerido.</mat-error> }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-checkbox formControlName="bActivo" class="form-field-checkbox">Activo</mat-checkbox>
+        </div>
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onCancel()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="onSave()" [disabled]="elementoSistemaForm.invalid">
+        {{ elementoExistente ? 'Actualizar' : 'Guardar' }}
+    </button>
+</mat-dialog-actions>

@@ -1,0 +1,45 @@
+.elemento-sistema-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.form-field {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Para que el campo descripción ocupe más espacio si está solo en una fila o con pocos campos */
+.description-field {
+    flex-basis: 100%;
+    /* Ocupa toda la fila si está solo */
+    /* O ajusta flex-grow si comparte fila:
+     flex-grow: 2;
+     */
+}
+
+
+.form-field-checkbox {
+    padding-top: 10px;
+    margin-bottom: 10px;
+}
+
+.placeholder {
+    min-width: 200px;
+    visibility: hidden;
+}
+
+mat-dialog-content {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+mat-error {
+    font-size: 0.75em;
+}
