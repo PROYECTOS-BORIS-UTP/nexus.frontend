@@ -1,5 +1,3 @@
-// src/app/modules/configuracion/elemento-sistema/pages/elemento-sistema-page/elemento-sistema-page.ts
-
 import { SelectionModel } from '@angular/cdk/collections';
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
@@ -23,6 +21,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { IElementoSistemaListadoRequest } from '../../interfaces/request/IElementoSistemaListadoRequest.interface';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
+import { IElementoSistemaCreateUpdateRequest } from '../../interfaces/request/IElementoSistemaCreateUpdateRequest.interface';
+import { ElementoSistemaForm } from './dialogs/elemento-sistema-form/elemento-sistema-form';
 
 @Component({
 	selector: 'app-elemento-sistema-page',
@@ -64,13 +64,16 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 	currentPageIndex = 0;
 	// #endregion
 
+	currentParentElement = signal<IElementoSistemaResponse | null>(null); // Padre actual
+	breadcrumb = signal<IElementoSistemaResponse[]>([]);
+
 	// #region Referencias a Componentes Hijos
 	@ViewChild(TableGeneric) tableGeneric!: TableGeneric<IElementoSistemaResponse>;
 	// #endregion
 
 	// #region Configuración de la Tabla
 	// Define las columnas a mostrar según IElementoSistemaResponse
-	aDisplayedColumns: string[] = ['select', 'vCodigo', 'vAbreviatura', 'vDescripcion', 'iIdTipoElemento', 'iIdCompania', 'bActivo']; // Ajusta las columnas
+	aDisplayedColumns: string[] = ['select', 'vCodigo', 'vAbreviatura', 'vDescripcion', 'bActivo','viewChildren']; // Ajusta las columnas
 	selection = new SelectionModel<IElementoSistemaResponse>(true, []);
 	elementoSistemaActions: TableAction[] = [ // Acciones específicas
 		{ name: 'edit', label: 'Editar Elemento', icon: 'edit' },
@@ -97,21 +100,18 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 
 	// #region Carga de Datos
 	/*
-	 * Obtiene los elementos del sistema del servicio.
+	 * Obtiene los elementos del sistema del servicio, filtrando por padre si se especifica.
+	 * @param parentId ID del elemento padre (o null para el nivel raíz).
 	 */
-	cargarElementosSistema(): void {
+	cargarElementosSistema(parentId: number | null = this.currentParentElement()?.iIdElemento ?? null): void {
 		this.isLoading.set(true);
 		this.selection.clear();
 
 		const request: IElementoSistemaListadoRequest = {
 			iPageNumber: this.currentPageIndex + 1,
 			iPageSize: this.currentPageSize,
-			// Usaremos sTerminoBusqueda para filtrar por Código o Descripción
-			sTerminoBusqueda: this.currentFilterValue || undefined,
-			// Puedes añadir otros filtros aquí si es necesario
-			// iIdTipoElemento: ...,
-			// iIdCompania: ...,
-			// bActivo: ...,
+			// sTerminoBusqueda: this.currentFilterValue || undefined,
+			iIdElementoPadre: parentId,
 		};
 
 		this.elementoSistemaService.listarElementosSistema(request).pipe(
@@ -120,16 +120,71 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 				this.data.set(response.aRecords);
 			}),
 			catchError(error => {
-				console.error('Error al cargar elementos del sistema:', error);
-				this.snackBar.open(error.message || 'Error al cargar la lista de elementos.', 'Cerrar', {
-					duration: 5000, panelClass: ['snackbar-error']
-				});
+				this.showSnackbar(error.message || 'Error al cargar elementos del sistema.', 'snackbar-error');
 				this.data.set([]);
 				this.totalRecords.set(0);
 				return of(null);
 			}),
 			finalize(() => this.isLoading.set(false))
 		).subscribe();
+	}
+	// #endregion
+
+	// #region Navegación Jerárquica
+	/*
+	 * Carga los hijos del elemento seleccionado.
+	 * @param elemento El elemento padre cuyos hijos se mostrarán.
+	 */
+	viewChildren(elemento: IElementoSistemaResponse): void {
+		// Actualiza breadcrumb y padre actual
+		this.breadcrumb.update(b => [...b, elemento]);
+		this.currentParentElement.set(elemento);
+		// Resetea filtro y paginación
+		this.currentFilterValue = '';
+		// Resetea visualmente el input de filtro si tienes una referencia a él
+		// if (this.inputFilter) this.inputFilter.nativeElement.value = '';
+		this.resetPaginationAndLoad();
+	}
+
+	/*
+	* Navega al nivel superior en la jerarquía.
+	*/
+	goBack(): void {
+		if (this.breadcrumb().length > 0) {
+			// Quita el último elemento del breadcrumb
+			const newBreadcrumb = this.breadcrumb().slice(0, -1);
+			this.breadcrumb.set(newBreadcrumb);
+			// Establece el nuevo padre actual (o null si se vació el breadcrumb)
+			this.currentParentElement.set(newBreadcrumb.length > 0 ? newBreadcrumb[newBreadcrumb.length - 1] : null);
+			// Resetea filtro y paginación
+			this.currentFilterValue = '';
+			// if (this.inputFilter) this.inputFilter.nativeElement.value = '';
+			this.resetPaginationAndLoad();
+		}
+	}
+
+	/*
+	* Navega a un nivel específico del breadcrumb.
+	* @param index Índice del elemento en el breadcrumb al que navegar.
+	*/
+	goToBreadcrumbLevel(index: number): void {
+		const newBreadcrumb = this.breadcrumb().slice(0, index + 1);
+		this.breadcrumb.set(newBreadcrumb);
+		this.currentParentElement.set(newBreadcrumb[newBreadcrumb.length - 1]); // El padre es el último del nuevo breadcrumb
+		this.currentFilterValue = '';
+		// if (this.inputFilter) this.inputFilter.nativeElement.value = '';
+		this.resetPaginationAndLoad();
+	}
+
+	/*
+	 * Navega al nivel raíz (sin padre).
+	 */
+	goToRoot(): void {
+		this.breadcrumb.set([]);
+		this.currentParentElement.set(null);
+		this.currentFilterValue = '';
+		// if (this.inputFilter) this.inputFilter.nativeElement.value = '';
+		this.resetPaginationAndLoad();
 	}
 	// #endregion
 
@@ -163,10 +218,16 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 	/*
 	 * Aplica el filtro desde el input.
 	 */
-	applyFilter(event: Event): void {
-		const filterValue = (event.target as HTMLInputElement).value;
-		// Envía el término de búsqueda al Subject
+	applyFilter(filterValue: string): void {
 		this.filterSubject.next(filterValue.trim());
+	}
+	// #endregion
+
+	/** Resetea la paginación a la primera página y recarga los datos */
+	private resetPaginationAndLoad(): void {
+		this.tableGeneric?.resetPaginator(); // Resetea el paginador visual
+		this.currentPageIndex = 0; // Resetea el índice lógico
+		this.cargarElementosSistema(); // Carga los datos del nivel actual (con el filtro si existe)
 	}
 	// #endregion
 
@@ -185,6 +246,13 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 	 */
 	toggleAllRows(): void {
 		this.isAllSelected() ? this.selection.clear() : this.selection.select(...this.data());
+	}
+
+	checkboxLabel(row?: IElementoSistemaResponse): string {
+		if (!row) {
+			return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
+		}
+		return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.iIdElemento + 1}`;
 	}
 	// #endregion
 
@@ -211,35 +279,76 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 	 * Abre diálogo para agregar elemento.
 	 */
 	onAddElementoSistema(): void {
-		// Debes crear el componente ElementoSistemaForm
-		// const dialogRef = this.dialog.open(ElementoSistemaForm, { width: '600px', disableClose: true, data: {} });
-		// dialogRef.afterClosed().subscribe(result => {
-		//   if (result) {
-		//     console.log('Nuevo elemento:', result);
-		//     // --- LLAMADA AL SERVICIO PARA CREAR ---
-		//     // this.elementoSistemaService.crearActualizarElementoSistema(result).subscribe(...);
-		//     this.snackBar.open('Elemento creado (simulado).', 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		//     this.cargarElementosSistema();
-		//   }
-		// });
-		alert('Funcionalidad "Agregar Elemento del Sistema" no implementada.'); // Placeholder
+		const dialogRef = this.dialog.open(ElementoSistemaForm, {
+			width: '100%',
+			maxWidth: '700px', // Ajusta según necesidad
+			disableClose: true,
+			data: {
+				elemento: null,
+				idPadre: this.currentParentElement()?.iIdElemento ?? null
+			}
+		});
+
+		dialogRef.afterClosed().subscribe((result: IElementoSistemaCreateUpdateRequest | undefined) => {
+			if (result) {
+				this.isLoading.set(true);
+				// El 'iIdElementoPadre' ya debería venir seteado desde el formulario si se pasó
+				this.elementoSistemaService.crearActualizarElementoSistema(result).pipe(
+					tap(response => {
+						this.showSnackbar(response.vMensaje || 'Elemento creado exitosamente.', 'snackbar-success');
+						// Recarga los datos del nivel actual (donde se agregó el nuevo hijo)
+						this.cargarElementosSistema();
+					}),
+					catchError(error => { /* ... sin cambios ... */ return of(null); }),
+					finalize(() => this.isLoading.set(false))
+				).subscribe();
+			}
+		});
 	}
 
 	/*
 	 * Abre diálogo para editar elemento.
 	 */
 	onEditElementoSistema(elemento: IElementoSistemaResponse): void {
-		// const dialogRef = this.dialog.open(ElementoSistemaForm, { width: '600px', disableClose: true, data: { elemento: elemento } });
-		// dialogRef.afterClosed().subscribe(result => {
-		//   if (result) {
-		//     console.log('Elemento a actualizar:', result);
-		//     // --- LLAMADA AL SERVICIO PARA ACTUALIZAR ---
-		//     // this.elementoSistemaService.crearActualizarElementoSistema(result).subscribe(...);
-		//     this.snackBar.open(`Elemento "${elemento.vAbreviatura}" actualizado (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		//     this.cargarElementosSistema();
-		//   }
-		// });
-		alert(`Funcionalidad "Editar Elemento: ${elemento.vAbreviatura}" no implementada.`); // Placeholder
+		const elementoParaEditar: IElementoSistemaCreateUpdateRequest = {
+			iIdElemento: elemento.iIdElemento,
+			iIdElementoPadre: elemento.iIdElementoPadre,
+			vCodigo: elemento.vCodigo,
+			vAbreviatura: elemento.vAbreviatura,
+			vDescripcion: elemento.vDescripcion,
+			iSubGrupo: elemento.iSubGrupo,
+			bActivo: elemento.bActivo,
+			iIdTipoElemento: elemento.iIdTipoElemento,
+			iIdCompania: elemento.iIdCompania,
+			iIdPais: elemento.iIdPais,
+		};
+
+		const dialogRef = this.dialog.open(ElementoSistemaForm, {
+			width: '100%',
+			maxWidth: '700px',
+			disableClose: true,
+			data: {
+				elemento: elementoParaEditar,
+				idPadre: elementoParaEditar.iIdElementoPadre
+			}
+		});
+
+		dialogRef.afterClosed().subscribe((result: IElementoSistemaCreateUpdateRequest | undefined) => {
+			if (result) {
+				this.isLoading.set(true);
+				this.elementoSistemaService.crearActualizarElementoSistema(result).pipe(
+					tap(response => {
+						this.showSnackbar(response.vMensaje || `Elemento "${elemento.vDescripcion}" actualizado.`, 'snackbar-success');
+						this.cargarElementosSistema();
+					}),
+					catchError(error => {
+						this.showSnackbar(error.message || 'Error al actualizar el elemento.', 'snackbar-error');
+						return of(null);
+					}),
+					finalize(() => this.isLoading.set(false))
+				).subscribe();
+			}
+		});
 	}
 
 	/*
@@ -250,20 +359,34 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 			width: '400px',
 			data: {
 				titulo: 'Confirmar Eliminación',
-				mensaje: `¿Estás seguro de eliminar el elemento "${elemento.vAbreviatura}"?`, // Usa vAbreviatura
-				mostrarCampoObservacion: false // O true si tu API lo requiere
+				mensaje: `¿Estás seguro de eliminar el elemento "${elemento.vDescripcion}"?`,
+				mostrarCampoObservacion: false
 			}
 		});
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result && result.confirmado) {
-				console.log('Eliminando elemento:', elemento.iIdElemento, 'Observación:', result.observacion);
-				// --- LLAMADA AL SERVICIO PARA ELIMINAR ---
-				// this.elementoSistemaService.eliminarElementoSistema(elemento.iIdElemento, result.observacion).subscribe(...);
-				this.snackBar.open(`Elemento "${elemento.vAbreviatura}" eliminado (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-warn'] });
-				this.cargarElementosSistema();
+				this.isLoading.set(true);
+				this.elementoSistemaService.eliminarElementoSistema(elemento.iIdElemento).pipe(
+					tap(response => {
+						this.showSnackbar(response.vMensaje || `Elemento "${elemento.vDescripcion}" eliminado.`, 'snackbar-warn');
+						this.cargarElementosSistema();
+					}),
+					catchError(error => {
+						this.showSnackbar(error.message || 'Error al eliminar el elemento.', 'snackbar-error');
+						return of(null);
+					}),
+					finalize(() => this.isLoading.set(false))
+				).subscribe();
 			}
 		});
 	}
 	// #endregion
+
+	private showSnackbar(message: string, panelClass: string = 'snackbar-info'): void {
+		this.snackBar.open(message, 'Cerrar', {
+			duration: 5000,
+			panelClass: [panelClass]
+		});
+	}
 }
