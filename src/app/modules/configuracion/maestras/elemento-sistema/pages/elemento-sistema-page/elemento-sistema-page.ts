@@ -279,6 +279,7 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 	 * Abre diálogo para agregar elemento.
 	 */
 	onAddElementoSistema(): void {
+		console.log(this.currentParentElement()?.iIdElemento);
 		const dialogRef = this.dialog.open(ElementoSistemaForm, {
 			width: '100%',
 			maxWidth: '700px', // Ajusta según necesidad
@@ -292,11 +293,9 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 		dialogRef.afterClosed().subscribe((result: IElementoSistemaCreateUpdateRequest | undefined) => {
 			if (result) {
 				this.isLoading.set(true);
-				// El 'iIdElementoPadre' ya debería venir seteado desde el formulario si se pasó
 				this.elementoSistemaService.crearActualizarElementoSistema(result).pipe(
 					tap(response => {
 						this.showSnackbar(response.vMensaje || 'Elemento creado exitosamente.', 'snackbar-success');
-						// Recarga los datos del nivel actual (donde se agregó el nuevo hijo)
 						this.cargarElementosSistema();
 					}),
 					catchError(error => { /* ... sin cambios ... */ return of(null); }),

@@ -39,8 +39,18 @@
             <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Tipo Elemento</mat-label>
                 <mat-select formControlName="iIdTipoElemento" required>
-                    @for(tipo of tiposElemento; track tipo.id) { <mat-option [value]="tipo.id">{{ tipo.nombre
-                        }}</mat-option> }
+                    @if (isLoadingTipos) {
+                      <mat-option disabled>
+                        <mat-spinner diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+                        Cargando...
+                      </mat-option>
+                    }
+                    @for(tipo of selectTipoElemento; track tipo.iIdElemento) {
+                      <mat-option [value]="tipo.iIdElemento">{{ tipo.vDescripcion }}</mat-option>
+                    }
+                    @if (!isLoadingTipos && selectTipoElemento.length === 0) {
+                      <mat-option disabled>No hay tipos disponibles</mat-option>
+                    }
                 </mat-select>
                 @if (fc['iIdTipoElemento'].hasError('required')) { <mat-error>Tipo es requerido.</mat-error> }
             </mat-form-field>
@@ -48,8 +58,11 @@
             <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Compañía</mat-label>
                 <mat-select formControlName="iIdCompania" required>
-                    @for(comp of companias; track comp.id) { <mat-option [value]="comp.id">{{ comp.nombre
-                        }}</mat-option> }
+                     @if (isLoadingCompanias) { <mat-option disabled>Cargando...</mat-option> }
+                     @for(comp of selectCompanias; track comp.iIdElemento) {
+                       <mat-option [value]="comp.iIdElemento">{{ comp.vDescripcion }}</mat-option>
+                     }
+                     @if (!isLoadingCompanias && selectCompanias.length === 0) { <mat-option disabled>No hay compañías</mat-option> }
                 </mat-select>
                 @if (fc['iIdCompania'].hasError('required')) { <mat-error>Compañía es requerida.</mat-error> }
             </mat-form-field>
@@ -57,7 +70,11 @@
             <mat-form-field appearance="outline" class="form-field">
                 <mat-label>País</mat-label>
                 <mat-select formControlName="iIdPais" required>
-                    @for(pais of paises; track pais.id) { <mat-option [value]="pais.id">{{ pais.nombre }}</mat-option> }
+                    @if (isLoadingPaises) { <mat-option disabled>Cargando...</mat-option> }
+                    @for(pais of selectPaises; track pais.iIdElemento) {
+                      <mat-option [value]="pais.iIdElemento">{{ pais.vDescripcion }}</mat-option>
+                    }
+                    @if (!isLoadingPaises && selectPaises.length === 0) { <mat-option disabled>No hay países</mat-option> }
                 </mat-select>
                 @if (fc['iIdPais'].hasError('required')) { <mat-error>País es requerido.</mat-error> }
             </mat-form-field>
@@ -66,7 +83,6 @@
         <div class="form-row">
             <mat-checkbox formControlName="bActivo" class="form-field-checkbox">Activo</mat-checkbox>
         </div>
-
     </form>
 </mat-dialog-content>
 
