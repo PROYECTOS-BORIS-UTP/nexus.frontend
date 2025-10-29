@@ -6,15 +6,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core'; // Necesario para MatDatepicker
-import { MatSelectModule } from '@angular/material/select'; // Para Tipo Persona, Género, Estado Civil, Ubigeo
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon'; // Opcional, para iconos
+import { MatIconModule } from '@angular/material/icon'; 
 import { IPersonaCreateUpdateRequest } from '../../../../interfaces/request/IPersonaCreateUpdateRequest.interface';
-
-
-// Interfaz para los datos inyectados al diálogo
-
 
 @Component({
 	selector: 'app-persona-form',
@@ -178,7 +174,6 @@ export class PersonaForm implements OnInit {
 				}
 			}
 		}
-
 
 		console.log("Datos a enviar:", dataToSend);
 		this.dialogRef.close(dataToSend); // Devuelve los datos del formulario limpios
