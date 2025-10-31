@@ -77,7 +77,7 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 	selection = new SelectionModel<IElementoSistemaResponse>(true, []);
 	elementoSistemaActions: TableAction[] = [ // Acciones específicas
 		{ name: 'edit', label: 'Editar Elemento', icon: 'edit' },
-		{ name: 'delete', label: 'Eliminar Elemento', icon: 'delete' },
+		{ name: 'delete', label: 'Desactivar Elemento', icon: 'delete' },
 	];
 	// #endregion
 
@@ -357,7 +357,7 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 		const dialogRef = this.dialog.open(Confirmacion, {
 			width: '400px',
 			data: {
-				titulo: 'Confirmar Eliminación',
+				titulo: 'Confirmar Desactivación',
 				mensaje: `¿Estás seguro de eliminar el elemento "${elemento.vDescripcion}"?`,
 				mostrarCampoObservacion: false
 			}
