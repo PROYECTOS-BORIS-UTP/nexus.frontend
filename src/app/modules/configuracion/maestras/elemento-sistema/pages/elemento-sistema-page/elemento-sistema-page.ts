@@ -298,7 +298,7 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 						this.showSnackbar(response.vMensaje || 'Elemento creado exitosamente.', 'snackbar-success');
 						this.cargarElementosSistema();
 					}),
-					catchError(error => { /* ... sin cambios ... */ return of(null); }),
+					catchError(error => { return of(null); }),
 					finalize(() => this.isLoading.set(false))
 				).subscribe();
 			}
@@ -350,6 +350,7 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 		});
 	}
 
+	//#region DELETE COMPANIA
 	/*
 	 * Abre diálogo de confirmación para eliminar elemento.
 	 */
@@ -368,7 +369,7 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 				this.isLoading.set(true);
 				this.elementoSistemaService.eliminarElementoSistema(elemento.iIdElemento).pipe(
 					tap(response => {
-						this.showSnackbar(response.vMensaje || `Elemento "${elemento.vDescripcion}" eliminado.`, 'snackbar-warn');
+						this.showSnackbar(response.vMensaje || `Elemento "${elemento.vDescripcion}" desactivado.`, 'snackbar-warn');
 						this.cargarElementosSistema();
 					}),
 					catchError(error => {
