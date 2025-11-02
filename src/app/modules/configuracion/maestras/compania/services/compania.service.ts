@@ -6,6 +6,10 @@ import { ICompaniaResponse } from '../interfaces/response/ICompaniaResponse.inte
 import { environment } from '../../../../../../environments/environments';
 import { IPaginationResponse } from '../../../../../core/interfaces/IPaginationResponse.interface';
 import { IApiResponse } from '../../../../../core/interfaces/IApiResponse.interface';
+import { handleHttpError } from '../../../../../core/utils/error-handler.utils';
+import { ICompaniaCreateUpdateRequest } from '../interfaces/request/ICompaniaCreateUpdateRequest.interface';
+import { ICompaniaCreateUpdateResponse } from '../interfaces/response/ICompaniaCreateUpdateResponse.interface.interface';
+import { ICompaniaDeleteResponse } from '../interfaces/response/ICompaniaDeleteResponse.interface';
 
 
 @Injectable({
@@ -33,11 +37,56 @@ export class CompaniaService {
                     throw new Error(response.vMessage || 'Error desconocido al obtener compañías');
                 }
             }),
-            catchError(error => {
-                console.error('Error en la llamada HTTP a listarCompanias:', error);
-                const errorMessage = error?.error?.vMessage || error?.message || 'Error del servidor al listar compañías';
-                return throwError(() => new Error(errorMessage));
-            })
+            catchError(handleHttpError)
         );
     }
+
+    /*
+     * Envía una solicitud para crear o actualizar una Compañia.
+     * @param request DTO con los datos de la compañia.
+     * @returns Un Observable con la respuesta del backend.
+     */
+    crearActualizarCompania(request: ICompaniaCreateUpdateRequest): Observable<ICompaniaCreateUpdateResponse> {
+        const url = `${this.apiUrl}/CrearActualizarCompania`;
+        return this.http.post<ICompaniaCreateUpdateResponse>(url, request).pipe(
+            map(response => {
+                if (response && typeof response.bStatus === 'boolean') {
+                    if (response.bStatus) {
+                        return response;
+                    } else {
+                        throw new Error(response.vMensaje || 'El backend indicó un error al crear/actualizar la compañia.');
+                    }
+                } else {
+                    console.error('Respuesta inesperada del backend:', response);
+                    throw new Error('Respuesta inesperada del servidor al crear/actualizar.');
+                }
+            }),
+            catchError(handleHttpError)
+        );
+    }
+
+    /*
+     * Envía una solicitud para eliminar (baja lógica) una compañia.
+     * @param iIdCompania ID de la compañia a eliminar.
+     * @returns Un Observable con la respuesta del backend.
+     */
+    eliminarCompania(iIdCompania: number): Observable<ICompaniaDeleteResponse> {
+        const url = `${this.apiUrl}/EliminarCompania/${iIdCompania}`;
+        return this.http.delete<ICompaniaDeleteResponse>(url).pipe(
+            map(response => {
+                if (response && typeof response.bStatus === 'boolean') {
+                    if (response.bStatus) {
+                        return response;
+                    } else {
+                        throw new Error(response.vMensaje || 'El backend indicó un error al eliminar la compañia.');
+                    }
+                } else {
+                    console.error('Respuesta inesperada del backend:', response);
+                    throw new Error('Respuesta inesperada del servidor al eliminar.');
+                }
+            }),
+            catchError(handleHttpError)
+        );
+    }
+
 }

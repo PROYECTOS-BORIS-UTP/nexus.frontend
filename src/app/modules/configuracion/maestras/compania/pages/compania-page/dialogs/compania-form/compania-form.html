@@ -1,21 +1,64 @@
-<h1 mat-dialog-title>{{ titulo }}</h1>
+<h2 mat-dialog-title>{{ tituloDialogo }}</h2>
 
-<div mat-dialog-content [formGroup]="CompaniaForm">
-    <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Codigo de la Compania</mat-label>
-        <input matInput formControlName="vCodigo" placeholder="Ingrese el codigo">
-    </mat-form-field>
+<mat-dialog-content class="mat-typography">
+    <form [formGroup]="companiaForm" class="elemento-sistema-form-container">
 
-    <mat-form-field appearance="outline" class="w-full mt-4">
-        <mat-label>RUC</mat-label>
-        <input matInput formControlName="vRUC" placeholder="Ingrese la RUC">
-    </mat-form-field>
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Código</mat-label>
+                <input matInput formControlName="vCodigo" required maxlength="50">
+                @if (fc['vCodigo'].hasError('required')) { <mat-error>Código es requerido.</mat-error> }
+                @if (fc['vCodigo'].hasError('maxlength')) { <mat-error>Máximo 50 caracteres.</mat-error> }
+            </mat-form-field>
 
-</div>
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>RUC</mat-label>
+                <input matInput formControlName="vRUC" required maxlength="50">
+                @if (fc['vRUC'].hasError('required')) { <mat-error>RUC es requerida.</mat-error> }
+                @if (fc['vRUC'].hasError('maxlength')) { <mat-error>Máximo 11 caracteres.</mat-error> }
+                @if (fc['vRUC'].hasError('minlength')) { <mat-error>Mínimo 11 caracteres.</mat-error> }
+            </mat-form-field>
 
-<div mat-dialog-actions align="end">
-    <button mat-button (click)="onCancelar()">Cancelar</button>
-    <button mat-raised-button color="primary" (click)="onGuardar()" [disabled]="!CompaniaForm.valid">
-        {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Razon Social</mat-label>
+                <input matInput formControlName="vRazonSocial" required maxlength="50">
+                @if (fc['vRazonSocial'].hasError('required')) { <mat-error>Razón Social es requerida.</mat-error> }
+                @if (fc['vRazonSocial'].hasError('maxlength')) { <mat-error>Máximo 50 caracteres.</mat-error> }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Abreviatura</mat-label>
+                <input matInput type="text" formControlName="vAbreviatura" required>
+                @if (fc['vAbreviatura'].hasError('required')) { <mat-error>Abreviatura es requerido.</mat-error> }
+                @if (fc['vAbreviatura'].hasError('pattern')) { <mat-error>Debe ser un número.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Dirección</mat-label>
+                <input matInput type="text" formControlName="vDireccion" required>
+                @if (fc['vDireccion'].hasError('required')) { <mat-error>Dirección es requerido.</mat-error> }
+                @if (fc['vDireccion'].hasError('pattern')) { <mat-error>Debe ser un número.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Ubigeo</mat-label>
+                <input matInput type="text" formControlName="iIdUbigeo" required>
+                @if (fc['iIdUbigeo'].hasError('required')) { <mat-error>Ubigeo es requerido.</mat-error> }
+                @if (fc['iIdUbigeo'].hasError('pattern')) { <mat-error>Debe ser un número.</mat-error> }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-checkbox formControlName="bActivo" class="form-field-checkbox">Activo</mat-checkbox>
+        </div>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onCancel()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="onSave()" [disabled]="companiaForm.invalid">
+        {{ companiaExistente ? 'Actualizar' : 'Guardar' }}
     </button>
-</div>
+</mat-dialog-actions>
