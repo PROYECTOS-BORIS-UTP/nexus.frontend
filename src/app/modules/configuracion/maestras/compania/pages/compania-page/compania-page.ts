@@ -22,6 +22,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ICompaniaListadoRequest } from '../../interfaces/request/ICompaniaListadoRequest.interface';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
+import { CompaniaForm } from './dialogs/compania-form/compania-form';
+import { ICompaniaCreateUpdateRequest } from '../../interfaces/request/ICompaniaCreateUpdateRequest.interface';
 
 
 @Component({
@@ -74,7 +76,7 @@ export class CompaniaPage implements OnInit, OnDestroy {
     selection = new SelectionModel<ICompaniaResponse>(true, []);
     companiaActions: TableAction[] = [ // Acciones específicas
         { name: 'edit', label: 'Editar Compañía', icon: 'edit' },
-        { name: 'delete', label: 'Eliminar Compañía', icon: 'delete' },
+        { name: 'delete', label: 'Desactivar Compañía', icon: 'delete' },
     ];
     // #endregion
 
@@ -210,35 +212,75 @@ export class CompaniaPage implements OnInit, OnDestroy {
      * Abre diálogo para agregar compañía.
      */
     onAddCompania(): void {
-        // Debes crear el componente CompaniaForm
-        // const dialogRef = this.dialog.open(CompaniaForm, { width: '600px', disableClose: true, data: {} });
-        // dialogRef.afterClosed().subscribe(result => {
-        //   if (result) {
-        //     console.log('Nueva compañía:', result);
-        //     // --- LLAMADA AL SERVICIO PARA CREAR ---
-        //     // this.companiaService.crearActualizarCompania(result).subscribe(...);
-        //     this.snackBar.open('Compañía creada (simulado).', 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-        //     this.cargarCompanias();
-        //   }
-        // });
-        alert('Funcionalidad "Agregar Compañía" no implementada.'); // Placeholder
+        const dialogRef = this.dialog.open(CompaniaForm, {
+            width: '100%',
+            maxWidth: '700px', // Ajusta según necesidad
+            disableClose: true,
+            data: {
+                compania: null
+            }
+        });
+
+        dialogRef.afterClosed().subscribe((result: ICompaniaCreateUpdateRequest | undefined) => {
+            if (result) {
+                this.isLoading.set(true);
+                this.companiaService.crearActualizarCompania(result).pipe(
+                    tap(response => {
+                        this.showSnackbar(response.vMensaje || 'Compañia creada exitosamente.', 'snackbar-success');
+                        this.cargarCompanias();
+                    }),
+                    catchError(error => { return of(null); }),
+                    finalize(() => this.isLoading.set(false))
+                ).subscribe();
+            }
+        });
     }
 
     /*
      * Abre diálogo para editar compañía.
      */
     onEditCompania(compania: ICompaniaResponse): void {
-        // const dialogRef = this.dialog.open(CompaniaForm, { width: '600px', disableClose: true, data: { compania: compania } });
-        // dialogRef.afterClosed().subscribe(result => {
-        //   if (result) {
-        //     console.log('Compañía a actualizar:', result);
-        //     // --- LLAMADA AL SERVICIO PARA ACTUALIZAR ---
-        //     // this.companiaService.crearActualizarCompania(result).subscribe(...);
-        //     this.snackBar.open(`Compañía "${compania.vRazonSocial}" actualizada (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-        //     this.cargarCompanias();
-        //   }
-        // });
-        alert(`Funcionalidad "Editar Compañía: ${compania.vRazonSocial}" no implementada.`); // Placeholder
+        const companiaParaEditar: ICompaniaCreateUpdateRequest = {
+            iIdCompania: compania.iIdCompania
+            , vCodigo: compania.vCodigo
+            , vRUC: compania.vRUC
+            , vRazonSocial: compania.vRazonSocial
+            , vAbreviatura: compania.vAbreviatura
+            , iIdUbigeo: compania.iIdUbigeo
+            , vDireccion: compania.vDireccion
+            , vLogoData: compania.vLogoData
+            , bActivo: compania.bActivo
+        };
+
+
+
+        const dialogRef = this.dialog.open(CompaniaForm, {
+            width: '100%',
+            maxWidth: '700px',
+            disableClose: true,
+            data: {
+                compania: companiaParaEditar
+            }
+        });
+
+        dialogRef.afterClosed().subscribe((result: ICompaniaCreateUpdateRequest | undefined) => {
+            if (result) {
+                this.isLoading.set(true);
+
+                console.log(result);
+                this.companiaService.crearActualizarCompania(result).pipe(
+                    tap(response => {
+                        this.showSnackbar(response.vMensaje || `Compañía "${compania.vRazonSocial}" actualizada.`, 'snackbar-success');
+                        this.cargarCompanias();
+                    }),
+                    catchError(error => {
+                        this.showSnackbar(error.message || 'Error al actualizar la compañía.', 'snackbar-error');
+                        return of(null);
+                    }),
+                    finalize(() => this.isLoading.set(false))
+                ).subscribe();
+            }
+        });
     }
 
     /*
@@ -256,13 +298,27 @@ export class CompaniaPage implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result && result.confirmado) {
-                console.log('Eliminando compañía:', compania.iIdCompania, 'Observación:', result.observacion);
-                // --- LLAMADA AL SERVICIO PARA ELIMINAR ---
-                // this.companiaService.eliminarCompania(compania.iIdCompania, result.observacion).subscribe(...);
-                this.snackBar.open(`Compañía "${compania.vRazonSocial}" eliminada (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-warn'] });
-                this.cargarCompanias();
+                this.isLoading.set(true);
+                this.companiaService.eliminarCompania(compania.iIdCompania).pipe(
+                    tap(response => {
+                        this.showSnackbar(response.vMensaje || `Elemento "${compania.vRazonSocial}" desactivado.`, 'snackbar-warn');
+                        this.cargarCompanias();
+                    }),
+                    catchError(error => {
+                        this.showSnackbar(error.message || 'Error al eliminar el elemento.', 'snackbar-error');
+                        return of(null);
+                    }),
+                    finalize(() => this.isLoading.set(false))
+                ).subscribe();
             }
         });
     }
     // #endregion
+
+    private showSnackbar(message: string, panelClass: string = 'snackbar-info'): void {
+        this.snackBar.open(message, 'Cerrar', {
+            duration: 5000,
+            panelClass: [panelClass]
+        });
+    }
 }
