@@ -23,7 +23,7 @@ export class TipoCambioService {
      * @returns Un Observable con la respuesta paginada de tipos de cambio.
      */
     listarTiposCambio(request: ITipoCambioListadoRequest): Observable<IPaginationResponse<ITipoCambioResponse>> {
-        const url = `${this.apiUrl}/ListadoTiposCambio`; // Endpoint específico
+        const url = `${this.apiUrl}/ListadoTipoCambio`; // Endpoint específico
         return this.http.post<IApiResponse<IPaginationResponse<ITipoCambioResponse>>>(url, request).pipe(
             map(response => {
                 if (response.bStatus && response.aData) {
