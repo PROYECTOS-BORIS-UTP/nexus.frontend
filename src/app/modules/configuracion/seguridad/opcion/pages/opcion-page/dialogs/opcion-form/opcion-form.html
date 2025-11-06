@@ -1,0 +1,81 @@
+<h2 mat-dialog-title>{{ formTitle }}</h2>
+
+<mat-dialog-content>
+    <form [formGroup]="opcionForm" class="opcion-form">
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Nombre Opción</mat-label>
+                <input matInput formControlName="vOpcion" required>
+                @if (opcionForm.get('vOpcion')?.hasError('required')) {
+                <mat-error>El nombre es requerido.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Tipo Opción</mat-label>
+                <mat-select formControlName="iIdTipoOpcion" required>
+                    @for (tipo of tiposOpcion; track tipo.id) {
+                    <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+                    }
+                </mat-select>
+                @if (opcionForm.get('iIdTipoOpcion')?.hasError('required')) {
+                <mat-error>El tipo es requerido.</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Código</mat-label>
+                <input matInput formControlName="vCodigo">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Ruta (Frontend)</mat-label>
+                <input matInput formControlName="vRuta" placeholder="/ejemplo/ruta">
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Icono (Material)</mat-label>
+                <input matInput formControlName="vIcono" placeholder="settings">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Color (Hex)</mat-label>
+                <input matInput formControlName="vColor" placeholder="#FFFFFF">
+            </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="vDescripcion" rows="2"></textarea>
+        </mat-form-field>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Tooltip</mat-label>
+                <input matInput formControlName="vTooltip">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Título Corto</mat-label>
+                <input matInput formControlName="vTitulo">
+            </mat-form-field>
+        </div>
+
+        <mat-checkbox formControlName="bActivo" class="form-checkbox">
+            Activo
+        </mat-checkbox>
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="cancelar()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="guardarOpcion()" [disabled]="opcionForm.invalid">
+        Guardar
+    </button>
+</mat-dialog-actions>
