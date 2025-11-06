@@ -8,7 +8,7 @@ import { IPaginationResponse } from '../../../../../core/interfaces/IPaginationR
 import { IApiResponse } from '../../../../../core/interfaces/IApiResponse.interface';
 import { handleHttpError } from '../../../../../core/utils/error-handler.utils';
 import { ICompaniaCreateUpdateRequest } from '../interfaces/request/ICompaniaCreateUpdateRequest.interface';
-import { ICompaniaCreateUpdateResponse } from '../interfaces/response/ICompaniaCreateUpdateResponse.interface.interface';
+import { ICompaniaCreateUpdateResponse } from '../interfaces/response/ICompaniaCreateUpdateResponse.interface';
 import { ICompaniaDeleteResponse } from '../interfaces/response/ICompaniaDeleteResponse.interface';
 
 
