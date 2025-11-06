@@ -1,0 +1,42 @@
+<div class="opcion-container">
+
+    @for (column of columns; track column.title; let i = $index) {
+    <div class="opcion-column">
+
+        <div class="opcion-header">
+            <span class="header-title">{{ column.title }}</span>
+            <button class="header-add-btn" title="Nueva Opción" (click)="onAddOption(column, i)">
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
+
+        <div class="opcion-body">
+
+            @for (option of column.options; track option.iIdOpcion) {
+            <div class="opcion-item" (click)="onSelectOption(option, i)" [class.active]="getIsActive(option, column)">
+
+                <button class="icon-button" (click)="onEditOption(option, $event, i)">
+                    <mat-icon class="icon edit-icon">edit</mat-icon>
+                </button>
+
+                <span class="label">{{ option.vOpcion }}</span>
+
+                <button class="icon-button delete-button" (click)="onDeleteOption(option, $event, i)">
+                    <mat-icon class="icon delete-icon">delete_outline</mat-icon>
+                </button>
+
+                <mat-icon class="icon arrow-icon">chevron_right</mat-icon>
+            </div>
+            }
+
+            @if (column.options.length === 0) {
+            <div class="opcion-item-empty">
+                <mat-icon class="empty-icon">info_outline</mat-icon>
+                No hay opciones disponibles.
+            </div>
+            }
+
+        </div>
+    </div>
+    }
+</div>

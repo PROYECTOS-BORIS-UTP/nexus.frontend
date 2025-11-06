@@ -6,6 +6,7 @@ import { IPerfilResponse } from '../interfaces/response/IPerfilResponse.interfac
 import { environment } from '../../../../../../environments/environments';
 import { IPaginationResponse } from '../../../../../core/interfaces/IPaginationResponse.interface';
 import { IApiResponse } from '../../../../../core/interfaces/IApiResponse.interface';
+import { handleHttpError } from '../../../../../core/utils/error-handler.utils';
 
 
 @Injectable({
@@ -33,11 +34,7 @@ export class PerfilService {
                     throw new Error(response.vMessage || 'Error desconocido al obtener perfiles');
                 }
             }),
-            catchError(error => {
-                console.error('Error en la llamada HTTP a listarPerfiles:', error);
-                const errorMessage = error?.error?.vMessage || error?.message || 'Error del servidor al listar perfiles';
-                return throwError(() => new Error(errorMessage));
-            })
+            catchError(handleHttpError)
         );
     }
 
