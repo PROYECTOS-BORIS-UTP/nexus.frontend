@@ -21,6 +21,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { IPerfilListadoRequest } from '../../interfaces/request/IPerfilListadoRequest.interface';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
+import { IPerfilCreateUpdateRequest } from '../../interfaces/request/IPerfilCreateUpdateRequest.interface';
+import { PerfilForm } from './dialogs/perfil-form/perfil-form';
 
 @Component({
 	selector: 'app-perfil-page',
@@ -203,21 +205,28 @@ export class PerfilPage implements OnInit, OnDestroy {
 	 * Abre diálogo para agregar perfil.
 	 */
 	onAddPerfil(): void {
-		// const dialogRef = this.dialog.open(PerfilForm, { 
-		// 	width: '500px',
-		// 	disableClose: true,
-		// 	data: {}
-		// });
-		// dialogRef.afterClosed().subscribe(result => {
-		// 	if (result) {
-		// 		console.log('Nuevo perfil a crear:', result);
-		// 		// --- LLAMADA AL SERVICIO PARA CREAR ---
-		// 		// this.perfilService.crearActualizarPerfil(result).subscribe(...);
-		// 		this.snackBar.open('Perfil creado (simulado).', 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		// 		this.cargarPerfiles();
-		// 	}
-		// });
-		alert('Funcionalidad "Agregar Perfil" no implementada.'); // Placeholder
+				const dialogRef = this.dialog.open(PerfilForm, {
+					width: '100%',
+					maxWidth: '700px', // Ajusta según necesidad
+					disableClose: true,
+					data: {
+						elemento: null
+					}
+				});
+		
+				dialogRef.afterClosed().subscribe((result: IPerfilCreateUpdateRequest | undefined) => {
+					if (result) {
+						this.isLoading.set(true);
+						this.perfilService.crearActualizarPerfil(result).pipe(
+							tap(response => {
+								this.showSnackbar(response.vMensaje || 'Perfil creado exitosamente.', 'snackbar-success');
+								this.cargarPerfiles();
+							}),
+							catchError(error => { return of(null); }),
+							finalize(() => this.isLoading.set(false))
+						).subscribe();
+					}
+				}); 	
 	}
 
 	/*
@@ -256,13 +265,27 @@ export class PerfilPage implements OnInit, OnDestroy {
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result && result.confirmado) {
-				console.log('Eliminando perfil:', perfil.iIdPerfil, 'Observación:', result.observacion);
-				// --- LLAMADA AL SERVICIO PARA ELIMINAR ---
-				// this.perfilService.eliminarPerfil(perfil.iIdPerfil, result.observacion).subscribe(...);
-				this.snackBar.open(`Perfil "${perfil.vPerfil}" eliminado (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-warn'] });
-				this.cargarPerfiles();
+				this.isLoading.set(true);
+				this.perfilService.eliminarPerfil(perfil.iIdPerfil).pipe(
+					tap(response => {
+						this.showSnackbar(response.vMensaje || `Perfil "${perfil.vDescripcion}" desactivado.`, 'snackbar-warn');
+						this.cargarPerfiles();
+					}), 
+					catchError(error => {
+						this.showSnackbar(error.message || 'Error al eliminar el perfil.', 'snackbar-error');
+						return of(null);
+					}),
+					finalize(() => this.isLoading.set(false))
+				).subscribe();
 			}
 		});
 	}
 	// #endregion
+
+	private showSnackbar(message: string, panelClass: string = 'snackbar-info'): void {
+		this.snackBar.open(message, 'Cerrar', {
+			duration: 5000,
+			panelClass: [panelClass]
+		});
+	}
 }
