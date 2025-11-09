@@ -1,1 +1,35 @@
-<p>perfil-form works!</p>
+<h2 mat-dialog-title>{{ tituloDialogo }}</h2>
+
+<mat-dialog-content class="mat-typography">
+    <form [formGroup]="perfilForm" class="elemento-sistema-form-container">
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Perfil</mat-label>
+                <input matInput formControlName="vPerfil" required maxlength="50">
+                @if (fc['vPerfil'].hasError('required')) { <mat-error>Perfil es requerido.</mat-error> }
+                @if (fc['vPerfil'].hasError('maxlength')) { <mat-error>Máximo 50 caracteres.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Descripcion</mat-label>
+                <input matInput formControlName="vDescripcion" required maxlength="50">
+                @if (fc['vDescripcion'].hasError('required')) { <mat-error>Descripcion es requerida.</mat-error> }
+                @if (fc['vDescripcion'].hasError('maxlength')) { <mat-error>Máximo 50 caracteres.</mat-error> }
+                @if (fc['vDescripcion'].hasError('minlength')) { <mat-error>Mínimo 10 caracteres.</mat-error> }
+            </mat-form-field>
+
+        </div>
+
+        <div class="form-row">
+            <mat-checkbox formControlName="bActivo" class="form-field-checkbox">Activo</mat-checkbox>
+        </div>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onCancel()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="onSave()" [disabled]="perfilForm.invalid">
+        {{ perfilExistente ? 'Actualizar' : 'Guardar' }}
+    </button>
+</mat-dialog-actions>

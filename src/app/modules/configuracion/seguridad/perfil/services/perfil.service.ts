@@ -48,7 +48,7 @@ export class PerfilService {
         * @returns Un Observable con la respuesta del backend.
         */
         crearActualizarPerfil(request: IPerfilCreateUpdateRequest): Observable<IPerfilCreateUpdateResponse> {
-            const url = `${this.apiUrl}/Crear o actualizar un perfil`;
+            const url = `${this.apiUrl}/CrearActualizarPerfil`;
             return this.http.post<IPerfilCreateUpdateResponse>(url, request).pipe(
                 map(response => {
                     if (response && typeof response.bStatus === 'boolean') {
