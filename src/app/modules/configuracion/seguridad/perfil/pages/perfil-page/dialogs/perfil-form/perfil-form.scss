@@ -1,0 +1,14 @@
+::ng-deep {
+    .mat-mdc-dialog-container .mat-mdc-dialog-content {
+        overflow: visible !important;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 15px;
+
+        .mat-mdc-form-field{
+            flex: 1;
+        }
+    }
+}
