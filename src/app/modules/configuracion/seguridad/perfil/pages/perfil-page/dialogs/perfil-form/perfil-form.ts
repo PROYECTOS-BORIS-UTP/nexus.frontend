@@ -87,7 +87,8 @@ export class PerfilForm {
 
 		const dataToSend: IPerfilCreateUpdateRequest = {
 			...formData,
-			iIdperfil: this.perfilExistente?.iIdPerfil ?? 0
+
+			iIdPerfil : this.perfilExistente?.iIdPerfil ?? 0
 		};
 
 		// Limpieza de strings vacíos a null (opcional, si el backend lo requiere)
