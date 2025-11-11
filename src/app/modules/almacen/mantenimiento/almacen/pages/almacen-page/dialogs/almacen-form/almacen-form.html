@@ -1,0 +1,74 @@
+<h2 mat-dialog-title>{{ isEdit() ? 'Editar' : 'Crear' }} Almacén</h2>
+
+@if (isLoading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<mat-dialog-content>
+    <form [formGroup]="almacenForm" class="almacen-form-container">
+
+       <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Compañía</mat-label>
+            <mat-select formControlName="iIdCompania" required>
+                    @if (isLoadingCompanias) { <mat-option disabled>Cargando...</mat-option> }
+                    @for(comp of selectCompanias; track comp.iIdElemento) {
+                    <mat-option [value]="comp.iIdElemento">{{ comp.vDescripcion }}</mat-option>
+                    }
+                    @if (!isLoadingCompanias && selectCompanias.length === 0) { <mat-option disabled>No hay compañías</mat-option> }
+            </mat-select>
+            @if (fc['iIdCompania'].hasError('required')) { <mat-error>Compañía es requerida.</mat-error> }
+        </mat-form-field>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Código</mat-label>
+                <input matInput formControlName="vCodigo" required maxlength="50">
+                @if (almacenForm.controls['vCodigo'].hasError('required')) {
+                <mat-error>El código es requerido.</mat-error>
+                }
+                @if (almacenForm.controls['vCodigo'].hasError('maxlength')) {
+                <mat-error>Máximo 50 caracteres.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field-2">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="vNombre" required maxlength="255">
+                @if (almacenForm.controls['vNombre'].hasError('required')) {
+                <mat-error>El nombre es requerido.</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Dirección</mat-label>
+            <input matInput formControlName="vDireccion" maxlength="500">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Ubigeo</mat-label>
+            <mat-select formControlName="iIdUbigeo">
+                <mat-option [value]="null">-- Ninguno --</mat-option>
+                @for (ubigeo of ubigeos(); track ubigeo.iIdUbigeo) {
+                <mat-option [value]="ubigeo.iIdUbigeo">{{ ubigeo.vDescripcion }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="bActivo" color="primary">
+            Estado: {{ almacenForm.value.bActivo ? 'Activo' : 'Inactivo' }}
+        </mat-slide-toggle>
+
+        <input type="hidden" formControlName="iIdAlmacen">
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onClose()" [disabled]="isLoading()">
+        <mat-icon>cancel</mat-icon> Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="isLoading() || almacenForm.invalid">
+        <mat-icon>save</mat-icon> Guardar
+    </button>
+</mat-dialog-actions>
