@@ -25,7 +25,6 @@ import { EstadoGeneral } from '../../../../../../common/components/estado-genera
 import { CompaniaForm } from './dialogs/compania-form/compania-form';
 import { ICompaniaCreateUpdateRequest } from '../../interfaces/request/ICompaniaCreateUpdateRequest.interface';
 
-
 @Component({
     selector: 'app-compania-page',
     imports: [
