@@ -1,0 +1,61 @@
+// src/app/modules/almacen/almacen/dialogs/almacen-form/almacen-form.scss
+
+// Contenedor principal del formulario
+.almacen-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; // Espacio entre campos
+}
+
+// Clase para filas con múltiples campos
+.form-row {
+    display: flex;
+    gap: 16px; // Espacio entre campos en la misma fila
+
+    .flex-field {
+        flex: 1; // Campo flexible
+    }
+
+    .flex-field-2 {
+        flex: 2; // Campo que ocupa el doble de espacio
+    }
+}
+
+// Asegura que los mat-form-field ocupen todo el ancho
+mat-form-field {
+    width: 100%;
+}
+
+// Estilo para el slide toggle
+mat-slide-toggle {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    padding-left: 2px;
+}
+
+// Estilo para los botones de acción
+mat-dialog-actions {
+    padding: 16px 24px; // Añade padding
+    border-top: 1px solid rgba(0, 0, 0, 0.12); // Separador
+}
+
+// Añade íconos a los botones
+mat-dialog-actions button mat-icon {
+    margin-right: 6px;
+}
+
+// Barra de progreso (para que se pegue arriba)
+mat-progress-bar {
+    // Asegura que esté pegada arriba del diálogo
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+// Título
+h2[mat-dialog-title] {
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    margin-bottom: 20px;
+}
