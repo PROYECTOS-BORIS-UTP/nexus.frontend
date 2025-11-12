@@ -1,0 +1,72 @@
+:host {
+    display: block;
+    padding: 24px;
+}
+
+/* Contenedor principal de controles (flex row) */
+.controls-container {
+    display: flex;
+    justify-content: space-between; // Manda los filtros a la izq. y el botón a la der.
+    // align-items: center;
+    padding: 16px 0;
+    flex-wrap: wrap; // Permite que el botón baje en pantallas chicas
+    gap: 16px; // Espacio entre grupo de filtros y botón
+}
+
+/* NUEVO: Grupo para los selectores de la izquierda */
+.filter-group {
+    display: flex;
+    flex-wrap: wrap; // Permite que los selectores se apilen si no caben
+    gap: 16px; // Espacio ENTRE los selectores
+    flex-grow: 1; // Permite que el grupo crezca
+}
+
+/* Estilo para los campos de selección */
+.select-field {
+    flex: 1; // Crecen para llenar el espacio
+    min-width: 240px; // Ancho mínimo para cada selector
+}
+
+/* Contenedor del botón (sin cambios) */
+.actions-container {
+    display: flex;
+    gap: 8px;
+    // Asegura que el botón no crezca
+    flex-shrink: 0;
+}
+
+/* Botón (sin cambios) */
+.btnAgregar {
+    padding: 0 24px !important;
+    min-width: auto;
+    height: 48px;
+    font-size: 15px;
+    white-space: nowrap;
+
+    .mat-icon {
+        margin-right: 8px;
+    }
+}
+
+/* Mensaje informativo (sin cambios) */
+.info-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    color: #555;
+    margin-top: 20px;
+}
+
+/* Clases de celda (sin cambios) */
+::ng-deep .mat-mdc-cell.text-success {
+    color: var(--status-active-text, #28a745);
+    font-weight: 500;
+}
+
+::ng-deep .mat-mdc-cell.text-danger {
+    color: var(--status-inactive-text, #dc3545);
+    font-weight: 500;
+}

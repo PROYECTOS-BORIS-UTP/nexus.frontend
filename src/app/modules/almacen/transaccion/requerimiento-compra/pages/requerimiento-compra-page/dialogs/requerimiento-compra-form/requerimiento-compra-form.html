@@ -1,0 +1,74 @@
+<h2 mat-dialog-title>{{ isEdit() ? 'Editar' : 'Crear' }} Requerimiento de Compra</h2>
+
+@if (isLoading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<mat-dialog-content>
+    <form [formGroup]="form" class="rc-form-container">
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Compañía</mat-label>
+                <mat-select formControlName="iIdCompania" required>
+                    @if (isLoadingCompanias()) { <mat-option disabled>Cargando...</mat-option> }
+                    @for(item of selectCompanias(); track item.iIdElemento) {
+                    <mat-option [value]="item.iIdElemento">{{ item.vDescripcion }}</mat-option>
+                    }
+                </mat-select>
+                @if (form.controls['iIdCompania'].hasError('required')) {
+                <mat-error>Compañía es requerida.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Centro de Costo</mat-label>
+                <mat-select formControlName="iIdCentroCosto" required>
+                    @if (isLoadingCentrosCosto()) { <mat-option disabled>Cargando...</mat-option> }
+                    @for(item of selectCentrosCosto(); track item.iIdElemento) {
+                    <mat-option [value]="item.iIdElemento">{{ item.vDescripcion }}</mat-option>
+                    }
+                </mat-select>
+                @if (form.controls['iIdCentroCosto'].hasError('required')) {
+                <mat-error>Centro de Costo es requerido.</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Fecha de Solicitud</mat-label>
+                <input matInput [matDatepicker]="pickerSol" formControlName="dFechaSolicitud" required readonly>
+                <mat-datepicker-toggle matSuffix [for]="pickerSol"></mat-datepicker-toggle>
+                <mat-datepicker #pickerSol></mat-datepicker>
+                @if (form.controls['dFechaSolicitud'].hasError('required')) {
+                <mat-error>Fecha de Solicitud es requerida.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Fecha de Necesidad (Opc.)</mat-label>
+                <input matInput [matDatepicker]="pickerNec" formControlName="dFechaNecesidad" readonly>
+                <mat-datepicker-toggle matSuffix [for]="pickerNec"></mat-datepicker-toggle>
+                <mat-datepicker #pickerNec></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Justificación (Opcional)</mat-label>
+            <textarea matInput formControlName="vJustificacion" rows="3" maxlength="500"></textarea>
+        </mat-form-field>
+
+        <input type="hidden" formControlName="iIdRequerimientoCompra">
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onClose()" [disabled]="isLoading()">
+        <mat-icon>cancel</mat-icon> Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="isLoading() || form.invalid">
+        <mat-icon>save</mat-icon> Guardar
+    </button>
+</mat-dialog-actions>

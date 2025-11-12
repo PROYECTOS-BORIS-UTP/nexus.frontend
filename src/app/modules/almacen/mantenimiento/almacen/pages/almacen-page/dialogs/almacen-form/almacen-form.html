@@ -7,7 +7,7 @@
 <mat-dialog-content>
     <form [formGroup]="almacenForm" class="almacen-form-container">
 
-       <mat-form-field appearance="outline" class="form-field">
+        <mat-form-field appearance="outline" class="form-field">
             <mat-label>Compañía</mat-label>
             <mat-select formControlName="iIdCompania" required>
                     @if (isLoadingCompanias) { <mat-option disabled>Cargando...</mat-option> }
