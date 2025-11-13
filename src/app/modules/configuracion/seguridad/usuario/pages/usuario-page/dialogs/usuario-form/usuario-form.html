@@ -1,21 +1,52 @@
-<h1 mat-dialog-title>{{ titulo }}</h1>
+<h2 mat-dialog-title>{{ tituloDialogo }}</h2>
 
-<div mat-dialog-content [formGroup]="usuarioForm">
-    <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Nombre Completo</mat-label>
-        <input matInput formControlName="vNombreCompleto" placeholder="Ingrese el nombre">
-    </mat-form-field>
+<mat-dialog-content class="mat-typography">
+  <form [formGroup]="usuarioForm" class="elemento-sistema-form-container">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Usuario</mat-label>
+        <input matInput formControlName="vUsuario" required maxlength="50" />
+        @if (fc['vUsuario'].hasError('required')) { <mat-error>Usuario es requerido.</mat-error> }
+        @if (fc['vUsuario'].hasError('maxlength')) { <mat-error>Máximo 50 caracteres.</mat-error> }
+      </mat-form-field>
 
-    <mat-form-field appearance="outline" class="w-full mt-4">
-        <mat-label>Email</mat-label>
-        <input matInput formControlName="vEmail" placeholder="Ingrese el correo electrónico">
-    </mat-form-field>
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Tipo Usuario</mat-label>
+        <input matInput formControlName="iIdTipoUsuario" required maxlength="50" />
+        @if (fc['iIdTipoUsuario'].hasError('required')) {
+        <mat-error>Tipo Usuario es requerida.</mat-error> } 
+        @if (fc['iIdTipoUsuario'].hasError('maxlength')) {
+        <mat-error>Máximo 50 caracteres.</mat-error> }
+      </mat-form-field>
 
-</div>
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Id Persona</mat-label>
+        <input matInput formControlName="iIdPersona" required maxlength="50" />
+        @if (fc['iIdPersona'].hasError('required')) {
+        <mat-error>Id Persona es requerida.</mat-error> } 
+        @if (fc['iIdPersona'].hasError('maxlength')) { <mat-error>Máximo 50 caracteres.</mat-error> }
+      </mat-form-field>
+    </div>
 
-<div mat-dialog-actions align="end">
-    <button mat-button (click)="onCancelar()">Cancelar</button>
-    <button mat-raised-button color="primary" (click)="onGuardar()" [disabled]="!usuarioForm.valid">
-        {{ isEditMode ? 'Actualizar' : 'Guardar' }}
-    </button>
-</div>
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Tipo Persona</mat-label>
+        <input matInput formControlName="iIdTipoPersona" required maxlength="50"/>
+        @if (fc['iIdTipoPersona'].hasError('required')) {
+        <mat-error>Tipo Persona es requerido.</mat-error> }
+      </mat-form-field>
+    </div>
+
+    
+    <div class="form-row">
+      <mat-checkbox formControlName="bActivo" class="form-field-checkbox">Activo</mat-checkbox>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="onCancel()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="onSave()" [disabled]="usuarioForm.invalid">
+    {{ usuarioExistente ? 'Actualizar' : 'Guardar' }}
+  </button>
+</mat-dialog-actions>
