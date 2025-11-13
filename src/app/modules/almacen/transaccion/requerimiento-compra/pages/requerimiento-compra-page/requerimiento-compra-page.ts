@@ -176,7 +176,7 @@ export class RequerimientoCompraPage {
 	// #endregion
 
 	// #region Manejo de Acciones de Fila
-	/**
+	/*
 	 * Maneja clics en las acciones de fila.
 	 */
 	onActionClicked(event: { action: string, element: IRequerimientoCompraListadoResponse }): void {
@@ -197,12 +197,13 @@ export class RequerimientoCompraPage {
 	// #endregion
 
 	// #region Apertura de Diálogos
-	/**
+	/*
 	 * Abre diálogo para agregar requerimiento.
 	 */
 	onAddRequerimiento(): void {
 		const dialogRef = this.dialog.open(RequerimientoCompraForm, {
-			width: '700px', // Ajusta el ancho
+			width: '100%',
+			maxWidth: '1050px',
 			disableClose: true,
 			data: {}
 		});
@@ -222,14 +223,19 @@ export class RequerimientoCompraPage {
 		const dataParaForm: IRequerimientoCompraCreateUpdateRequest = {
 			iIdRequerimientoCompra: requerimiento.iIdRequerimientoCompra,
 			iIdCompania: requerimiento.iIdCompania,
+			vSerie: requerimiento.vSerie,
+			vNumero: requerimiento.vNumero,
 			dFechaSolicitud: (requerimiento.dFechaSolicitud as string).split('T')[0], // Formato YYYY-MM-DD
 			dFechaNecesidad: requerimiento.dFechaNecesidad ? (requerimiento.dFechaNecesidad as string).split('T')[0] : null,
 			iIdCentroCosto: requerimiento.iIdCentroCosto,
+			iIdUsuarioSolicitante: requerimiento.iIdUsuarioSolicitante,
+			iIdEstado: requerimiento.iIdEstado,
 			vJustificacion: requerimiento.vJustificacion
 		};
 
 		const dialogRef = this.dialog.open(RequerimientoCompraForm, {
-			width: '700px',
+			width: '100%',
+			maxWidth: '1050px',
 			disableClose: true,
 			data: { requerimiento: dataParaForm } // Envía los datos mapeados
 		});
