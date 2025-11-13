@@ -1,0 +1,62 @@
+<h2 mat-dialog-title>Catálogo de Productos</h2>
+
+<div class="selector-container">
+    <div class="filter-header">
+        <mat-form-field appearance="outline" style="flex: 1; font-size: 14px;">
+            <mat-label>Buscar producto (Nombre, Código, Familia)...</mat-label>
+            <input matInput [formControl]="searchControl" placeholder="Ej. Laptop">
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+    </div>
+
+    <div class="table-container">
+        <table mat-table [dataSource]="dataSource">
+
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="vCodigo">
+                <th mat-header-cell *matHeaderCellDef> Código </th>
+                <td mat-cell *matCellDef="let element"> {{element.vCodigo}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="vDescripcion">
+                <th mat-header-cell *matHeaderCellDef> Descripción </th>
+                <td mat-cell *matCellDef="let element">
+                    <strong>{{element.vDescripcion}}</strong>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="vUnidadMedida">
+                <th mat-header-cell *matHeaderCellDef> U.M. </th>
+                <td mat-cell *matCellDef="let element"> {{element.vUnidadMedida}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="vCategoria">
+                <th mat-header-cell *matHeaderCellDef> Familia </th>
+                <td mat-cell *matCellDef="let element"> {{element.vCategoria}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></tr>
+        </table>
+    </div>
+</div>
+
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancelar</button>
+    <button mat-raised-button color="primary" (click)="agregarSeleccionados()" [disabled]="selection.isEmpty()">
+        Agregar ({{selection.selected.length}})
+    </button>
+</mat-dialog-actions>

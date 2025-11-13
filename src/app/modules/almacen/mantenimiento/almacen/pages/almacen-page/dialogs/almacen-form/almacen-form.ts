@@ -56,11 +56,10 @@ export class AlmacenForm {
 	// #endregion
 
 	// #region Datos (Selects) - (Simulados, debes cargarlos)
+	isLoadingCompanias = false;
 	selectCompanias: ISelectItem[] = [];
 	ubigeos = signal<any[]>([]);   // Ejemplo: [{ iIdUbigeo: 150101, vDescripcion: 'LIMA' }]
 	// #endregion
-
-	isLoadingCompanias = false;
 
 	constructor(@Inject(MAT_DIALOG_DATA) public data: AlmacenFormData) {
 		this.isEdit.set(!!data.almacen); // Determina si es edición

@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } fr
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -18,6 +18,10 @@ import { RequerimientoCompraService } from '../../../../services/requerimiento-c
 import { IRequerimientoCompraDetalleListadoRequest } from '../../../../interfaces/request/IRequerimientoCompraDetalleListadoRequest.interface';
 import { IRequerimientoCompraDetalleCreateUpdateRequest } from '../../../../interfaces/request/IRequerimientoCompraDetalleCreateUpdateRequest';
 import { IRequerimientoCompraCreateUpdateResponse } from '../../../../interfaces/response/IRequerimientoCompraCreateUpdateResponse.interface';
+import { ICompaniaListadoRequest } from '../../../../../../../configuracion/maestras/compania/interfaces/request/ICompaniaListadoRequest.interface';
+import { CompaniaService } from '../../../../../../../configuracion/maestras/compania/services/compania.service';
+import { ProductoSelector } from '../../../../../../mantenimiento/almacen/pages/almacen-page/dialogs/almacen-form/dialogs/producto-selector/producto-selector';
+import { IProductoCatalogo } from '../../../../../../mantenimiento/almacen/pages/almacen-page/dialogs/almacen-form/dialogs/interfaces/IProductoCatalogo.interface';
 
 export interface RequerimientoCompraFormData {
 	requerimiento?: IRequerimientoCompraCreateUpdateRequest; // Usa el DTO inferido
@@ -47,9 +51,10 @@ export class RequerimientoCompraForm {
 	private fb = inject(FormBuilder);
 	private requerimientoCompraService = inject(RequerimientoCompraService);
 	private snackBar = inject(MatSnackBar);
+	private companiaService = inject(CompaniaService);
 	public dialogRef = inject(MatDialogRef<RequerimientoCompraForm>);
+	private dialogService = inject(MatDialog);
 	// (Inyecta servicios para selects)
-	// private companiaService = inject(CompaniaService);
 	// private centroCostoService = inject(CentroCostoService);
 	// #endregion
 
@@ -80,8 +85,8 @@ export class RequerimientoCompraForm {
 		this.form = this.fb.group({
 			iIdRequerimientoCompra: [0],
 			iIdCompania: [null, [Validators.required, Validators.min(1)]],
-			vSerie: [{value: 'REQCOM', disabled: true}, Validators.required], 
-            vNumero: [null, Validators.required],
+			vSerie: [{ value: 'REQCOM', disabled: true }, Validators.required],
+			vNumero: [{ value: '', disabled: true }],
 			dFechaSolicitud: [new Date(), [Validators.required]], // Por defecto hoy
 			dFechaNecesidad: [null], // Opcional
 			iIdCentroCosto: [null, [Validators.required, Validators.min(1)]],
@@ -91,13 +96,13 @@ export class RequerimientoCompraForm {
 	}
 
 	ngOnInit(): void {
+		this.cargarCompanias();
 		this.cargarDatosSelects(); // Carga maestros (Compañías, Productos, etc.)
 
 		if (this.isEdit() && this.data.requerimiento) {
 			this.cargarDatosEdicion();
 		} else {
-			// Si es nuevo, agregamos una fila vacía por defecto para mejor UX
-			this.agregarDetalle();
+			this.form.get('vNumero')?.setValue('---');
 		}
 	}
 
@@ -108,21 +113,54 @@ export class RequerimientoCompraForm {
 
 	// #region Gestión de Detalles (FormArray)
 
-	/** Crea un FormGroup para una fila de la tabla */
-	crearDetalleGroup(data?: any): FormGroup {
-		return this.fb.group({
-			iIdRequerimientoCompraDetalle: [data?.iIdRequerimientoCompraDetalle || 0],
-			iIdProducto: [data?.iIdProducto || null, Validators.required],
-			dCantidadSolicitada: [data?.dCantidadSolicitada || null, [Validators.required, Validators.min(0.01)]],
-			iIdUnidadMedida: [data?.iIdUnidadMedida || null, Validators.required],
-			vObservacion: [data?.vObservacion || null]
+	/** Agrega una nueva fila a la tabla */
+	abrirSelectorProductos(): void {
+		const dialogRef = this.dialogService.open(ProductoSelector, {
+			width: '100%',
+			maxWidth: '700px',
+			disableClose: false
+		});
+
+		dialogRef.afterClosed().subscribe((productosSeleccionados: IProductoCatalogo[]) => {
+			if (productosSeleccionados && productosSeleccionados.length > 0) {
+
+				// Recorremos los productos seleccionados y los agregamos a la tabla
+				productosSeleccionados.forEach(prod => {
+					// Verificamos si ya existe en la tabla para no duplicar (Opcional)
+					const existe = this.detallesArr.controls.some(
+						ctrl => ctrl.get('iIdProducto')?.value === prod.iIdProducto
+					);
+
+					if (!existe) {
+						this.detallesArr.push(this.crearDetalleGroup({
+							iIdProducto: prod.iIdProducto,
+							vProductoNombre: prod.vDescripcion, // Guardamos nombre solo para mostrar (ver HTML abajo)
+							iIdUnidadMedida: prod.iIdUnidadMedida, // Pre-llenamos la UM del producto
+							dCantidadSolicitada: 1, // Valor por defecto
+							vObservacion: ''
+						}));
+					}
+				});
+
+				this.mostrarSnack(`${productosSeleccionados.length} productos agregados.`, 'snackbar-success');
+			}
 		});
 	}
 
-	/** Agrega una nueva fila a la tabla */
-	agregarDetalle(): void {
-		this.detallesArr.push(this.crearDetalleGroup());
-	}
+	/** Crea un FormGroup para una fila de la tabla */
+	crearDetalleGroup(data?: any): FormGroup {
+        return this.fb.group({
+            iIdRequerimientoCompraDetalle: [data?.iIdRequerimientoCompraDetalle || 0],
+            iIdProducto: [data?.iIdProducto || null, Validators.required],
+            
+            // Campo auxiliar para mostrar el nombre en modo lectura (readonly)
+            vProductoNombre: [data?.vProductoNombre || 'Producto Cargado', Validators.required], 
+            
+            dCantidadSolicitada: [data?.dCantidadSolicitada || null, [Validators.required, Validators.min(0.01)]],
+            iIdUnidadMedida: [data?.iIdUnidadMedida || null, Validators.required],
+            vObservacion: [data?.vObservacion || null]
+        });
+    }
 
 	/** Elimina una fila de la tabla visualmente y marca para borrar en BD si ya existía */
 	eliminarDetalle(index: number): void {
@@ -140,6 +178,32 @@ export class RequerimientoCompraForm {
 	// #endregion
 
 	// #region Carga de Datos (Selects)
+
+	cargarCompanias(): void {
+		this.isLoadingCompanias.set(true);
+		const request: ICompaniaListadoRequest = {
+			iPageNumber: 1,
+			iPageSize: 1000,
+		};
+
+		this.companiaService.listarCompanias(request)
+			.pipe(finalize(() => this.isLoadingCompanias.set(false)))
+			.subscribe({
+				next: (paginatedResponse) => {
+					this.selectCompanias.set(
+						paginatedResponse.aRecords.map(comp => ({
+							iIdElemento: comp.iIdCompania,
+							vDescripcion: comp.vRazonSocial
+						}))
+					);
+				},
+				error: (err) => {
+					console.error('Error al cargar Compañías:', err);
+					this.selectCompanias.set([]);
+				}
+			});
+	}
+
 	/*
 	 * Carga datos para los selects (Compañías, Centros de Costo)
 	 * DEBES REEMPLAZAR ESTO con llamadas a servicios reales.
@@ -150,7 +214,6 @@ export class RequerimientoCompraForm {
 
 		this.isLoadingCompanias.set(true);
 		setTimeout(() => {
-			this.selectCompanias.set([{ iIdElemento: 1, vDescripcion: 'Mi Empresa S.A.C.' }]);
 			this.selectCentrosCosto.set([{ iIdElemento: 1, vDescripcion: 'Logística' }, { iIdElemento: 2, vDescripcion: 'TI' }]);
 
 			// Datos para el detalle
@@ -172,12 +235,11 @@ export class RequerimientoCompraForm {
 
 	cargarDatosEdicion() {
 		const req = this.data.requerimiento!;
-
 		// 1. Cargar Cabecera
 		this.form.patchValue({
 			...req,
-			vSerie: req.vSerie,
-            vNumero: req.vNumero,
+			// vSerie: req.vSerie,
+			// vNumero: req.vNumero,
 			dFechaSolicitud: req.dFechaSolicitud ? new Date(req.dFechaSolicitud + 'T00:00:00') : null,
 			dFechaNecesidad: req.dFechaNecesidad ? new Date(req.dFechaNecesidad + 'T00:00:00') : null
 		});
@@ -229,12 +291,14 @@ export class RequerimientoCompraForm {
 		this.isLoading.set(true);
 		const formVal = this.form.getRawValue();
 
+		const numeroEnvio = this.isEdit() ? formVal.vNumero : '';
+
 		// 1. Preparar DTO Cabecera
 		const requestCabecera: IRequerimientoCompraCreateUpdateRequest = {
 			iIdRequerimientoCompra: formVal.iIdRequerimientoCompra,
 			iIdCompania: formVal.iIdCompania,
 			vSerie: formVal.vSerie,
-            vNumero: formVal.vNumero,
+			vNumero: numeroEnvio,
 			dFechaSolicitud: this.formatDate(formVal.dFechaSolicitud)!,
 			dFechaNecesidad: this.formatDate(formVal.dFechaNecesidad),
 			iIdCentroCosto: formVal.iIdCentroCosto,
@@ -250,11 +314,13 @@ export class RequerimientoCompraForm {
 				const idCabecera = respCabecera.iIdRequerimientoCompra;
 
 				if (respCabecera.vNumero) {
-                    this.form.patchValue({
-                        vNumero: respCabecera.vNumero
-                    });
-                }
-				
+					this.form.patchValue({
+						vNumero: respCabecera.vNumero,
+						iIdRequerimientoCompra: idCabecera // Actualizamos ID para pasar a modo edición
+					});
+					this.isEdit.set(true); // Cambiamos estado visual a edición
+				}
+
 				// Array de observables para operaciones en paralelo
 				const peticionesDetalle = [];
 
@@ -292,12 +358,12 @@ export class RequerimientoCompraForm {
 		).subscribe({
 			next: () => {
 				this.mostrarSnack('Requerimiento guardado exitosamente.', 'snackbar-success');
-				this.dialogRef.close(true);
+				// this.dialogRef.close(true);
 			},
 			error: (err: any) => {
-                console.error("Error en proceso de guardado:", err);
-                this.mostrarSnack('Ocurrió un error al guardar el requerimiento.', 'snackbar-error');
-            }
+				console.error("Error en proceso de guardado:", err);
+				this.mostrarSnack('Ocurrió un error al guardar el requerimiento.', 'snackbar-error');
+			}
 		});
 	}
 
@@ -305,7 +371,7 @@ export class RequerimientoCompraForm {
 
 	// #region Helpers
 	onClose(): void {
-		this.dialogRef.close(false);
+		this.dialogRef.close(true);
 	}
 
 	private formatDate(date: Date | string | null): string | null {
