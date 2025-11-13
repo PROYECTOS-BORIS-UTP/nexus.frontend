@@ -1,0 +1,147 @@
+<div class="page-container">
+
+	<div class="controls-container">
+
+		<div class="filter-group">
+			<mat-form-field appearance="outline" class="select-field">
+				<mat-label>Selecciona Almacén</mat-label>
+				<mat-select
+					[(ngModel)]="almacenIdSeleccionado"
+					(selectionChange)="onAlmacenChange()"
+					[disabled]="isLoadingAlmacenes()"
+				>
+
+					@if (isLoadingAlmacenes()) { <mat-option disabled>Cargando...</mat-option> }
+					@for (almacen of selectAlmacenes(); track almacen.iIdElemento) {
+					<mat-option [value]="almacen.iIdElemento">
+						{{ almacen.vDescripcion }}
+					</mat-option>
+					}
+					@if (!isLoadingAlmacenes() && selectAlmacenes().length === 0) {
+					<mat-option disabled>No hay almacenes</mat-option>
+					}
+				</mat-select>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline" class="select-field">
+				<mat-label>Selecciona Producto</mat-label>
+				<mat-select
+					[(ngModel)]="productoIdSeleccionado"
+					(selectionChange)="onProductoChange()"
+					[disabled]="!almacenIdSeleccionado() || isLoadingProductos()"
+				>
+
+					@if (isLoadingProductos()) { <mat-option disabled>Cargando...</mat-option> }
+					@for (producto of selectProductos(); track producto.iIdElemento) {
+					<mat-option [value]="producto.iIdElemento">
+						{{ producto.vDescripcion }}
+					</mat-option>
+					}
+					@if (!isLoadingProductos() && selectProductos().length === 0) {
+					<mat-option disabled>No hay productos</mat-option>
+					}
+				</mat-select>
+			</mat-form-field>
+		</div>
+
+		<div class="actions-container">
+			<button mat-raised-button color="primary" (click)="onAddMovimiento()" class="btnAgregar">
+				<mat-icon>add</mat-icon>
+				<span>Agregar Movimiento</span>
+			</button>
+		</div>
+
+	</div>
+
+	@if (isLoading()) {
+	<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+	}
+
+	@if (productoIdSeleccionado()) {
+	<app-table-generic #table [data]="data()" [displayedColumns]="aDisplayedColumns" [selection]="selection"
+		[actions]="movimientoActions" [totalRecords]="totalRecords()" [pageSizeOptions]="pageSizeOptions"
+		[initialPageSize]="currentPageSize" (actionClicked)="onActionClicked($event)"
+		(pageChange)="handlePageEvent($event)">
+
+		<ng-container matColumnDef="select">
+			<th mat-header-cell *matHeaderCellDef>
+				<mat-checkbox (change)="$event ? toggleAllRows() : null"
+					[checked]="selection.hasValue() && isAllSelected()"  
+					[indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Seleccionar todas las filas">
+				</mat-checkbox>
+			</th>
+			<td mat-cell *matCellDef="let row">
+				<mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+					[checked]="selection.isSelected(row)" [aria-label]="'Seleccionar movimiento ' + row.iIdMovimiento">
+				</mat-checkbox>
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="dFechaMovimiento">
+			<th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha </th>
+			<td mat-cell *matCellDef="let element"> {{element.dFechaMovimiento | date:'dd/MM/yyyy HH:mm'}}
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="vTipoMovimientoNombre">
+			<th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo Movimiento </th>
+			<td mat-cell *matCellDef="let element"> {{element.vTipoMovimientoNombre || '-'}} </td>
+		</ng-container>
+
+		<ng-container matColumnDef="dCantidad">
+			<th mat-header-cell *matHeaderCellDef mat-sort-header> Cantidad </th>
+			<td mat-cell *matCellDef="let element" [ngClass]="element.dCantidad > 0 ? 'text-success' : 'text-danger'">
+				{{ element.dCantidad | number:'1.2-4' }}
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="dPrecioUnitario">
+			<th mat-header-cell *matHeaderCellDef mat-sort-header> P. Unitario </th>
+			<td mat-cell *matCellDef="let element">
+				{{ (element.dPrecioUnitario !== null && element.dPrecioUnitario !== undefined) ?
+				(element.dPrecioUnitario | number:'1.2-4') : '-' }}
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="dTotal">
+			<th mat-header-cell *matHeaderCellDef mat-sort-header> Total </th>
+			<td mat-cell *matCellDef="let element">
+				{{ (element.dTotal !== null && element.dTotal !== undefined) ? (element.dTotal |
+				number:'1.2-2') : '-'
+				}}
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="vObservacion">
+			<th mat-header-cell *matHeaderCellDef> Observación </th>
+			<td mat-cell *matCellDef="let element" [matTooltip]="element.vObservacion">
+				{{ (element.vObservacion | slice:0:30) || '-' }}{{ element.vObservacion &&
+				element.vObservacion.length >
+				30 ? '...' : '' }}
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="bActivo">
+			<th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+			<td mat-cell *matCellDef="let element">
+				<app-estado-general [iIdEstado]="element.bActivo ? 1 : 2"  
+					[vNombreEstado]="element.bActivo ? 'Válido' : 'Anulado'">
+				</app-estado-general>
+			</td>
+		</ng-container>
+
+	</app-table-generic>
+	} @else {
+	<div class="info-message">
+		<mat-icon>info_outline</mat-icon>
+		<span>
+			@if (!almacenIdSeleccionado()) {
+			Selecciona un almacén para empezar.
+			} @else {
+			Selecciona un producto para ver su Kardex.
+			}
+		</span>
+	</div>
+	}
+
+</div>
