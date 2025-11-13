@@ -1,0 +1,61 @@
+// src/app/modules/almacen/movimientos/dialogs/movimiento-form/movimiento-form.scss
+
+// Contenedor principal del formulario
+.movimiento-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; // Espacio entre campos
+}
+
+// Clase para filas con múltiples campos
+.form-row {
+    display: flex;
+    gap: 16px; // Espacio entre campos en la misma fila
+
+    .flex-field {
+        flex: 1; // Campo flexible
+    }
+}
+
+// Asegura que los mat-form-field ocupen todo el ancho
+mat-form-field {
+    width: 100%;
+}
+
+// Estilo para mostrar el total calculado
+.total-display {
+    padding: 8px 4px;
+    font-size: 1.1em;
+    font-weight: 500;
+    text-align: right;
+    color: var(--mat-primary-color, #3f51b5); // Usa color primario
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    margin: 8px 0;
+}
+
+// Estilo para los botones de acción
+mat-dialog-actions {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+// Añade íconos a los botones
+mat-dialog-actions button mat-icon {
+    margin-right: 6px;
+}
+
+// Barra de progreso
+mat-progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+// Título
+h2[mat-dialog-title] {
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    margin-bottom: 20px;
+}

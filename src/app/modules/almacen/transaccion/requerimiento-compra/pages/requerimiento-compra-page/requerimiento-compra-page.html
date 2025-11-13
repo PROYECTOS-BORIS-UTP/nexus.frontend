@@ -1,0 +1,78 @@
+<div class="page-container">
+    <div class="controls-container">
+        <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar Requerimiento</mat-label>
+            <input matInput (input)="applyFilter($event)" placeholder="Escribe N° de documento..." #inputFilter>
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="actions-container">
+            <button mat-raised-button color="primary" (click)="onAddRequerimiento()" class="btnAgregar">
+                <mat-icon>add</mat-icon>
+                <span>Nuevo Requerimiento</span>
+            </button>
+        </div>
+    </div>
+
+    @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <app-table-generic #table [data]="data()" [displayedColumns]="aDisplayedColumns" [selection]="selection"
+        [actions]="requerimientoActions" [totalRecords]="totalRecords()" [pageSizeOptions]="pageSizeOptions"
+        [initialPageSize]="currentPageSize" (actionClicked)="onActionClicked($event)"
+        (pageChange)="handlePageEvent($event)">
+
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Seleccionar todas las filas">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)" [aria-label]="'Seleccionar R.C. ' + row.vNumero">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vNumero">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Número </th>
+            <td mat-cell *matCellDef="let element"> {{element.vSerie}}-{{element.vNumero}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dFechaSolicitud">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> F. Solicitud </th>
+            <td mat-cell *matCellDef="let element"> {{element.dFechaSolicitud | date:'dd/MM/yyyy'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vUsuarioSolicitanteNombre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Solicitante </th>
+            <td mat-cell *matCellDef="let element"> {{element.vUsuarioSolicitanteNombre}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vCentroCostoNombre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Centro Costo </th>
+            <td mat-cell *matCellDef="let element"> {{element.vCentroCostoNombre}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vJustificacion">
+            <th mat-header-cell *matHeaderCellDef> Justificación </th>
+            <td mat-cell *matCellDef="let element" [matTooltip]="element.vJustificacion">
+                {{ (element.vJustificacion | slice:0:40) || '-' }}{{ element.vJustificacion &&
+                element.vJustificacion.length > 40 ? '...' : '' }}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vEstadoNombre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+            <td mat-cell *matCellDef="let element">
+                <app-estado-general [iIdEstado]="element.iIdEstado" [vNombreEstado]="element.vEstadoNombre">
+                </app-estado-general>
+            </td>
+        </ng-container>
+
+    </app-table-generic>
+
+</div>

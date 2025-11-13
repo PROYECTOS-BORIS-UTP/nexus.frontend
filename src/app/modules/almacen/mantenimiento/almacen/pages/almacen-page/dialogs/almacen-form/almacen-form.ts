@@ -56,12 +56,10 @@ export class AlmacenForm {
 	// #endregion
 
 	// #region Datos (Selects) - (Simulados, debes cargarlos)
-	// Deberías cargar estos datos desde servicios correspondientes
-	companias = signal<any[]>([]); // Ejemplo: [{ iIdCompania: 1, vRazonSocial: 'Mi Compañía' }]
+	selectCompanias: ISelectItem[] = [];
 	ubigeos = signal<any[]>([]);   // Ejemplo: [{ iIdUbigeo: 150101, vDescripcion: 'LIMA' }]
 	// #endregion
 
-	selectCompanias: ISelectItem[] = []; // Usar ISelectItem si aplica
 	isLoadingCompanias = false;
 
 	constructor(@Inject(MAT_DIALOG_DATA) public data: AlmacenFormData) {
@@ -80,7 +78,7 @@ export class AlmacenForm {
 	}
 
 	ngOnInit(): void {
-		
+
 		if (this.isEdit() && this.data.almacen) {
 			// Mapea la respuesta del listado al DTO de Create/Update
 			const almacenData: IAlmacenCreateUpdateRequest = {
