@@ -1,0 +1,21 @@
+::ng-deep {
+    .mdc-text-field--outlined.mdc-text-field--disabled {
+        .mdc-text-field__input {
+            color: inherit !important;
+        }
+
+        .mdc-floating-label {
+            color: inherit !important;
+        }
+
+        // .mat-mdc-notch-piece {
+        //     border-color: inherit !important;
+        // }
+    }
+
+    .mat-mdc-dialog-container .mat-mdc-dialog-title {
+        background: #280552 !important;
+        color: #ffffff !important;
+        font-weight: 500 !important;
+    }
+}

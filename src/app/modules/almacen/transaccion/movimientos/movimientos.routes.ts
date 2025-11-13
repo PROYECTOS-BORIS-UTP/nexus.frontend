@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { OpcionPage } from '../../../configuracion/seguridad/opcion/pages/opcion-page/opcion-page';
+import { MovimientosPage } from './pages/movimientos-page/movimientos-page';
 
 export const MOVIMIENTOS_ROUTES: Routes = [
     {
         path: ''
-        ,component: OpcionPage
-        ,data: { breadcrumb: 'Opciones', icon: 'checklist' }
+        ,component: MovimientosPage
+        ,data: { breadcrumb: 'Movimientos', icon: 'checklist' }
     }
 ];
