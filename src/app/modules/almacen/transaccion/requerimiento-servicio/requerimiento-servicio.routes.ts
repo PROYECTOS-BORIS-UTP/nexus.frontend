@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { OpcionPage } from '../../../configuracion/seguridad/opcion/pages/opcion-page/opcion-page';
+import { RequerimientoServicioPage } from './pages/requerimiento-servicio-page/requerimiento-servicio-page';
 
-export const OPCION_ROUTES: Routes = [
+export const REQUERIMIENTOSERVICIO_ROUTES: Routes = [
     {
         path: ''
-        ,component: OpcionPage
+        ,component: RequerimientoServicioPage
         ,data: { breadcrumb: 'Opciones', icon: 'checklist' }
     }
 ];

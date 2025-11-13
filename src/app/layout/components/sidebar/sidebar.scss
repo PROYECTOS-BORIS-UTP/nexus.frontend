@@ -27,10 +27,11 @@
 
     // Estilos base para la lista de navegación principal
     .mat-mdc-nav-list {
-        padding: 0 16px;
+        padding: 0 6px;
         padding-top: 30px;
         height: calc(100vh - 64px);
         background: #3b0879;
+        overflow-y: auto;
 
         app-menu-item {
             display: flex;
