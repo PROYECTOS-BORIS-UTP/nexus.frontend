@@ -48,13 +48,13 @@ export class CompaniaService {
      */
     crearActualizarCompania(request: ICompaniaCreateUpdateRequest): Observable<ICompaniaCreateUpdateResponse> {
         const url = `${this.apiUrl}/CrearActualizarCompania`;
-        return this.http.post<ICompaniaCreateUpdateResponse>(url, request).pipe(
-            map(response => {
+        return this.http.post<IApiResponse<ICompaniaCreateUpdateResponse>>(url, request).pipe(
+            map(response => {                
                 if (response && typeof response.bStatus === 'boolean') {
                     if (response.bStatus) {
-                        return response;
+                        return response.aData;
                     } else {
-                        throw new Error(response.vMensaje || 'El backend indicó un error al crear/actualizar la compañia.');
+                        throw new Error(response.vMessage || 'El backend indicó un error al crear/actualizar la compañia.');
                     }
                 } else {
                     console.error('Respuesta inesperada del backend:', response);
@@ -72,13 +72,13 @@ export class CompaniaService {
      */
     eliminarCompania(iIdCompania: number): Observable<ICompaniaDeleteResponse> {
         const url = `${this.apiUrl}/EliminarCompania/${iIdCompania}`;
-        return this.http.delete<ICompaniaDeleteResponse>(url).pipe(
+        return this.http.delete<IApiResponse<ICompaniaDeleteResponse>>(url).pipe(
             map(response => {
                 if (response && typeof response.bStatus === 'boolean') {
                     if (response.bStatus) {
-                        return response;
+                        return response.aData;
                     } else {
-                        throw new Error(response.vMensaje || 'El backend indicó un error al eliminar la compañia.');
+                        throw new Error(response.vMessage || 'El backend indicó un error al eliminar la compañia.');
                     }
                 } else {
                     console.error('Respuesta inesperada del backend:', response);

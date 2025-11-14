@@ -1,39 +1,37 @@
+:host {
+    display: block;
+    padding: 24px;
+}
+
 .controls-container {
     display: flex;
-    justify-content: space-between; // Esto alinea los elementos a los extremos
+    justify-content: space-between;
     align-items: center;
-    padding: 16px 0; // Añade un poco de espacio vertical
-    flex-wrap: wrap; // Permite que los elementos pasen a la siguiente línea en pantallas pequeñas
-    gap: 16px; // Espacio entre el buscador y los botones
+    padding: 16px 0;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
 .search-field {
-    flex: 1 1 3.00px; // Permite que el campo de búsqueda crezca pero tenga una base de 300px
-
-    ::ng-deep .mat-mdc-form-field-subscript-wrapper, .mat-mdc-form-field-bottom-align::before{
-        display: none !important;
-    }
+    flex: 1;
+    min-width: 250px;
+    max-width: 400px;
 }
 
 .actions-container {
     display: flex;
-    gap: 7px;
+    gap: 8px;
+    flex-shrink: 0;
+}
 
-    .btnAgregar {
-        // 2. AGRANDAR EL BOTÓN:
-        // Aumentamos el padding horizontal (el segundo valor) para darle más espacio.
-        padding: 0 32px !important;
+.btnAgregar {
+    padding: 0 24px !important;
+    min-width: auto;
+    height: 48px;
+    font-size: 15px;
+    white-space: nowrap;
 
-        // También puedes establecer un ancho mínimo si prefieres un tamaño más consistente.
-        min-width: 250px;
-
-        height: 48px;
-        font-size: 15px;
-
-        .mat-icon {
-            height: 22px;
-            width: 22px;
-            font-size: 22px;
-        }
+    .mat-icon {
+        margin-right: 8px;
     }
 }

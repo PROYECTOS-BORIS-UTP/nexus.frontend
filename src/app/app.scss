@@ -13,9 +13,17 @@
         // }
     }
 
-    .mat-mdc-dialog-container .mat-mdc-dialog-title {
-        background: #280552 !important;
-        color: #ffffff !important;
-        font-weight: 500 !important;
+    .mat-mdc-dialog-container {
+
+        .mat-mdc-dialog-title {
+            background: #280552 !important;
+            color: #ffffff !important;
+            font-weight: 500 !important;
+        }
+
+        .mat-mdc-dialog-title+.mat-mdc-dialog-content {
+            padding-top: 20px !important;
+        }
     }
+
 }

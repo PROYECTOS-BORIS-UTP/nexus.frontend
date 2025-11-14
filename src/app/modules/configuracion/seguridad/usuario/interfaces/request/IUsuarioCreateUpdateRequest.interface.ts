@@ -1,7 +1,4 @@
-
-
 export interface IUsuarioCreateUpdateRequest{
-
     iIdUsuario?: number ;
     vUsuario: string;
     vPassword?: string | null; // <-- Cambiado a string | null para recibir texto plano
@@ -10,5 +7,4 @@ export interface IUsuarioCreateUpdateRequest{
     iIdPersona?: number | null;
     iIdTipoPersona: number;
     bChangePassword: boolean;
-
 }

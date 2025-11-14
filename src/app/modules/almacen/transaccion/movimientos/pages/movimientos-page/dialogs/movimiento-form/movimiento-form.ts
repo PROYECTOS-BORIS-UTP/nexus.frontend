@@ -16,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ISelectItem } from '../../../../../../../../core/interfaces/ISelectItem.interface';
 import { IElementoSistemaListadoPorCodigoRequest } from '../../../../../../../configuracion/maestras/elemento-sistema/interfaces/request/IElementoSistemaListadoPorCodigoRequest.interface';
 import { ElementoSistemaService } from '../../../../../../../configuracion/maestras/elemento-sistema/services/elemento-sistema.service';
+import { IMovimientoCreateResponse } from '../../../../interfaces/response/IMovimientoCreateResponse.interface';
 
 // Validador personalizado para 'no ser cero'
 export const notZeroValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
@@ -156,17 +157,10 @@ export class MovimientoForm {
 
 		this.movimientosService.crearMovimiento(request).pipe(
 			finalize(() => this.isLoading.set(false)),
-			catchError(error => {
-				// El error ya es manejado por el servicio (handleHttpError)
-				return of(null);
-			})
-		).subscribe(response => {
+		).subscribe((response: IMovimientoCreateResponse) => {
 			if (response && response.bStatus) {
-				this.snackBar.open(response.vMensaje, 'Cerrar', {
-					duration: 3000,
-					panelClass: ['snackbar-success']
-				});
-				this.dialogRef.close(true); // Cierra el diálogo y devuelve 'true' (éxito)
+				this.snackBar.open(response.vMensaje, 'Cerrar', {duration: 3000,panelClass: ['snackbar-success']});
+				this.dialogRef.close(true);
 			}
 		});
 	}

@@ -47,13 +47,13 @@ export class PersonaService {
     */
     crearActualizarPersona(request: IPersonaCreateUpdateRequest): Observable<IPersonaCreateUpdateResponse> {
         const url = `${this.apiUrl}/CrearActualizarPersona`;
-        return this.http.post<IPersonaCreateUpdateResponse>(url, request).pipe(
+        return this.http.post<IApiResponse<IPersonaCreateUpdateResponse>>(url, request).pipe(
             map(response => {
                 if (response && typeof response.bStatus === 'boolean') {
                     if (response.bStatus) {
-                        return response;
+                        return response.aData;
                     } else {
-                        throw new Error(response.vMensaje || 'El backend indicó un error al crear/actualizar la persona.');
+                        throw new Error(response.vMessage || 'El backend indicó un error al crear/actualizar la persona.');
                     }
                 } else {
                     console.error('Respuesta inesperada del backend:', response);
@@ -71,13 +71,13 @@ export class PersonaService {
      */
     eliminarPersona(iIdPersona: number): Observable<IPersonaDeleteResponse> {
         const url = `${this.apiUrl}/EliminarPersona/${iIdPersona}`;
-        return this.http.delete<IPersonaDeleteResponse>(url).pipe(
+        return this.http.delete<IApiResponse<IPersonaDeleteResponse>>(url).pipe(
             map(response => {
                 if (response && typeof response.bStatus === 'boolean') {
                     if (response.bStatus) {
-                        return response;
+                        return response.aData;
                     } else {
-                        throw new Error(response.vMensaje || 'El backend indicó un error al eliminar la persona.');
+                        throw new Error(response.vMessage || 'El backend indicó un error al eliminar la persona.');
                     }
                 } else {
                     console.error('Respuesta inesperada del backend:', response);
