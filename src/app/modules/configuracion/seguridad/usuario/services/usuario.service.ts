@@ -41,52 +41,52 @@ export class UsuarioService {
         );
     }
 
-     /*
-         * Envía una solicitud para crear o actualizar una Usuario.
-         * @param request DTO con los datos de la usuario.
-         * @returns Un Observable con la respuesta del backend.
-         */
-        crearActualizarUsario(request: IUsuarioCreateUpdateRequest): Observable<IUsuarioCreateUpdateResponse> {
-            const url = `${this.apiUrl}/CrearActualizarUsuario`;
-            return this.http.post<IUsuarioCreateUpdateResponse>(url, request).pipe(
-                map(response => {
-                    if (response && typeof response.bStatus === 'boolean') {
-                        if (response.bStatus) {
-                            return response;
-                        } else {
-                            throw new Error(response.vMensaje || 'El backend indicó un error al crear/actualizar la compañia.');
-                        }
+    /*
+     * Envía una solicitud para crear o actualizar una Usuario.
+     * @param request DTO con los datos de la usuario.
+     * @returns Un Observable con la respuesta del backend.
+     */
+    crearActualizarUsuario(request: IUsuarioCreateUpdateRequest): Observable<IUsuarioCreateUpdateResponse> {
+        const url = `${this.apiUrl}/CrearActualizarUsuario`;
+        return this.http.post<IApiResponse<IUsuarioCreateUpdateResponse>>(url, request).pipe(
+            map(response => {
+                if (response && typeof response.bStatus === 'boolean') {
+                    if (response.bStatus) {
+                        return response.aData;
                     } else {
-                        console.error('Respuesta inesperada del backend:', response);
-                        throw new Error('Respuesta inesperada del servidor al crear/actualizar.');
+                        throw new Error(response.vMessage || 'El backend indicó un error al crear/actualizar la compañia.');
                     }
-                }),
-                catchError(handleHttpError)
-            );
-        }
-    
-        /*
-         * Envía una solicitud para eliminar (baja lógica) un usuario.
-         * @param iIdCompania ID del usuario a eliminar.
-         * @returns Un Observable con la respuesta del backend.
-         */
-        eliminarUsuario(iIdUsuario: number): Observable<IUsuarioDeleteResponse> {
-            const url = `${this.apiUrl}/EliminarUsuario/${iIdUsuario}`;
-            return this.http.delete<IUsuarioDeleteResponse>(url).pipe(
-                map(response => {
-                    if (response && typeof response.bStatus === 'boolean') {
-                        if (response.bStatus) {
-                            return response;
-                        } else {
-                            throw new Error(response.vMensaje || 'El backend indicó un error al eliminar el usuario.');
-                        }
+                } else {
+                    console.error('Respuesta inesperada del backend:', response);
+                    throw new Error('Respuesta inesperada del servidor al crear/actualizar.');
+                }
+            }),
+            catchError(handleHttpError)
+        );
+    }
+
+    /*
+     * Envía una solicitud para eliminar (baja lógica) un usuario.
+     * @param iIdCompania ID del usuario a eliminar.
+     * @returns Un Observable con la respuesta del backend.
+     */
+    eliminarUsuario(iIdUsuario: number): Observable<IUsuarioDeleteResponse> {
+        const url = `${this.apiUrl}/EliminarUsuario/${iIdUsuario}`;
+        return this.http.delete<IApiResponse<IUsuarioDeleteResponse>>(url).pipe(
+            map(response => {
+                if (response && typeof response.bStatus === 'boolean') {
+                    if (response.bStatus) {
+                        return response.aData;
                     } else {
-                        console.error('Respuesta inesperada del backend:', response);
-                        throw new Error('Respuesta inesperada del servidor al eliminar.');
+                        throw new Error(response.vMessage || 'El backend indicó un error al eliminar el usuario.');
                     }
-                }),
-                catchError(handleHttpError)
-            );
-        }
-    
+                } else {
+                    console.error('Respuesta inesperada del backend:', response);
+                    throw new Error('Respuesta inesperada del servidor al eliminar.');
+                }
+            }),
+            catchError(handleHttpError)
+        );
+    }
+
 }

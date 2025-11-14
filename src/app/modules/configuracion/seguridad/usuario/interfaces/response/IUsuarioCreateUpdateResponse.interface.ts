@@ -1,7 +1,5 @@
-export interface IUsuarioCreateUpdateResponse{
-
+export interface IUsuarioCreateUpdateResponse {
    iIdUsuario: number;
-    vMensaje: string;
+   vMensaje: string;
    bStatus: boolean;
-
 }

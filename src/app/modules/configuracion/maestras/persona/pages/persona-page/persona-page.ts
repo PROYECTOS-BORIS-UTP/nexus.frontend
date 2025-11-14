@@ -23,6 +23,8 @@ import { IPersonaListadoRequest } from '../../interfaces/request/IPersonaListado
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
 import { PersonaForm } from './dialogs/persona-form/persona-form';
 import { IPersonaCreateUpdateRequest } from '../../interfaces/request/IPersonaCreateUpdateRequest.interface';
+import { IPersonaCreateUpdateResponse } from '../../interfaces/response/IPersonaCreateUpdateResponse.interface';
+import { IPersonaDeleteResponse } from '../../interfaces/response/IPersonaDeleteResponse.interface';
 
 @Component({
     selector: 'app-persona-page',
@@ -119,7 +121,6 @@ export class PersonaPage implements OnInit, OnDestroy {
                 this.data.set(response.aRecords);
             }),
             catchError(error => {
-                console.error('Error al cargar personas:', error);
                 this.snackBar.open(error.message || 'Error al cargar la lista de personas.', 'Cerrar', {
                     duration: 5000, panelClass: ['snackbar-error']
                 });
@@ -217,22 +218,20 @@ export class PersonaPage implements OnInit, OnDestroy {
      * Abre diálogo para agregar persona.
      */
     onAddPersona(): void {
-        // --- DESCOMENTA CUANDO CREES EL FORMULARIO ---
         const dialogRef = this.dialog.open(PersonaForm, {
-            width: '100%', // Ajusta el ancho según tu formulario
+            width: '100%',
             maxWidth: '900px',
-            disableClose: true, // Evita cerrar haciendo clic fuera
-            data: { persona: null } // Pasa null para indicar creación
+            disableClose: true,
+            data: { persona: null }
         });
 
         dialogRef.afterClosed().subscribe((result: IPersonaCreateUpdateRequest | undefined) => {
             if (result) {
-                console.log('Datos para crear persona:', result);
                 this.isLoading.set(true);
                 this.personaService.crearActualizarPersona(result).pipe(
-                    tap(response => {
-                        this.showSnackbar(response.vMensaje || 'Persona creada exitosamente.', 'snackbar-success');
-                        this.cargarPersonas(); // Recargar la lista
+                    tap((response: IPersonaCreateUpdateResponse) => {
+                        this.showSnackbar(response.vMensaje, 'snackbar-success');
+                        this.cargarPersonas();
                     }),
                     catchError(error => {
                         console.error('Error al crear persona:', error);
@@ -250,24 +249,22 @@ export class PersonaPage implements OnInit, OnDestroy {
      */
     onEditPersona(persona: IPersonaResponse): void {
         const personaParaEditar: IPersonaCreateUpdateRequest = {
-            // Mapea los campos de IPersonaResponse a IPersonaCreateUpdateRequest
-            // Asegúrate de incluir TODOS los campos necesarios por el DTO del backend
             iIdPersona: persona.iIdPersona,
-            iIdTipoPersona: persona.iIdTipoPersona, // Necesitarás este dato en IPersonaResponse
-            vPrimerNombre: persona.vPrimerNombre, // Necesitarás este dato en IPersonaResponse
-            vSegundoNombre: persona.vSegundoNombre, // Necesitarás este dato en IPersonaResponse
-            vApellidoPaterno: persona.vApellidoPaterno, // Necesitarás este dato en IPersonaResponse
-            vApellidoMaterno: persona.vApellidoMaterno, // Necesitarás este dato en IPersonaResponse
-            dFechaNacimiento: persona.dFechaNacimiento ? new Date(persona.dFechaNacimiento).toISOString().split('T')[0] : null, // Formato YYYY-MM-DD si viene como Date
-            iIdUbigeoNacimiento: persona.iIdUbigeoNacimiento, // Necesitarás este dato en IPersonaResponse
-            iIdGenero: persona.iIdGenero, // Necesitarás este dato en IPersonaResponse
-            iIdEstadoCivil: persona.iIdEstadoCivil, // Necesitarás este dato en IPersonaResponse
+            iIdTipoPersona: persona.iIdTipoPersona,
+            vPrimerNombre: persona.vPrimerNombre,
+            vSegundoNombre: persona.vSegundoNombre,
+            vApellidoPaterno: persona.vApellidoPaterno,
+            vApellidoMaterno: persona.vApellidoMaterno,
+            dFechaNacimiento: persona.dFechaNacimiento ? new Date(persona.dFechaNacimiento).toISOString().split('T')[0] : null,
+            iIdUbigeoNacimiento: persona.iIdUbigeoNacimiento,
+            iIdGenero: persona.iIdGenero,
+            iIdEstadoCivil: persona.iIdEstadoCivil,
             vCorreo: persona.vCorreo,
             vCelular1: persona.vCelular1,
-            vCelular2: persona.vCelular2, // Necesitarás este dato en IPersonaResponse
-            vTelefono: persona.vTelefono, // Necesitarás este dato en IPersonaResponse
+            vCelular2: persona.vCelular2,
+            vTelefono: persona.vTelefono,
             vDNI: persona.vDNI,
-            vCE: persona.vCE, // Necesitarás este dato en IPersonaResponse
+            vCE: persona.vCE,
             vRUC: persona.vRUC,
             bActivo: persona.bActivo,
         };
@@ -276,18 +273,16 @@ export class PersonaPage implements OnInit, OnDestroy {
         const dialogRef = this.dialog.open(PersonaForm, {
             width: '700px',
             disableClose: true,
-            data: { persona: personaParaEditar } // Pasa el objeto mapeado
+            data: { persona: personaParaEditar }
         });
 
         dialogRef.afterClosed().subscribe((result: IPersonaCreateUpdateRequest | undefined) => {
             if (result) {
-                console.log('Datos para actualizar persona:', result);
                 this.isLoading.set(true);
-                // Asegúrate que el result SÍ tenga el iIdPersona
                 this.personaService.crearActualizarPersona(result).pipe(
-                    tap(response => {
-                        this.showSnackbar(response.vMensaje || `Persona "${persona.vNombreCompleto}" actualizada.`, 'snackbar-success');
-                        this.cargarPersonas(); // Recargar la lista
+                    tap((response: IPersonaCreateUpdateResponse) => {
+                        this.showSnackbar(response.vMensaje, 'snackbar-success');
+                        this.cargarPersonas();
                     }),
                     catchError(error => {
                         console.error('Error al actualizar persona:', error);
@@ -315,12 +310,11 @@ export class PersonaPage implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result && result.confirmado) {
-                console.log('Eliminando persona:', persona.iIdPersona);
                 this.isLoading.set(true);
                 this.personaService.eliminarPersona(persona.iIdPersona).pipe(
-                    tap(response => {
-                        this.showSnackbar(response.vMensaje || `Persona "${persona.vNombreCompleto}" eliminada.`, 'snackbar-warn');
-                        this.cargarPersonas(); // Recargar la lista
+                    tap((response: IPersonaDeleteResponse) => {
+                        this.showSnackbar(response.vMensaje, 'snackbar-warn');
+                        this.cargarPersonas();
                     }),
                     catchError(error => {
                         console.error('Error al eliminar persona:', error);

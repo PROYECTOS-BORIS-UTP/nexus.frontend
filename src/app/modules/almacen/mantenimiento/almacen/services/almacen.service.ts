@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, map, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map, Observable } from 'rxjs';
 
 import { IAlmacenResponse } from '../interfaces/response/IAlmacenResponse.interface';
 import { IAlmacenListadoRequest } from '../interfaces/request/IAlmacenListadoRequest.interface';
@@ -11,7 +11,6 @@ import { handleHttpError } from '../../../../../core/utils/error-handler.utils';
 import { IAlmacenCreateUpdateRequest } from '../interfaces/request/IAlmacenCreateUpdateRequest.interface';
 import { IAlmacenCreateUpdateResponse } from '../interfaces/response/IAlmacenCreateUpdateResponse.interface';
 import { IAlmacenDeleteResponse } from '../interfaces/response/IAlmacenDeleteResponse.interface';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
     providedIn: 'root'
@@ -24,10 +23,10 @@ export class AlmacenService {
     constructor() { }
 
     /*
-    * Obtiene la lista paginada de Almacenes desde el backend.
-    * @param request DTO con parámetros de paginación y filtros.
-    * @returns Un Observable con la respuesta paginada de almacenes.
-    */
+     * Obtiene la lista paginada de Almacenes desde el backend.
+     * @param request DTO con parámetros de paginación y filtros.
+     * @returns Un Observable con la respuesta paginada de almacenes.
+     */
     listarAlmacenes(request: IAlmacenListadoRequest): Observable<IPaginationResponse<IAlmacenResponse>> {
         const url = `${this.apiUrl}/ListadoAlmacen`;
         return this.http.post<IApiResponse<IPaginationResponse<IAlmacenResponse>>>(url, request).pipe(
@@ -43,7 +42,7 @@ export class AlmacenService {
     }
 
     // #region Crear/Actualizar
-    /**
+    /*
      * Crea o actualiza un Almacén.
      * @param request DTO con los datos del almacén.
      * @returns Observable con la respuesta de la operación.
@@ -64,7 +63,7 @@ export class AlmacenService {
     // #endregion
 
     // #region Eliminar (Baja Lógica)
-    /**
+    /*
      * Realiza la baja lógica de un Almacén.
      * @param iIdAlmacen ID del almacén a eliminar.
      * @returns Observable con la respuesta de la operación.

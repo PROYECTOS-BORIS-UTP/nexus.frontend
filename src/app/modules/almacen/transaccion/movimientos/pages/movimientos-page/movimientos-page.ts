@@ -28,6 +28,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { ISelectItem } from '../../../../../../core/interfaces/ISelectItem.interface';
 import { IAlmacenListadoRequest } from '../../../../mantenimiento/almacen/interfaces/request/IAlmacenListadoRequest.interface';
+import { IMovimientoAnularResponse } from '../../interfaces/response/IMovimientoAnularResponse.interface';
 
 @Component({
 	selector: 'app-movimientos-page',
@@ -251,7 +252,7 @@ export class MovimientosPage {
 	// #endregion
 
 	// #region Apertura de Diálogos (Actualizado)
-	/**
+	/*
 	 * Abre diálogo para agregar movimiento.
 	 */
 	onAddMovimiento(): void {
@@ -283,16 +284,16 @@ export class MovimientosPage {
 		});
 	}
 
-	/**
+	/*
 	 * Abre diálogo de confirmación para anular movimiento.
 	 */
 	onDeleteMovimiento(movimiento: IMovimientoResponse): void {
 		const dialogRef = this.dialog.open(Confirmacion, {
-			width: '450px', // Un poco más ancho para el mensaje
+			width: '450px',
 			data: {
 				titulo: 'Confirmar Anulación',
 				mensaje: `¿Estás seguro de ANULAR el movimiento "${movimiento.vTipoMovimientoNombre}" de ${movimiento.dCantidad} unidades? Esta acción revertirá el stock.`,
-				mostrarCampoObservacion: true, // A menudo se pide observación para anular
+				mostrarCampoObservacion: true,
 				labelObservacion: 'Motivo de anulación (opcional)'
 			}
 		});
@@ -300,20 +301,12 @@ export class MovimientosPage {
 		dialogRef.afterClosed().subscribe(result => {
 			if (result && result.confirmado) {
 				this.isLoading.set(true);
-				// Llama al servicio de anulación
 				this.movimientosService.anularMovimiento(movimiento.iIdMovimiento).pipe(
 					finalize(() => this.isLoading.set(false)),
-					catchError(error => {
-						// El servicio ya mostró el SnackBar de error
-						return of(null);
-					})
-				).subscribe(response => {
+				).subscribe((response: IMovimientoAnularResponse) => {
 					if (response && response.bStatus) {
-						this.snackBar.open(response.vMensaje, 'Cerrar', {
-							duration: 3000,
-							panelClass: ['snackbar-success'] // O 'snackbar-warn'
-						});
-						this.cargarMovimientos(); // Recarga la tabla
+						this.snackBar.open(response.vMensaje, 'Cerrar', {duration: 3000,panelClass: ['snackbar-success']});
+						this.cargarMovimientos();
 					}
 				});
 			}

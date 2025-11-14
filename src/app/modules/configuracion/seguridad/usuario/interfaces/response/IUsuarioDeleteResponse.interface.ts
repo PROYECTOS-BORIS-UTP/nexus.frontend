@@ -1,7 +1,5 @@
-
-
-export interface IUsuarioDeleteResponse{
+export interface IUsuarioDeleteResponse {
     iIdUsuario: number;
     vMensaje: string;
-   bStatus: boolean;
+    bStatus: boolean;
 }

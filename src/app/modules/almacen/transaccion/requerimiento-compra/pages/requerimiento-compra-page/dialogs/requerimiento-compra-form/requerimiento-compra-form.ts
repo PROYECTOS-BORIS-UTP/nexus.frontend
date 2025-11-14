@@ -111,7 +111,7 @@ export class RequerimientoCompraForm {
 		return this.form.get('detalles') as FormArray;
 	}
 
-	// #region Gestión de Detalles (FormArray)
+	// #region Gestión de Detalles
 
 	/** Agrega una nueva fila a la tabla */
 	abrirSelectorProductos(): void {
@@ -123,10 +123,7 @@ export class RequerimientoCompraForm {
 
 		dialogRef.afterClosed().subscribe((productosSeleccionados: IProductoCatalogo[]) => {
 			if (productosSeleccionados && productosSeleccionados.length > 0) {
-
-				// Recorremos los productos seleccionados y los agregamos a la tabla
 				productosSeleccionados.forEach(prod => {
-					// Verificamos si ya existe en la tabla para no duplicar (Opcional)
 					const existe = this.detallesArr.controls.some(
 						ctrl => ctrl.get('iIdProducto')?.value === prod.iIdProducto
 					);
@@ -134,14 +131,13 @@ export class RequerimientoCompraForm {
 					if (!existe) {
 						this.detallesArr.push(this.crearDetalleGroup({
 							iIdProducto: prod.iIdProducto,
-							vProductoNombre: prod.vDescripcion, // Guardamos nombre solo para mostrar (ver HTML abajo)
-							iIdUnidadMedida: prod.iIdUnidadMedida, // Pre-llenamos la UM del producto
-							dCantidadSolicitada: 1, // Valor por defecto
+							vProductoNombre: prod.vDescripcion,
+							iIdUnidadMedida: prod.iIdUnidadMedida,
+							dCantidadSolicitada: 1,
 							vObservacion: ''
 						}));
 					}
 				});
-
 				this.mostrarSnack(`${productosSeleccionados.length} productos agregados.`, 'snackbar-success');
 			}
 		});
@@ -149,18 +145,16 @@ export class RequerimientoCompraForm {
 
 	/** Crea un FormGroup para una fila de la tabla */
 	crearDetalleGroup(data?: any): FormGroup {
-        return this.fb.group({
-            iIdRequerimientoCompraDetalle: [data?.iIdRequerimientoCompraDetalle || 0],
-            iIdProducto: [data?.iIdProducto || null, Validators.required],
-            
-            // Campo auxiliar para mostrar el nombre en modo lectura (readonly)
-            vProductoNombre: [data?.vProductoNombre || 'Producto Cargado', Validators.required], 
-            
-            dCantidadSolicitada: [data?.dCantidadSolicitada || null, [Validators.required, Validators.min(0.01)]],
-            iIdUnidadMedida: [data?.iIdUnidadMedida || null, Validators.required],
-            vObservacion: [data?.vObservacion || null]
-        });
-    }
+		return this.fb.group({
+			iIdRequerimientoCompraDetalle: [data?.iIdRequerimientoCompraDetalle || 0],
+			iIdProducto: [data?.iIdProducto || null, Validators.required],
+			// Campo auxiliar para mostrar el nombre en modo lectura (readonly)
+			vProductoNombre: [data?.vProductoNombre || 'Producto Cargado', Validators.required],
+			dCantidadSolicitada: [data?.dCantidadSolicitada || null, [Validators.required, Validators.min(0.01)]],
+			iIdUnidadMedida: [data?.iIdUnidadMedida || null, Validators.required],
+			vObservacion: [data?.vObservacion || null]
+		});
+	}
 
 	/** Elimina una fila de la tabla visualmente y marca para borrar en BD si ya existía */
 	eliminarDetalle(index: number): void {

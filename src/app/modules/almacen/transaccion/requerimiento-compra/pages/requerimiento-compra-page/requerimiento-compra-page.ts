@@ -23,6 +23,7 @@ import { IRequerimientoCompraListadoRequest } from '../../interfaces/request/IRe
 import { IRequerimientoCompraListadoResponse } from '../../interfaces/response/IRequerimientoCompraListadoResponse.interface';
 import { RequerimientoCompraService } from '../../services/requerimiento-compra.service';
 import { RequerimientoCompraForm } from './dialogs/requerimiento-compra-form/requerimiento-compra-form';
+import { IRequerimientoCompraDeleteResponse } from '../../interfaces/response/IRequerimientoCompraDeleteResponse.interface';
 
 @Component({
 	selector: 'app-requerimiento-compra-page',
@@ -247,11 +248,10 @@ export class RequerimientoCompraPage {
 		});
 	}
 
-	/**
+	/*
 	 * Abre diálogo de confirmación para anular requerimiento.
 	 */
 	onDeleteRequerimiento(requerimiento: IRequerimientoCompraListadoResponse): void {
-		// Opcional: Validar si el estado permite anular
 		if (requerimiento.vEstadoNombre?.toLowerCase() !== 'pendiente') {
 			this.snackBar.open(`No se puede anular un requerimiento en estado "${requerimiento.vEstadoNombre}".`, 'Cerrar', {
 				duration: 4000, panelClass: ['snackbar-warn']
@@ -264,7 +264,7 @@ export class RequerimientoCompraPage {
 			data: {
 				titulo: 'Confirmar Anulación',
 				mensaje: `¿Estás seguro de ANULAR el Requerimiento "${requerimiento.vSerie}-${requerimiento.vNumero}"?`,
-				mostrarCampoObservacion: true, // La anulación a menudo requiere motivo
+				mostrarCampoObservacion: true,
 				labelObservacion: 'Motivo de anulación (Opcional)'
 			}
 		});
@@ -272,17 +272,12 @@ export class RequerimientoCompraPage {
 		dialogRef.afterClosed().subscribe(result => {
 			if (result && result.confirmado) {
 				this.isLoading.set(true);
-				// Llama al servicio de anulación
 				this.requerimientoCompraService.anularRequerimientoCompra(requerimiento.iIdRequerimientoCompra).pipe(
 					finalize(() => this.isLoading.set(false)),
-					catchError(error => of(null)) // El servicio ya maneja el snackbar
-				).subscribe(response => {
+				).subscribe((response: IRequerimientoCompraDeleteResponse) => {
 					if (response && response.bStatus) {
-						this.snackBar.open(response.vMensaje, 'Cerrar', {
-							duration: 3000,
-							panelClass: ['snackbar-success']
-						});
-						this.cargarRequerimientos(); // Recarga la tabla
+						this.snackBar.open(response.vMensaje, 'Cerrar', {duration: 3000,panelClass: ['snackbar-success']});
+						this.cargarRequerimientos();
 					}
 				});
 			}
