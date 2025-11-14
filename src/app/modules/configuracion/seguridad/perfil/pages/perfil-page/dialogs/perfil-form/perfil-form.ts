@@ -10,17 +10,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
-
-
 export interface PerfilFormData {
-  perfil: IPerfilCreateUpdateRequest | null;
+	perfil: IPerfilCreateUpdateRequest | null;
 }
 
 @Component({
-  selector: 'app-perfil-form',
-  imports: [
+	selector: 'app-perfil-form',
+	imports: [
 
-    CommonModule,
+		CommonModule,
 		MatFormFieldModule,
 		MatInputModule,
 		MatSelectModule,
@@ -29,17 +27,15 @@ export interface PerfilFormData {
 		ReactiveFormsModule,
 		MatButtonModule,
 		MatProgressSpinnerModule
-  ],
-  templateUrl: './perfil-form.html',
-  styleUrl: './perfil-form.scss'
+	],
+	templateUrl: './perfil-form.html',
+	styleUrl: './perfil-form.scss'
 })
-
-
 
 export class PerfilForm {
 
 
-  private fb = inject(FormBuilder);
+	private fb = inject(FormBuilder);
 	public dialogRef = inject(MatDialogRef<PerfilForm>);
 
 	perfilForm: FormGroup;
@@ -53,7 +49,7 @@ export class PerfilForm {
 
 		this.perfilForm = this.fb.group({
 			vPerfil: ['', [Validators.required, Validators.maxLength(50)]],
-			vDescripcion: ['', [Validators.required, Validators.maxLength(50),Validators.minLength(10) ]],
+			vDescripcion: ['', [Validators.required, Validators.maxLength(50), Validators.minLength(10)]],
 			bActivo: [true, Validators.required]
 		});
 	}
@@ -88,7 +84,7 @@ export class PerfilForm {
 		const dataToSend: IPerfilCreateUpdateRequest = {
 			...formData,
 
-			iIdPerfil : this.perfilExistente?.iIdPerfil ?? 0
+			iIdPerfil: this.perfilExistente?.iIdPerfil ?? 0
 		};
 
 		// Limpieza de strings vacíos a null (opcional, si el backend lo requiere)

@@ -128,9 +128,7 @@ export class OpcionPage {
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result === true) {
-				// Si el modal se cerró con 'true' (guardado exitoso), refrescamos la columna
 				this.refreshColumn(columnIndex);
-
 				this.snackBar.open('Opción creada exitosamente.', 'OK', {
 					duration: 3000,
 					panelClass: 'success-snackbar' // (Opcional)

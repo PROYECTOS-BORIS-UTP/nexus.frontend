@@ -1,0 +1,96 @@
+<div mat-dialog-title class="dialog-title">
+    <span>Asignar Permisos - {{ data.vPerfilNombre }}</span>
+    @if (isSaving()) {
+    <mat-progress-spinner mode="indeterminate" diameter="24" aria-label="Guardando permiso"></mat-progress-spinner>
+    }
+    <button mat-icon-button [mat-dialog-close]="true" cdkFocusInitial>
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+@if (isLoading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<mat-dialog-content class="dialog-content-container">
+
+    <div class="opcion-container">
+        <div class="opcion-column">
+
+            <div class="opcion-header">
+                @if (showBackButton()) {
+                <button mat-icon-button (click)="onGoBack()" class="back-button" matTooltip="Volver al nivel anterior">
+                    <mat-icon>arrow_back_ios</mat-icon>
+                </button>
+                }
+                <span class="header-title">{{ currentTitle() }}</span>
+            </div>
+
+            <div class="permissions-header-row">
+                <span class="header-opcion-label">Opción</span>
+                <div class="permissions-labels">
+                    <span matTooltip="Visualizar">V</span>
+                    <span matTooltip="Crear">C</span>
+                    <span matTooltip="Actualizar">A</span>
+                    <span matTooltip="Eliminar">E</span>
+                </div>
+            </div>
+
+            <div class="opcion-body">
+                @for (option of currentOptions; track option.iIdOpcion) {
+                <div class="opcion-item" (click)="onSelectOption(option)" [class.has-children]="hasChildren(option)">
+                    <div class="opcion-label">
+                        <mat-icon class="icon">{{ option.vIcono || 'article' }}</mat-icon>
+                        <span class="label" [matTooltip]="option.vOpcion">{{ option.vOpcion }}</span>
+                    </div>
+
+                    <div class="permissions-container">
+                        <mat-checkbox
+                        [checked]="option.bAcceso_visualizar"
+                        (change)="onPermisoChange(option, 'bAcceso_visualizar', $event)" 
+                        (click)="$event.stopPropagation()"
+                        [aria-label]="'Visualizar ' + option.vOpcion"
+                        ></mat-checkbox>
+                        <mat-checkbox
+                        [checked]="option.bAcceso_crear"
+                        (change)="onPermisoChange(option, 'bAcceso_crear', $event)" 
+                        (click)="$event.stopPropagation()"
+                        [aria-label]="'Crear ' + option.vOpcion"
+                        ></mat-checkbox>
+                        <mat-checkbox
+                        [checked]="option.bAcceso_actualizar"
+                        (change)="onPermisoChange(option, 'bAcceso_actualizar', $event)" 
+                        (click)="$event.stopPropagation()"
+                        [aria-label]="'Actualizar ' + option.vOpcion"
+                        ></mat-checkbox>
+                        <mat-checkbox
+                        [checked]="option.bAcceso_eliminar"
+                        (change)="onPermisoChange(option, 'bAcceso_eliminar', $event)" 
+                        (click)="$event.stopPropagation()"
+                        [aria-label]="'Eliminar ' + option.vOpcion"
+                        ></mat-checkbox>
+                    </div>
+
+                    @if (hasChildren(option)) {
+                    <mat-icon class="icon arrow-icon">chevron_right</mat-icon>
+                    } @else {
+                    <div class="arrow-placeholder"></div>
+                    }
+                </div>
+                } @empty {
+                <div class="opcion-item-empty">
+                    <mat-icon class="empty-icon">info_outline</mat-icon>
+                    No hay opciones en este nivel.
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-flat-button color="primary" [mat-dialog-close]="true">
+        <mat-icon>check</mat-icon>
+        <span>Hecho</span>
+    </button>
+</mat-dialog-actions>

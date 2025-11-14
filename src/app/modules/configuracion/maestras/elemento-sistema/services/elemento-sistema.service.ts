@@ -65,23 +65,18 @@ export class ElementoSistemaService {
     }
 
     /*
-    * Envía una solicitud para crear o actualizar un Elemento del Sistema.
-    * @param request DTO con los datos del elemento.
-    * @returns Un Observable con la respuesta del backend.
-    */
+     * Envía una solicitud para crear o actualizar un Elemento del Sistema.
+     * @param request DTO con los datos del elemento.
+     * @returns Un Observable con la respuesta del backend.
+     */
     crearActualizarElementoSistema(request: IElementoSistemaCreateUpdateRequest): Observable<IElementoSistemaCreateUpdateResponse> {
         const url = `${this.apiUrl}/CrearActualizarElementoSistema`;
-        return this.http.post<IElementoSistemaCreateUpdateResponse>(url, request).pipe(
+        return this.http.post<IApiResponse<IElementoSistemaCreateUpdateResponse>>(url, request).pipe(
             map(response => {
-                if (response && typeof response.bStatus === 'boolean') {
-                    if (response.bStatus) {
-                        return response;
-                    } else {
-                        throw new Error(response.vMensaje || 'El backend indicó un error al crear/actualizar el elemento.');
-                    }
+                if (response && response.bStatus) {
+                    return response.aData;
                 } else {
-                    console.error('Respuesta inesperada del backend:', response);
-                    throw new Error('Respuesta inesperada del servidor al crear/actualizar.');
+                    throw new Error(response.vMessage || 'El backend indicó un error.');
                 }
             }),
             catchError(handleHttpError)
@@ -95,13 +90,13 @@ export class ElementoSistemaService {
      */
     eliminarElementoSistema(iIdElemento: number): Observable<IElementoSistemaDeleteResponse> {
         const url = `${this.apiUrl}/EliminarElementoSistema/${iIdElemento}`;
-        return this.http.delete<IElementoSistemaDeleteResponse>(url).pipe(
+        return this.http.delete<IApiResponse<IElementoSistemaDeleteResponse>>(url).pipe(
             map(response => {
                 if (response && typeof response.bStatus === 'boolean') {
                     if (response.bStatus) {
-                        return response;
+                        return response.aData;
                     } else {
-                        throw new Error(response.vMensaje || 'El backend indicó un error al eliminar el elemento.');
+                        throw new Error(response.vMessage || 'El backend indicó un error al eliminar el elemento.');
                     }
                 } else {
                     console.error('Respuesta inesperada del backend:', response);

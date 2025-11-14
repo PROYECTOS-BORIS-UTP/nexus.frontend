@@ -1,78 +1,70 @@
 <div class="page-container">
-    <div class="controls-container">
-        <mat-form-field appearance="outline" class="search-field">
-            <mat-label>Buscar Usuario</mat-label>
-            <input matInput (input)="applyFilter($event)" placeholder="Escribe para buscar..." #inputFilter>
-            <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
+	<div class="controls-container">
+		<mat-form-field appearance="outline" class="search-field">
+			<mat-label>Buscar Usuario</mat-label>
+			<input matInput (input)="applyFilter($event)" placeholder="Escribe nombre de usuario..." #inputFilter>
+			<mat-icon matSuffix>search</mat-icon>
+		</mat-form-field>
 
-        <div class="actions-container">
-            <button mat-raised-button color="primary" (click)="onAddUser()" class="btnAgregar">
-                <mat-icon>add</mat-icon>
-                <span>Agregar Usuario</span>
-            </button>
-        </div>
-    </div>
+		<div class="actions-container">
+			<button mat-raised-button color="primary" (click)="onAddUsuario()" class="btnAgregar">
+				<mat-icon>add</mat-icon>
+				<span>Agregar Usuario</span>
+			</button>
+		</div>
+	</div>
 
-    @if (isLoading()) {
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    }
+	@if (isLoading()) {
+	<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+	}
 
-    <app-table-generic
-        #table
-        [data]="data()"
-        [displayedColumns]="aDisplayedColumns"
-        [selection]="selection"
-        [actions]="userActions"
-        [totalRecords]="totalRecords()" 
-        [pageSizeOptions]="pageSizeOptions"
-        [initialPageSize]="currentPageSize"
-        (actionClicked)="onActionClicked($event)"
-        (pageChange)="handlePageEvent($event)"
-    >
-        <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef>
-                <mat-checkbox (change)="$event ? toggleAllRows() : null"
-                    [checked]="selection.hasValue() && isAllSelected()"
-                    [indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Seleccionar todas las filas">
-                </mat-checkbox>
-            </th>
-            <td mat-cell *matCellDef="let row">
-                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-                    [checked]="selection.isSelected(row)"
-                    [aria-label]="'Seleccionar fila ' + (data().indexOf(row) + 1)">
-                </mat-checkbox>
-            </td>
-        </ng-container>
+	<app-table-generic #table [data]="data()" [displayedColumns]="aDisplayedColumns" [selection]="selection"
+		[actions]="usuarioActions" [totalRecords]="totalRecords()" [pageSizeOptions]="pageSizeOptions"
+		[initialPageSize]="currentPageSize" (actionClicked)="onActionClicked($event)"
+		(pageChange)="handlePageEvent($event)">
 
-        <ng-container matColumnDef="vUsuario">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Usuario </th>
-            <td mat-cell *matCellDef="let element"> {{element.vUsuario}} </td>
-        </ng-container>
+		<ng-container matColumnDef="select">
+			<th mat-header-cell *matHeaderCellDef>
+				<mat-checkbox (change)="$event ? toggleAllRows() : null"
+					[checked]="selection.hasValue() && isAllSelected()"
+					[indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Seleccionar todas las filas">
+				</mat-checkbox>
+			</th>
+			<td mat-cell *matCellDef="let row">
+				<mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+					[checked]="selection.isSelected(row)" [aria-label]="'Seleccionar usuario ' + row.vUsuario">
+				</mat-checkbox>
+			</td>
+		</ng-container>
 
-        <ng-container matColumnDef="bActivo">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
-            <td mat-cell *matCellDef="let element">
-                <app-estado-general
-                    [iIdEstado]="element.bActivo ? 1 : 0"
-                    [vNombreEstado]="element.bActivo ? 'Activo' : 'Inactivo'">
-                </app-estado-general>
-            </td>
-        </ng-container>
+		<ng-container matColumnDef="vUsuario">
+			<th mat-header-cell *matHeaderCellDef mat-sort-header> Usuario </th>
+			<td mat-cell *matCellDef="let element"> {{element.vUsuario}} </td>
+		</ng-container>
 
-        <ng-container matColumnDef="iIdTipoUsuario">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo Usuario ID </th>
-            <td mat-cell *matCellDef="let element" matTooltip="ID del Tipo de Usuario"> {{element.iIdTipoUsuario}} </td>
-        </ng-container>
+		<ng-container matColumnDef="iIdTipoUsuario">
+			<th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo Usuario </th>
+			<td mat-cell *matCellDef="let element" matTooltip="ID Tipo Usuario"> {{element.iIdTipoUsuario}} </td>
+		</ng-container>
 
-        <ng-container matColumnDef="iIdPersona">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Persona ID </th>
-            <td mat-cell *matCellDef="let element" matTooltip="ID de la Persona asociada"> {{element.iIdPersona}} </td>
-        </ng-container>
+		<ng-container matColumnDef="iIdPersona">
+			<th mat-header-cell *matHeaderCellDef mat-sort-header> Persona </th>
+			<td mat-cell *matCellDef="let element" matTooltip="ID Persona"> {{element.iIdPersona}} </td>
+		</ng-container>
 
-        <ng-container matColumnDef="iIdTipoPersona">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo Persona ID </th>
-            <td mat-cell *matCellDef="let element" matTooltip="ID del Tipo de Persona"> {{element.iIdTipoPersona}} </td>
-        </ng-container>
-    </app-table-generic>
+		<ng-container matColumnDef="iIdTipoPersona">
+			<th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo Persona </th>
+			<td mat-cell *matCellDef="let element" matTooltip="ID Tipo Persona"> {{element.iIdTipoPersona}} </td>
+		</ng-container>
+
+		<ng-container matColumnDef="bActivo">
+			<th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+			<td mat-cell *matCellDef="let element">
+				<app-estado-general [iIdEstado]="element.bActivo ? 1 : 2"
+					[vNombreEstado]="element.bActivo ? 'Activo' : 'Inactivo'">
+				</app-estado-general>
+			</td>
+		</ng-container>
+
+	</app-table-generic>
 </div>

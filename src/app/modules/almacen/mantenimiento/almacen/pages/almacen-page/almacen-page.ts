@@ -22,6 +22,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
 import { AlmacenForm } from './dialogs/almacen-form/almacen-form';
+import { IAlmacenDeleteResponse } from '../../interfaces/response/IAlmacenDeleteResponse.interface';
 
 @Component({
 	selector: 'app-almacen-page',
@@ -235,7 +236,7 @@ export class AlmacenPage {
 		});
 	}
 
-	/**
+	/*
 	 * Abre diálogo de confirmación para eliminar almacén.
 	 */
 	onDeleteAlmacen(almacen: IAlmacenResponse): void {
@@ -244,34 +245,26 @@ export class AlmacenPage {
 			data: {
 				titulo: 'Confirmar Eliminación',
 				mensaje: `¿Estás seguro de eliminar el almacén "${almacen.vNombre}"?`,
-				mostrarCampoObservacion: false // O true si el SP de eliminación lo requiere
+				mostrarCampoObservacion: false
 			}
 		});
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result && result.confirmado) {
-				console.log('Eliminando almacén:', almacen.iIdAlmacen);
-
-				this.isLoading.set(true); // Activa el loading de la página
+				this.isLoading.set(true);
 				this.almacenService.eliminarAlmacen(almacen.iIdAlmacen).pipe(
 					finalize(() => this.isLoading.set(false)),
-					catchError(error => {
-						// El error ya lo maneja el servicio (snackBar)
-						// Solo necesitamos atraparlo aquí para que no rompa el subscribe
-						return of(null);
-					})
-				).subscribe(response => {
+				).subscribe((response: IAlmacenDeleteResponse) => {
 					if (response && response.bStatus) {
 						this.snackBar.open(response.vMensaje, 'Cerrar', {
 							duration: 3000,
-							panelClass: ['snackbar-success'] // Usa 'success' o 'warn' según prefieras
+							panelClass: ['snackbar-success']
 						});
-						this.cargarAlmacenes(); // Recarga la tabla si fue exitoso
+						this.cargarAlmacenes();
 					}
 				});
 			}
 		});
 	}
 	// #endregion
-	
 }
