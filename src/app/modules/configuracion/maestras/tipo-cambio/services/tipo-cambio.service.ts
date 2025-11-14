@@ -11,64 +11,62 @@ import { ITipoCambioCreateUpdateResponse } from '../interfaces/response/ITipoCam
 import { ITipoCambioCreateUpdateRequest } from '../interfaces/request/ITipoCambioCreateUpdateRequest.interface';
 
 @Injectable({
-  providedIn: 'root',
+	providedIn: 'root',
 })
 export class TipoCambioService {
-  private http = inject(HttpClient);
-  private apiUrl = `${environment.UrlBase}/tipo-cambio`;
+	private http = inject(HttpClient);
+	private apiUrl = `${environment.UrlBase}/tipo-cambio`;
 
-  constructor() {}
+	constructor() { }
 
-  /*
-   * Obtiene la lista paginada de Tipos de Cambio desde el backend.
-   * @param request DTO con parámetros de paginación y filtros.
-   * @returns Un Observable con la respuesta paginada de tipos de cambio.
-   */
-  listarTiposCambio(
-    request: ITipoCambioListadoRequest
-  ): Observable<IPaginationResponse<ITipoCambioResponse>> {
-    const url = `${this.apiUrl}/ListadoTipoCambio`; // Endpoint específico
-    return this.http
-      .post<IApiResponse<IPaginationResponse<ITipoCambioResponse>>>(url, request)
-      .pipe(
-        map((response) => {
-          if (response.bStatus && response.aData) {
-            return response.aData;
-          } else {
-            throw new Error(response.vMessage || 'Error desconocido al obtener tipos de cambio');
-          }
-        }),
-        catchError(handleHttpError)
-      );
-  }
+	/*
+	 * Obtiene la lista paginada de Tipos de Cambio desde el backend.
+	 * @param request DTO con parámetros de paginación y filtros.
+	 * @returns Un Observable con la respuesta paginada de tipos de cambio.
+	 */
+	listarTiposCambio(
+		request: ITipoCambioListadoRequest
+	): Observable<IPaginationResponse<ITipoCambioResponse>> {
+		const url = `${this.apiUrl}/ListadoTipoCambio`; // Endpoint específico
+		return this.http
+			.post<IApiResponse<IPaginationResponse<ITipoCambioResponse>>>(url, request)
+			.pipe(
+				map((response) => {
+					if (response.bStatus && response.aData) {
+						return response.aData;
+					} else {
+						throw new Error(response.vMessage || 'Error desconocido al obtener tipos de cambio');
+					}
+				}),
+				catchError(handleHttpError)
+			);
+	}
 
-  /*
-   * Envía una solicitud para crear o actualizar un tipo de cambio.
-   * @param request DTO con los datos del tipo de cambio.
-   * @returns Un Observable con la respuesta del backend.
-   */
-  crearActualizarTipoCambio(
-    request: ITipoCambioCreateUpdateRequest
-  ): Observable<ITipoCambioCreateUpdateResponse> {
-    const url = `${this.apiUrl}/CrearActualizarTipoCambio`;
-
-    return this.http.post<ITipoCambioCreateUpdateResponse>(url, request).pipe(
-      map((response) => {
-        if (response && typeof response.bStatus === 'boolean') {
-          if (response.bStatus) {
-            return response;
-          } else {
-            throw new Error(
-              response.vMensaje || 'El backend indicó un error al crear/actualizar el tipo de cambio.'
-            );
-          }
-        } else {
-          console.error('Respuesta inesperada del backend:', response);
-          throw new Error('Respuesta inesperada del servidor al crear/actualizar.');
-        }
-      }),
-      catchError(handleHttpError)
-    );
-  }
-
+	/*
+	 * Envía una solicitud para crear o actualizar un tipo de cambio.
+	 * @param request DTO con los datos del tipo de cambio.
+	 * @returns Un Observable con la respuesta del backend.
+	 */
+	crearActualizarTipoCambio(
+		request: ITipoCambioCreateUpdateRequest
+	): Observable<ITipoCambioCreateUpdateResponse> {
+		const url = `${this.apiUrl}/CrearActualizarTipoCambio`;
+		return this.http.post<IApiResponse<ITipoCambioCreateUpdateResponse>>(url, request).pipe(
+			map((response) => {
+				if (response && typeof response.bStatus === 'boolean') {
+					if (response.bStatus) {
+						return response.aData;
+					} else {
+						throw new Error(
+							response.vMessage || 'El backend indicó un error al crear/actualizar el tipo de cambio.'
+						);
+					}
+				} else {
+					console.error('Respuesta inesperada del backend:', response);
+					throw new Error('Respuesta inesperada del servidor al crear/actualizar.');
+				}
+			}),
+			catchError(handleHttpError)
+		);
+	}
 }

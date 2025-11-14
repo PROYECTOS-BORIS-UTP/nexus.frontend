@@ -47,12 +47,12 @@ export class OpcionService {
      */
     crearActualizarOpcion(request: IOpcionCreateUpdateRequest): Observable<IOpcionCreateUpdateResponse> {
         const url = `${this.apiUrl}/CrearActualizarOpcion`;
-        return this.http.post<IOpcionCreateUpdateResponse>(url, request).pipe(
+        return this.http.post<IApiResponse<IOpcionCreateUpdateResponse>>(url, request).pipe(
             map(response => {
                 if (response.bStatus) {
-                    return response;
+                    return response.aData;
                 } else {
-                    throw new Error(response.vMensaje || 'Error al procesar la solicitud');
+                    throw new Error(response.vMessage || 'Error al procesar la solicitud');
                 }
             }),
             catchError(handleHttpError)
@@ -66,12 +66,12 @@ export class OpcionService {
      */
     eliminarOpcion(iIdOpcion: number): Observable<IOpcionDeleteResponse> {
         const url = `${this.apiUrl}/EliminarOpcion/${iIdOpcion}`;
-        return this.http.delete<IOpcionDeleteResponse>(url).pipe(
+        return this.http.delete<IApiResponse<IOpcionDeleteResponse>>(url).pipe(
             map(response => {
                 if (response.bStatus) {
-                    return response;
+                    return response.aData;
                 } else {
-                    throw new Error(response.vMensaje || 'Error al eliminar la opción');
+                    throw new Error(response.vMessage || 'Error al eliminar la opción');
                 }
             }),
             catchError(handleHttpError)

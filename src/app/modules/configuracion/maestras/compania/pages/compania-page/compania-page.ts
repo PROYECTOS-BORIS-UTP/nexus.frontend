@@ -24,6 +24,8 @@ import { ICompaniaListadoRequest } from '../../interfaces/request/ICompaniaLista
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
 import { CompaniaForm } from './dialogs/compania-form/compania-form';
 import { ICompaniaCreateUpdateRequest } from '../../interfaces/request/ICompaniaCreateUpdateRequest.interface';
+import { ICompaniaCreateUpdateResponse } from '../../interfaces/response/ICompaniaCreateUpdateResponse.interface';
+import { ICompaniaDeleteResponse } from '../../interfaces/response/ICompaniaDeleteResponse.interface';
 
 @Component({
     selector: 'app-compania-page',
@@ -224,8 +226,8 @@ export class CompaniaPage implements OnInit, OnDestroy {
             if (result) {
                 this.isLoading.set(true);
                 this.companiaService.crearActualizarCompania(result).pipe(
-                    tap(response => {
-                        this.showSnackbar(response.vMensaje || 'Compañia creada exitosamente.', 'snackbar-success');
+                    tap((response: ICompaniaCreateUpdateResponse) => {
+                        this.showSnackbar(response.vMensaje, 'snackbar-success');
                         this.cargarCompanias();
                     }),
                     catchError(error => { return of(null); }),
@@ -265,11 +267,9 @@ export class CompaniaPage implements OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe((result: ICompaniaCreateUpdateRequest | undefined) => {
             if (result) {
                 this.isLoading.set(true);
-
-                console.log(result);
                 this.companiaService.crearActualizarCompania(result).pipe(
-                    tap(response => {
-                        this.showSnackbar(response.vMensaje || `Compañía "${compania.vRazonSocial}" actualizada.`, 'snackbar-success');
+                    tap((response: ICompaniaCreateUpdateResponse) => {
+                        this.showSnackbar(response.vMensaje, 'snackbar-success');
                         this.cargarCompanias();
                     }),
                     catchError(error => {
@@ -299,8 +299,8 @@ export class CompaniaPage implements OnInit, OnDestroy {
             if (result && result.confirmado) {
                 this.isLoading.set(true);
                 this.companiaService.eliminarCompania(compania.iIdCompania).pipe(
-                    tap(response => {
-                        this.showSnackbar(response.vMensaje || `Elemento "${compania.vRazonSocial}" desactivado.`, 'snackbar-warn');
+                    tap((response: ICompaniaDeleteResponse) => {
+                        this.showSnackbar(response.vMensaje, 'snackbar-warn');
                         this.cargarCompanias();
                     }),
                     catchError(error => {

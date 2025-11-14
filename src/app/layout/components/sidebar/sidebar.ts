@@ -85,7 +85,7 @@ export class Sidebar {
 		dialogRef.afterClosed().subscribe(resultado => {
 			if (resultado === true) {
 				this.authService.logout();
-				this.layoutService.clearMenu();
+				this.layoutService.clearMenuOnLogout();
 				this.router.navigate(['/login']);
 			}
 		});

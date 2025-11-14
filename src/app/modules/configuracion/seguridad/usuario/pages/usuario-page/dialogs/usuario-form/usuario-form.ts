@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Inject } from '@angular/core';
+import { Component, inject, Inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -9,101 +9,152 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { IUsuarioCreateUpdateRequest } from '../../../../interfaces/request/IUsuarioCreateUpdateRequest.interface';
+import { IUsuarioResponse } from '../../../../interfaces/response/IUsuarioResponse.interface';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { finalize, catchError, of } from 'rxjs';
+import { ISelectItem } from '../../../../../../../../core/interfaces/ISelectItem.interface';
+import { UsuarioService } from '../../../../services/usuario.service';
+import { IUsuarioCreateUpdateResponse } from '../../../../interfaces/response/IUsuarioCreateUpdateResponse.interface';
 
 
 export interface UsuarioFormData {
-	usuario: IUsuarioCreateUpdateRequest | null;
+	usuario?: IUsuarioResponse;
 }
- 
+
 @Component({
 	selector: 'app-usuario-form',
 	imports: [
 		CommonModule,
+		ReactiveFormsModule,
+		MatDialogModule,
+		MatButtonModule,
 		MatFormFieldModule,
 		MatInputModule,
 		MatSelectModule,
-		MatDialogModule,
-		MatCheckboxModule,
-		ReactiveFormsModule,
-		MatButtonModule,
-		MatProgressSpinnerModule
+		MatSlideToggleModule,
+		MatProgressBarModule,
+		MatSnackBarModule,
+		MatIconModule
 	],
 	templateUrl: './usuario-form.html',
 	styleUrl: './usuario-form.scss'
 })
 export class UsuarioForm {
-private fb = inject(FormBuilder);
+	// #region Inyecciones y Dependencias
+	private fb = inject(FormBuilder);
+	private usuarioService = inject(UsuarioService);
+	private snackBar = inject(MatSnackBar);
 	public dialogRef = inject(MatDialogRef<UsuarioForm>);
+	// #endregion
 
-	usuarioForm: FormGroup;
-	tituloDialogo = 'Agregar Usuario';
-	public usuarioExistente: IUsuarioCreateUpdateRequest | null = null;
+	// #region Estado del Componente
+	form: FormGroup;
+	isEdit = signal(false);
+	isLoading = signal(false);
+	hidePassword = signal(true); // Para mostrar/ocultar contraseña
+	// #endregion
 
-	constructor(
-		@Inject(MAT_DIALOG_DATA) public data: UsuarioFormData
-	) {
-		this.usuarioExistente = data?.usuario;
+	// #region Datos (Selects) - Simulados
+	selectTiposUsuario = signal<ISelectItem[]>([]);
+	selectPersonas = signal<ISelectItem[]>([]);
+	selectTiposPersona = signal<ISelectItem[]>([]);
+	// #endregion
 
-		this.usuarioForm = this.fb.group({
+	constructor(@Inject(MAT_DIALOG_DATA) public data: UsuarioFormData) {
+		this.isEdit.set(!!data.usuario);
 
-			vUsuario: ['', [Validators.required, Validators.maxLength(50)]],
-			bActivo: [true, Validators.required],
-			iIdTipoUsuario: ['', [Validators.required ]],
-			iIdPersona: [[Validators.required, Validators.maxLength(50)]],
-			iIdTipoPersona: ['', [Validators.required, Validators.maxLength(50)]],
-			
-			
+		this.form = this.fb.group({
+			iIdUsuario: [0],
+			vUsuario: ['', [Validators.required, Validators.maxLength(50)]], // Ajusta maxLength según DB
+			vPassword: [''], // Requerido solo en creación (validado manualmente)
+			bActivo: [true, [Validators.required]],
+			iIdTipoUsuario: [null, [Validators.required, Validators.min(1)]],
+			iIdPersona: [null],
+			iIdTipoPersona: [null, [Validators.required, Validators.min(1)]],
+			bChangePassword: [false]
 		});
 	}
 
 	ngOnInit(): void {
-		if (this.usuarioExistente) {
-			this.tituloDialogo = 'Editar Usuario';
-			// Asegúrate que el patchValue reciba los IDs correctos para los selects
-			const patchData = {
-				...this.usuarioExistente,
-				// Si iIdElementoPadre viene en usuarioExistente y lo necesitas en el form, añádelo
-			};
-			this.usuarioForm.patchValue(patchData);
+		if (this.isEdit() && this.data.usuario) {
+			const u = this.data.usuario;
+			this.form.patchValue({
+				iIdUsuario: u.iIdUsuario,
+				vUsuario: u.vUsuario,
+				bActivo: u.bActivo,
+				iIdTipoUsuario: u.iIdTipoUsuario,
+				iIdPersona: u.iIdPersona,
+				iIdTipoPersona: u.iIdTipoPersona,
+				bChangePassword: u.bChangePassword || false,
+				vPassword: null // No mostrar password al editar
+			});
+
+			// Si es edición, el password no es obligatorio a menos que se quiera cambiar
+			this.form.get('vPassword')?.clearValidators();
+			this.form.get('vPassword')?.updateValueAndValidity();
 		} else {
-			this.tituloDialogo = 'Crear Usuario';
+			// Si es creación, el password es obligatorio
+			this.form.get('vPassword')?.setValidators([Validators.required, Validators.minLength(6)]);
+			this.form.get('vPassword')?.updateValueAndValidity();
 		}
+
+		this.cargarDatosSelects();
 	}
 
-	//#Region SELECT
-
-	//#endregion
-
-	onCancel(): void {
-		this.dialogRef.close();
+	// #region Carga de Datos (Selects)
+	cargarDatosSelects(): void {
+		// Simulación - REEMPLAZAR CON SERVICIOS REALES
+		setTimeout(() => {
+			this.selectTiposUsuario.set([
+				{ iIdElemento: 1, vDescripcion: 'Administrador' },
+				{ iIdElemento: 2, vDescripcion: 'Operador' }
+			]);
+			this.selectPersonas.set([
+				{ iIdElemento: 101, vDescripcion: 'Juan Perez' },
+				{ iIdElemento: 102, vDescripcion: 'Maria Lopez' }
+			]);
+			this.selectTiposPersona.set([
+				{ iIdElemento: 1, vDescripcion: 'Empleado' },
+				{ iIdElemento: 2, vDescripcion: 'Cliente' }
+			]);
+		}, 300);
 	}
+	// #endregion
 
-	//#region ON SAVE
+	// #region Acciones
 	onSave(): void {
-		if (this.usuarioForm.invalid) { this.usuarioForm.markAllAsTouched(); return; }
-
-		const formData = this.usuarioForm.getRawValue();
-
-		const dataToSend: IUsuarioCreateUpdateRequest = {
-			...formData,
-			iIdusuario: this.usuarioExistente?.iIdUsuario ?? 0
-		};
-
-		// Limpieza de strings vacíos a null (opcional, si el backend lo requiere)
-		for (const key in dataToSend) {
-			if (Object.prototype.hasOwnProperty.call(dataToSend, key)) {
-				const typedKey = key as keyof IUsuarioCreateUpdateRequest;
-				const requiredFields: (keyof IUsuarioCreateUpdateRequest)[] = [
-					'vUsuario', 'iIdTipoUsuario', 'iIdPersona','iIdTipoPersona' // Añade otros strings requeridos si los hay
-				];
-				if (dataToSend[typedKey] === '' && !requiredFields.includes(typedKey)) {
-					(dataToSend as any)[typedKey] = null;
-				}
-			}
+		if (this.form.invalid) {
+			this.form.markAllAsTouched();
+			return;
 		}
 
-		this.dialogRef.close(dataToSend);
+		this.isLoading.set(true);
+		const request = this.form.value as IUsuarioCreateUpdateRequest;
+
+		// En edición, si el password está vacío, enviamos null o undefined para no actualizarlo
+		if (this.isEdit() && !request.vPassword) {
+			request.vPassword = null;
+		}
+
+		this.usuarioService.crearActualizarUsuario(request).pipe(
+			finalize(() => this.isLoading.set(false)),
+		).subscribe((response: IUsuarioCreateUpdateResponse) => {
+			if (response && response.bStatus) {
+
+				this.snackBar.open(response.vMensaje, 'Cerrar', {duration: 3000, panelClass: ['snackbar-success']});
+				this.dialogRef.close(true);
+			} else {
+				const errorMsg = response?.vMensaje || 'Ocurrió un error inesperado';
+				this.snackBar.open(errorMsg, 'Cerrar', { duration: 3000 });
+			}
+		});
 	}
 
-	get fc() { return this.usuarioForm.controls; }
+	onClose(): void {
+		this.dialogRef.close(false);
+	}
+	// #endregion
 }
