@@ -6,6 +6,10 @@ import { environment } from '../../../../../../environments/environments';
 import { IApiResponse } from '../../../../../core/interfaces/IApiResponse.interface';
 import { IPaginationResponse } from '../../../../../core/interfaces/IPaginationResponse.interface';
 import { IUsuarioResponse } from '../interfaces/response/IUsuarioResponse.interface';
+import { handleHttpError } from '../../../../../core/utils/error-handler.utils';
+import { IUsuarioCreateUpdateRequest } from '../interfaces/request/IUsuarioCreateUpdateRequest.interface';
+import { IUsuarioCreateUpdateResponse } from '../interfaces/response/IUsuarioCreateUpdateResponse.interface';
+import { IUsuarioDeleteResponse } from '../interfaces/response/IUsuarioDeleteResponse.interface';
 
 @Injectable({
     providedIn: 'root'
@@ -33,10 +37,56 @@ export class UsuarioService {
                     throw new Error(response.vMessage || 'Error desconocido al obtener usuarios');
                 }
             }),
-            catchError(error => {
-                console.error('Error en la llamada HTTP a listarUsuarios:', error);
-                return throwError(() => new Error(error.message || 'Error del servidor al listar usuarios'));
-            })
+            catchError(handleHttpError)
         );
     }
+
+     /*
+         * Envía una solicitud para crear o actualizar una Usuario.
+         * @param request DTO con los datos de la usuario.
+         * @returns Un Observable con la respuesta del backend.
+         */
+        crearActualizarUsario(request: IUsuarioCreateUpdateRequest): Observable<IUsuarioCreateUpdateResponse> {
+            const url = `${this.apiUrl}/CrearActualizarUsuario`;
+            return this.http.post<IUsuarioCreateUpdateResponse>(url, request).pipe(
+                map(response => {
+                    if (response && typeof response.bStatus === 'boolean') {
+                        if (response.bStatus) {
+                            return response;
+                        } else {
+                            throw new Error(response.vMensaje || 'El backend indicó un error al crear/actualizar la compañia.');
+                        }
+                    } else {
+                        console.error('Respuesta inesperada del backend:', response);
+                        throw new Error('Respuesta inesperada del servidor al crear/actualizar.');
+                    }
+                }),
+                catchError(handleHttpError)
+            );
+        }
+    
+        /*
+         * Envía una solicitud para eliminar (baja lógica) un usuario.
+         * @param iIdCompania ID del usuario a eliminar.
+         * @returns Un Observable con la respuesta del backend.
+         */
+        eliminarUsuario(iIdUsuario: number): Observable<IUsuarioDeleteResponse> {
+            const url = `${this.apiUrl}/EliminarUsuario/${iIdUsuario}`;
+            return this.http.delete<IUsuarioDeleteResponse>(url).pipe(
+                map(response => {
+                    if (response && typeof response.bStatus === 'boolean') {
+                        if (response.bStatus) {
+                            return response;
+                        } else {
+                            throw new Error(response.vMensaje || 'El backend indicó un error al eliminar el usuario.');
+                        }
+                    } else {
+                        console.error('Respuesta inesperada del backend:', response);
+                        throw new Error('Respuesta inesperada del servidor al eliminar.');
+                    }
+                }),
+                catchError(handleHttpError)
+            );
+        }
+    
 }
