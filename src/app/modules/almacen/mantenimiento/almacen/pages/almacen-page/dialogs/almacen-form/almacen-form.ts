@@ -17,6 +17,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ISelectItem } from '../../../../../../../../core/interfaces/ISelectItem.interface';
 import { ICompaniaListadoRequest } from '../../../../../../../configuracion/maestras/compania/interfaces/request/ICompaniaListadoRequest.interface';
 import { CompaniaService } from '../../../../../../../configuracion/maestras/compania/services/compania.service';
+import { IAlmacenCreateUpdateResponse } from '../../../../interfaces/response/IAlmacenCreateUpdateResponse.interface';
 
 export interface AlmacenFormData {
 	almacen?: IAlmacenResponse;
@@ -56,11 +57,10 @@ export class AlmacenForm {
 	// #endregion
 
 	// #region Datos (Selects) - (Simulados, debes cargarlos)
+	isLoadingCompanias = false;
 	selectCompanias: ISelectItem[] = [];
 	ubigeos = signal<any[]>([]);   // Ejemplo: [{ iIdUbigeo: 150101, vDescripcion: 'LIMA' }]
 	// #endregion
-
-	isLoadingCompanias = false;
 
 	constructor(@Inject(MAT_DIALOG_DATA) public data: AlmacenFormData) {
 		this.isEdit.set(!!data.almacen); // Determina si es edición
@@ -144,10 +144,7 @@ export class AlmacenForm {
 	onSave(): void {
 		if (this.almacenForm.invalid) {
 			this.almacenForm.markAllAsTouched(); // Marca todos los campos como tocados para mostrar errores
-			this.snackBar.open('Por favor, complete los campos requeridos.', 'Cerrar', {
-				duration: 3000,
-				panelClass: ['snackbar-warn']
-			});
+			this.snackBar.open('Por favor, complete los campos requeridos.', 'Cerrar', {duration: 3000,	panelClass: ['snackbar-warn']});
 			return;
 		}
 
@@ -155,25 +152,16 @@ export class AlmacenForm {
 		const request = this.almacenForm.value as IAlmacenCreateUpdateRequest;
 
 		this.almacenService.crearActualizarAlmacen(request).pipe(
-			finalize(() => this.isLoading.set(false)), // Desactiva el loading al finalizar
-			catchError(error => {
-				// El error ya es manejado por el servicio (handleHttpError),
-				// pero lo atrapamos aquí para evitar que se propague al subscribe
-				return of(null);
-			})
-		).subscribe(response => {
+			finalize(() => this.isLoading.set(false)),
+		).subscribe((response: IAlmacenCreateUpdateResponse) => {
 			if (response && response.bStatus) {
-				this.snackBar.open(response.vMensaje, 'Cerrar', {
-					duration: 3000,
-					panelClass: ['snackbar-success']
-				});
-				this.dialogRef.close(true); // Cierra el diálogo y devuelve 'true' (éxito)
+				this.snackBar.open(response.vMensaje, 'Cerrar', {duration: 3000,panelClass: ['snackbar-success']});
+				this.dialogRef.close(true);
 			}
-			// Si hay error, el servicio ya mostró el SnackBar y este subscribe no recibe nada
 		});
 	}
 
-	/**
+	/*
 	 * Se ejecuta al hacer clic en Cancelar.
 	 */
 	onClose(): void {

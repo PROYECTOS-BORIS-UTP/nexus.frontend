@@ -23,6 +23,8 @@ import { IElementoSistemaListadoRequest } from '../../interfaces/request/IElemen
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
 import { IElementoSistemaCreateUpdateRequest } from '../../interfaces/request/IElementoSistemaCreateUpdateRequest.interface';
 import { ElementoSistemaForm } from './dialogs/elemento-sistema-form/elemento-sistema-form';
+import { IElementoSistemaCreateUpdateResponse } from '../../interfaces/response/IElementoSistemaCreateUpdateResponse.interface';
+import { IElementoSistemaDeleteResponse } from '../../interfaces/response/IElementoSistemaDeleteResponse.interface';
 
 @Component({
 	selector: 'app-elemento-sistema-page',
@@ -294,8 +296,8 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 			if (result) {
 				this.isLoading.set(true);
 				this.elementoSistemaService.crearActualizarElementoSistema(result).pipe(
-					tap(response => {
-						this.showSnackbar(response.vMensaje || 'Elemento creado exitosamente.', 'snackbar-success');
+					tap((response: IElementoSistemaCreateUpdateResponse) => {
+						this.showSnackbar(response.vMensaje, 'snackbar-success');
 						this.cargarElementosSistema();
 					}),
 					catchError(error => { return of(null); }),
@@ -336,8 +338,8 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 			if (result) {
 				this.isLoading.set(true);
 				this.elementoSistemaService.crearActualizarElementoSistema(result).pipe(
-					tap(response => {
-						this.showSnackbar(response.vMensaje || `Elemento "${elemento.vDescripcion}" actualizado.`, 'snackbar-success');
+					tap((response: IElementoSistemaCreateUpdateResponse) => {
+						this.showSnackbar(response.vMensaje, 'snackbar-success');
 						this.cargarElementosSistema();
 					}),
 					catchError(error => {
@@ -368,8 +370,8 @@ export class ElementoSistemaPage implements OnInit, OnDestroy {
 			if (result && result.confirmado) {
 				this.isLoading.set(true);
 				this.elementoSistemaService.eliminarElementoSistema(elemento.iIdElemento).pipe(
-					tap(response => {
-						this.showSnackbar(response.vMensaje || `Elemento "${elemento.vDescripcion}" desactivado.`, 'snackbar-warn');
+					tap((response: IElementoSistemaDeleteResponse) => {
+						this.showSnackbar(response.vMensaje, 'snackbar-warn');
 						this.cargarElementosSistema();
 					}),
 					catchError(error => {

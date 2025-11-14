@@ -94,7 +94,6 @@ export class OpcionForm {
 		const request: IOpcionCreateUpdateRequest = this.opcionForm.value;
 		this.opcionService.crearActualizarOpcion(request).subscribe({
 			next: (response) => {
-				console.log('Operación exitosa', response);
 				this.dialogRef.close(true);
 			},
 			error: (err) => {
