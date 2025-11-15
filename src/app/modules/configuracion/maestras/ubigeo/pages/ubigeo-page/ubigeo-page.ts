@@ -21,6 +21,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { IUbigeoListadoRequest } from '../../interfaces/request/IUbigeoListadoRequest.interface';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
+import { UbigeoForm } from '../dialogs/ubigeo-form/ubigeo-form';
+import { IUbigeoCreateUpdateRequest } from '../../interfaces/request/IUbigeoCreateUpdateRequest.interface';
 
 @Component({
 	selector: 'app-ubigeo-page',
@@ -68,7 +70,7 @@ export class UbigeoPage implements OnInit, OnDestroy {
 
 	// #region Configuración de la Tabla
 	// Define las columnas a mostrar según IUbigeoResponse
-	aDisplayedColumns: string[] = ['select', 'vCodigo', 'vDescripcion', 'vTipoUbigeoDescripcion', 'vUbigeoPadreDescripcion', 'vPaisNombre', 'bActivo'];
+	aDisplayedColumns: string[] = ['select', 'vCodigo', 'vDescripcion', 'vTipoUbigeoDescripcion', 'vPaisNombre', 'bActivo'];
 	selection = new SelectionModel<IUbigeoResponse>(true, []);
 	ubigeoActions: TableAction[] = [ // Acciones específicas
 		{ name: 'edit', label: 'Editar Ubigeo', icon: 'edit' },
@@ -106,10 +108,6 @@ export class UbigeoPage implements OnInit, OnDestroy {
 			iPageSize: this.currentPageSize,
 			sTerminoBusqueda: this.currentFilterValue || undefined, // Mapeado desde vDescripcionFiltro
 			// Puedes añadir otros filtros aquí si es necesario
-			// iIdUbigeoPadre: ...,
-			// iIdTipoUbigeo: ...,
-			// iIdPais: ...,
-			// bActivo: ...,
 		};
 
 		this.ubigeoService.listarUbigeos(request).pipe(
@@ -209,35 +207,73 @@ export class UbigeoPage implements OnInit, OnDestroy {
 	 * Abre diálogo para agregar ubigeo.
 	 */
 	onAddUbigeo(): void {
-		// Debes crear el componente UbigeoForm
-		// const dialogRef = this.dialog.open(UbigeoForm, { width: '600px', disableClose: true, data: {} });
-		// dialogRef.afterClosed().subscribe(result => {
-		//   if (result) {
-		//     console.log('Nuevo ubigeo:', result);
-		//     // --- LLAMADA AL SERVICIO PARA CREAR ---
-		//     // this.ubigeoService.crearActualizarUbigeo(result).subscribe(...);
-		//     this.snackBar.open('Ubigeo creado (simulado).', 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		//     this.cargarUbigeos();
-		//   }
-		// });
-		alert('Funcionalidad "Agregar Ubigeo" no implementada.'); // Placeholder
+		const dialogRef = this.dialog.open(UbigeoForm, {
+			width: '100%',
+			maxWidth: '700px', // Ajusta según necesidad
+			disableClose: true,
+			data: {
+				UbigeoExistente: null,
+			}
+		});
+
+		dialogRef.afterClosed().subscribe((result:IUbigeoCreateUpdateRequest| undefined) => {
+			if (result) {
+				this.isLoading.set(true);
+				this.ubigeoService.crearActualizarUbigeo(result).pipe(
+					tap(response => {
+						this.showSnackbar(response.vMensaje || 'Ubigeo Creado exitosamente.', 'snackbar-success');
+						this.cargarUbigeos();
+					}),
+					catchError(error => { return of(null); }),
+					finalize(() => this.isLoading.set(false))
+				).subscribe();
+			}
+		});
 	}
 
 	/*
 	 * Abre diálogo para editar ubigeo.
 	 */
 	onEditUbigeo(ubigeo: IUbigeoResponse): void {
-		// const dialogRef = this.dialog.open(UbigeoForm, { width: '600px', disableClose: true, data: { ubigeo: ubigeo } });
-		// dialogRef.afterClosed().subscribe(result => {
-		//   if (result) {
-		//     console.log('Ubigeo a actualizar:', result);
-		//     // --- LLAMADA AL SERVICIO PARA ACTUALIZAR ---
-		//     // this.ubigeoService.crearActualizarUbigeo(result).subscribe(...);
-		//     this.snackBar.open(`Ubigeo "${ubigeo.vDescripcion}" actualizado (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		//     this.cargarUbigeos();
-		//   }
-		// });
-		alert(`Funcionalidad "Editar Ubigeo: ${ubigeo.vDescripcion}" no implementada.`); // Placeholder
+        // Se construye un objeto con todos los datos necesarios para editar, incluyendo
+        // los IDs para el formulario reactivo y las descripciones si el formulario las usa.
+		const ubigeoParaEditar: any = { 
+			iIdUbigeo: ubigeo.iIdUbigeo,
+			vCodigo: ubigeo.vCodigo,
+			vDescripcion: ubigeo.vDescripcion,
+			iIdTipoUbigeo: ubigeo.iIdTipoUbigeo,
+            // Datos adicionales útiles para el formulario de edición
+            vTipoUbigeoDescripcion: ubigeo.vTipoUbigeoDescripcion, 
+			iIdPais: ubigeo.iIdPais,
+            vPaisNombre: ubigeo.vPaisNombre, 
+			bActivo: ubigeo.bActivo,
+		};
+
+		const dialogRef = this.dialog.open(UbigeoForm, {
+			width: '100%',
+			maxWidth: '700px',
+			disableClose: true,
+			data: {
+				UbigeoExistente: ubigeoParaEditar,
+			}
+		});
+
+		dialogRef.afterClosed().subscribe((result: IUbigeoCreateUpdateRequest | undefined) => {
+			if (result) {
+				this.isLoading.set(true);
+				this.ubigeoService.crearActualizarUbigeo(result).pipe(
+					tap(response => {
+						this.showSnackbar(response.vMensaje || `Elemento "${ubigeo.vDescripcion}" actualizado.`, 'snackbar-success');
+						this.cargarUbigeos();
+					}),
+					catchError(error => {
+						this.showSnackbar(error.message || 'Error al actualizar el elemento.', 'snackbar-error');
+						return of(null);
+					}),
+					finalize(() => this.isLoading.set(false))
+				).subscribe();
+			}
+		});
 	}
 
 	/*
@@ -255,13 +291,26 @@ export class UbigeoPage implements OnInit, OnDestroy {
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result && result.confirmado) {
-				console.log('Eliminando ubigeo:', ubigeo.iIdUbigeo, 'Observación:', result.observacion);
-				// --- LLAMADA AL SERVICIO PARA ELIMINAR ---
-				// this.ubigeoService.eliminarUbigeo(ubigeo.iIdUbigeo, result.observacion).subscribe(...);
-				this.snackBar.open(`Ubigeo "${ubigeo.vDescripcion}" eliminado (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-warn'] });
-				this.cargarUbigeos();
+				this.isLoading.set(true);
+				this.ubigeoService.eliminarUbigeo(ubigeo.iIdUbigeo).pipe(
+					tap(response => {
+						this.showSnackbar(response.vMensaje || `Elemento "${ubigeo.vDescripcion}" desactivado.`, 'snackbar-warn');
+						this.cargarUbigeos();
+					}),
+					catchError(error => {
+						this.showSnackbar(error.message || 'Error al eliminar el elemento.', 'snackbar-error');
+						return of(null);
+					}),
+					finalize(() => this.isLoading.set(false))
+				).subscribe();
 			}
 		});
 	}
 	// #endregion
+	private showSnackbar(message: string, panelClass: string = 'snackbar-info'): void {
+		this.snackBar.open(message, 'Cerrar', {
+			duration: 5000,
+			panelClass: [panelClass]
+		});
+	}
 }
