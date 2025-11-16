@@ -1,0 +1,62 @@
+<h2 mat-dialog-title>{{ tituloDialogo }}</h2>
+
+<mat-dialog-content class="mat-typography">
+    <form [formGroup]="ubigeoForm" class="elemento-sistema-form-container">
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Código</mat-label>
+                <input matInput type="text" formControlName="vCodigo" required maxlength="50"> 
+                @if (fc['vCodigo'].hasError('required')) { <mat-error>Código es requerido.</mat-error> }
+                @if (fc['vCodigo'].hasError('maxlength')) { <mat-error>Máximo 50 caracteres.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Descripción</mat-label>
+                <input matInput type="text" formControlName="vDescripcion" required maxlength="250">
+                @if (fc['vDescripcion'].hasError('required')) { <mat-error>Descripción es requerida.</mat-error> }
+                @if (fc['vDescripcion'].hasError('maxlength')) { <mat-error>Máximo 250 caracteres.</mat-error> }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Tipo Ubigeo</mat-label>
+                <mat-select formControlName="iIdTipoUbigeo" required [disabled]="isLoadingLists"> 
+                    @for (tipo of tiposUbigeo; track tipo.iIdTipoUbigeo) {
+                        <mat-option [value]="tipo.iIdTipoUbigeo">
+                            {{ tipo.vDescripcion }}
+                        </mat-option>
+                    }
+                    @if (isLoadingLists) { <mat-progress-spinner mode="indeterminate" diameter="24" style="margin-left: 16px;"></mat-progress-spinner> }
+                </mat-select>
+                @if (fc['iIdTipoUbigeo'].hasError('required')) { <mat-error>Tipo Ubigeo es requerido.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>País</mat-label>
+                <mat-select formControlName="iIdPais" required [disabled]="isLoadingLists">
+                    @for (pais of paises; track pais.iIdPais) {
+                        <mat-option [value]="pais.iIdPais">
+                            {{ pais.vNombre }}
+                        </mat-option>
+                    }
+                     @if (isLoadingLists) { <mat-progress-spinner mode="indeterminate" diameter="24" style="margin-left: 16px;"></mat-progress-spinner> }
+                </mat-select>
+                @if (fc['iIdPais'].hasError('required')) { <mat-error>País es requerido.</mat-error> }
+            </mat-form-field>
+        </div>
+        
+        <div class="form-row">
+            <mat-checkbox formControlName="bActivo" class="form-field-checkbox">Activo</mat-checkbox>
+        </div>
+        
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onCancel()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="onSave()" [disabled]="ubigeoForm.invalid || isLoadingLists">
+        {{ ubigeoExistente ? 'Actualizar' : 'Guardar' }}
+    </button>
+</mat-dialog-actions>
