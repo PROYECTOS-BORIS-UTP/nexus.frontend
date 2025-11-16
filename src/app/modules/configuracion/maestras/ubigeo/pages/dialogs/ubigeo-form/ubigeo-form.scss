@@ -1,0 +1,34 @@
+// ubigeo-form.scss
+
+::ng-deep {
+    // Asegura que el contenido del diálogo no tenga problemas de overflow
+    .mat-mdc-dialog-container .mat-mdc-dialog-content {
+        overflow: visible !important;
+        // Añadir padding inferior para que el contenido no pegue con los botones
+        padding: 0 24px 20px 24px !important; 
+    }
+    
+    // Contenedor principal: usa flex-direction: column y gap para espaciar las filas
+    .elemento-sistema-form-container {
+        display: flex;
+        flex-direction: column; // Apila las filas verticalmente
+        gap: 20px; // Espacio vertical entre cada .form-row
+        width: 100%;
+    }
+
+    // Estilo para cada fila: usa flex y gap para espaciar los campos horizontalmente
+    .form-row {
+        display: flex;
+        gap: 15px; // Espacio horizontal entre los campos de la fila
+        width: 100%;
+        
+        .mat-mdc-form-field{
+            flex: 1; // Permite que los campos se repartan el espacio equitativamente
+        }
+
+        .form-field-checkbox {
+            // Ajuste para el checkbox
+            margin-top: 5px; 
+        }
+    }
+}
