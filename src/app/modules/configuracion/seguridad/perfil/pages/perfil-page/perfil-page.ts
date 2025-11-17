@@ -317,7 +317,7 @@ export class PerfilPage implements OnInit, OnDestroy {
 	onEditPermisos(perfil: IPerfilResponse): void {
 		const dialogRef = this.dialog.open(PerfilPermisos, {
 			width: '100%',
-			maxWidth: '900px', // Más ancho para el árbol de permisos
+			maxWidth: '700px', // Más ancho para el árbol de permisos
 			disableClose: true,
 			data: {
 				iIdPerfil: perfil.iIdPerfil,
