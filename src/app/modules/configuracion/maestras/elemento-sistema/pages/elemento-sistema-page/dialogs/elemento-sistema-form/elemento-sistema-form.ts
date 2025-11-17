@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, inject } from '@angular/core';
+import { Component, Inject, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { IElementoSistemaCreateUpdateRequest } from '../../../../interfaces/request/IElementoSistemaCreateUpdateRequest.interface';
@@ -51,11 +51,11 @@ export class ElementoSistemaForm implements OnInit {
 	tituloDialogo = 'Agregar Elemento del Sistema';
 	public elementoExistente: IElementoSistemaCreateUpdateRequest | null = null;
 
-	selectTipoElemento: ISelectItem[] = [];
+	selectTipoElemento = signal<ISelectItem[]>([]);
 	isLoadingTipos = false;
 	// --- Placeholders para Selects (DEBES CARGARLOS DESDE SERVICIOS) ---
-	selectCompanias: ISelectItem[] = []; // Usar ISelectItem si aplica
-	selectPaises: ISelectItem[] = [];   // Usar ISelectItem si aplica
+	selectCompanias = signal<ISelectItem[]>([]);
+	selectPaises = signal<ISelectItem[]>([]);
 	isLoadingCompanias = false;
 	isLoadingPaises = false;
 	// --- Fin Placeholders ---
@@ -110,12 +110,16 @@ export class ElementoSistemaForm implements OnInit {
 			.pipe(finalize(() => this.isLoadingTipos = false)) // Asegura que el spinner se oculte
 			.subscribe({
 				next: (data) => {
-					this.selectTipoElemento = data;
+					this.selectTipoElemento.set(
+						data.map(comp => ({
+							iIdElemento: comp.iIdElemento,
+							vDescripcion: comp.vDescripcion
+						}))
+					);
 				},
 				error: (err) => {
 					console.error('Error al cargar Tipos de Elemento:', err);
-					// Aquí podrías mostrar un mensaje al usuario (ej: con MatSnackBar)
-					this.selectTipoElemento = []; // Limpiar en caso de error
+					this.selectTipoElemento.set([]);
 				}
 			});
 	}
@@ -131,14 +135,16 @@ export class ElementoSistemaForm implements OnInit {
 			.pipe(finalize(() => this.isLoadingCompanias = false))
 			.subscribe({
 				next: (paginatedResponse) => {
-					this.selectCompanias = paginatedResponse.aRecords.map(comp => ({
-						iIdElemento: comp.iIdCompania,
-						vDescripcion: comp.vRazonSocial
-					}));
+					this.selectCompanias.set(
+						paginatedResponse.aRecords.map(comp => ({
+							iIdElemento: comp.iIdCompania,
+							vDescripcion: comp.vRazonSocial
+						}))
+					);
 				},
 				error: (err) => {
 					console.error('Error al cargar Compañías:', err);
-					this.selectCompanias = [];
+					this.selectCompanias.set([]);
 				}
 			});
 	}
@@ -154,14 +160,16 @@ export class ElementoSistemaForm implements OnInit {
 			.pipe(finalize(() => this.isLoadingPaises = false))
 			.subscribe({
 				next: (paginatedResponse) => {
-					this.selectPaises = paginatedResponse.aRecords.map(pais => ({
-						iIdElemento: pais.iIdPais,
-						vDescripcion: pais.vNombre
-					}));
+					this.selectPaises.set(
+						paginatedResponse.aRecords.map(comp => ({
+							iIdElemento: comp.iIdPais,
+							vDescripcion: comp.vNombre
+						}))
+					);
 				},
 				error: (err) => {
 					console.error('Error al cargar Países:', err);
-					this.selectPaises = []; // Limpiar en caso de error
+					this.selectPaises.set([]); 
 				}
 			});
 	}
