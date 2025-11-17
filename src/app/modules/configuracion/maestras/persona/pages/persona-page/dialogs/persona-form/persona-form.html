@@ -93,15 +93,15 @@
         </div>
 
         <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-                <mat-label>Fecha Nacimiento</mat-label>
-                <input matInput [matDatepicker]="pickerNacimiento" formControlName="dFechaNacimiento" readonly>
-                <mat-datepicker-toggle matSuffix [for]="pickerNacimiento"></mat-datepicker-toggle>
-                <mat-datepicker #pickerNacimiento></mat-datepicker>
-                @if (fc['dFechaNacimiento'].hasError('matDatepickerParse')) {
-                <mat-error>Fecha inválida.</mat-error>
-                }
-            </mat-form-field>
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha Nacimiento</mat-label>
+                    <input matInput [matDatepicker]="pickerNacimiento" formControlName="dFechaNacimiento" readonly>
+                    <mat-datepicker-toggle matSuffix [for]="pickerNacimiento"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerNacimiento></mat-datepicker>
+                    @if (fc['dFechaNacimiento'].hasError('matDatepickerParse')) {
+                    <mat-error>Fecha inválida.</mat-error>
+                    }
+                </mat-form-field>
 
             <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Género</mat-label>
