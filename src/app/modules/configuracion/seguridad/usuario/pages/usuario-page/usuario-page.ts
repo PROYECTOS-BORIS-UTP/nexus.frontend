@@ -23,6 +23,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { IUsuarioListadoRequest } from '../../interfaces/request/IUsuarioListadoRequest.interface';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
 import { IUsuarioCreateUpdateRequest } from '../../interfaces/request/IUsuarioCreateUpdateRequest.interface';
+import { PerfilService } from '../../../perfil/services/perfil.service';
+import { AsignarPerfil } from './dialogs/asignar-perfil/asignar-perfil';
 
 @Component({
 	selector: 'app-usuario-page',
@@ -52,6 +54,7 @@ export class UsuarioPage implements OnInit, OnDestroy {
 	private usuarioService = inject(UsuarioService);
 	public dialog = inject(MatDialog);
 	private snackBar = inject(MatSnackBar);
+	private perfilService = inject(PerfilService);
 	// #endregion
 
 	// #region Estado del Componente (Signals y Variables)
@@ -72,6 +75,7 @@ export class UsuarioPage implements OnInit, OnDestroy {
 	selection = new SelectionModel<IUsuarioResponse>(true, []);
 	usuarioActions: TableAction[] = [
 		{ name: 'edit', label: 'Editar Usuario', icon: 'edit' },
+		{ name: 'assign_profiles', label: 'Asignar Perfiles', icon: 'manage_accounts' },
 		{ name: 'delete', label: 'Eliminar Usuario', icon: 'delete' },
 	];
 	// #endregion
@@ -174,6 +178,9 @@ export class UsuarioPage implements OnInit, OnDestroy {
 			case 'edit':
 				this.onEditUsuario(event.element);
 				break;
+			case 'assign_profiles':
+				this.onAsignarPerfiles(event.element);
+				break;
 			case 'delete':
 				this.onDeleteUsuario(event.element);
 				break;
@@ -208,6 +215,30 @@ export class UsuarioPage implements OnInit, OnDestroy {
 		dialogRef.afterClosed().subscribe(result => {
 			if (result) {
 				this.cargarUsuarios();
+			}
+		});
+	}
+
+	/*
+	 * Abre el diálogo para asignar/desasignar perfiles a un usuario.
+	 */
+	onAsignarPerfiles(usuario: IUsuarioResponse): void {
+		const iIdCompania = 1; // <-- REEMPLAZAR ESTO
+
+		const dialogRef = this.dialog.open(AsignarPerfil, {
+			width: '600px',
+			disableClose: true,
+			data: {
+				iIdUsuario: usuario.iIdUsuario,
+				iIdCompania: iIdCompania,
+				nombreUsuario: usuario.vUsuario
+			}
+		});
+
+		dialogRef.afterClosed().subscribe(huboCambios => {
+			if (huboCambios) {
+				// Opcional: Recargar datos si es necesario
+				// this.cargarUsuarios(); 
 			}
 		});
 	}

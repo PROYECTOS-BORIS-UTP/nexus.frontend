@@ -269,14 +269,14 @@ export class PersonaPage implements OnInit, OnDestroy {
             bActivo: persona.bActivo,
         };
 
-
         const dialogRef = this.dialog.open(PersonaForm, {
-            width: '700px',
-            disableClose: true,
+            width: '100%',
+            maxWidth: '900px',
             data: { persona: personaParaEditar }
         });
 
         dialogRef.afterClosed().subscribe((result: IPersonaCreateUpdateRequest | undefined) => {
+            console.log("Resultado del diálogo de edición de persona:", result);
             if (result) {
                 this.isLoading.set(true);
                 this.personaService.crearActualizarPersona(result).pipe(
