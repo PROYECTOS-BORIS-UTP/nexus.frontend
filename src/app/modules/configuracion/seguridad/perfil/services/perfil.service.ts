@@ -13,6 +13,11 @@ import { IPerfilDeleteResponse } from '../interfaces/response/IPerfilDeleteRespo
 import { IPerfilOpcionCreateRequest } from '../interfaces/request/IPerfilOpcionCreateRequest.interface';
 import { IPerfilOpcionCreateResponse } from '../interfaces/response/IPerfilOpcionCreateResponse.interface';
 import { IPerfilOpcionListadoResponse } from '../interfaces/response/IPerfilOpcionListadoResponse.interface';
+import { IPerfilUsuarioCreateRequest } from '../interfaces/request/IPerfilUsuarioCreateRequest.interface';
+import { IPerfilUsuarioListadoRequest } from '../interfaces/request/IPerfilUsuarioListadoRequest.interface';
+import { IPerfilUsuarioCreateResponse } from '../interfaces/response/IPerfilUsuarioCreateResponse.interface';
+import { IPerfilUsuarioDeleteResponse } from '../interfaces/response/IPerfilUsuarioDeleteResponse.interface';
+import { IPerfilUsuarioListadoResponse } from '../interfaces/response/IPerfilUsuarioListadoResponse.interface';
 
 
 @Injectable({
@@ -132,5 +137,81 @@ export class PerfilService {
             catchError(handleHttpError)
         );
     }
+    // #endregion
+
+
+    // #region Asignación Perfil-Usuario
+
+    /*
+     * Lista los perfiles asignados a un usuario específico en una compañía.
+     * @param request DTO con iIdUsuario, iIdCompania y paginación.
+     * @returns Un Observable con la respuesta paginada de perfiles asignados.
+     */
+    listarPerfilesPorUsuario(request: IPerfilUsuarioListadoRequest): Observable<IPaginationResponse<IPerfilUsuarioListadoResponse>> {
+        const url = `${this.apiUrl}/ListarPerfilesPorUsuario`;
+        return this.http.post<IApiResponse<IPaginationResponse<IPerfilUsuarioListadoResponse>>>(url, request).pipe(
+            map(response => {
+                if (response.bStatus && response.aData) {
+                    return response.aData;
+                } else {
+                    throw new Error(response.vMessage || 'Error desconocido al obtener perfiles por usuario');
+                }
+            }),
+            catchError(handleHttpError) 
+        );
+    }
+
+    /*
+     * Asigna un perfil a un usuario en una compañía.
+     * @param request DTO con iIdUsuario, iIdPerfil, iIdCompania.
+     * @returns Un Observable con la respuesta de la operación.
+     */
+    asignarPerfilUsuario(request: IPerfilUsuarioCreateRequest): Observable<IPerfilUsuarioCreateResponse> {
+        const url = `${this.apiUrl}/AsignarPerfilUsuario`;
+        return this.http.post<IApiResponse<IPerfilUsuarioCreateResponse>>(url, request).pipe(
+            map(response => {
+                if (response && typeof response.bStatus === 'boolean') {
+                    if (response.bStatus) {
+                        return response.aData;
+                    } else {
+                        throw new Error(response.vMessage || 'El backend indicó un error al asignar el perfil.');
+                    }
+                } else {
+                    // Respuesta inesperada sin bStatus
+                    console.error('Respuesta inesperada del backend:', response);
+                    throw new Error('Respuesta inesperada del servidor al asignar.');
+                }
+            }),
+            catchError(handleHttpError) // Maneja errores HTTP y los lanzados
+        );
+    }
+
+    /*
+     * Elimina la asignación de un perfil a un usuario.
+     * @param iIdUsuario ID del Usuario
+     * @param iIdPerfil ID del Perfil
+     * @param iIdCompania ID de la Compañía
+     * @returns Un Observable con la respuesta de la operación.
+     */
+    eliminarPerfilUsuario(iIdUsuario: number, iIdPerfil: number, iIdCompania: number): Observable<IPerfilUsuarioDeleteResponse> {
+        const url = `${this.apiUrl}/EliminarPerfilUsuario/${iIdUsuario}/${iIdPerfil}/${iIdCompania}`;
+        return this.http.delete<IApiResponse<IPerfilUsuarioDeleteResponse>>(url).pipe(
+            map(response => {
+                if (response && typeof response.bStatus === 'boolean') {
+                    if (response.bStatus) {
+                        return response.aData;
+                    } else {
+                        throw new Error(response.vMessage || 'El backend indicó un error al eliminar la asignación.');
+                    }
+                } else {
+                    // Respuesta inesperada sin bStatus
+                    console.error('Respuesta inesperada del backend:', response);
+                    throw new Error('Respuesta inesperada del servidor al eliminar la asignación.');
+                }
+            }),
+            catchError(handleHttpError)
+        );
+    }
+
     // #endregion
 }

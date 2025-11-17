@@ -16,6 +16,7 @@ import { finalize, catchError, of } from 'rxjs';
 import { ISelectItem } from '../../../../../../../../core/interfaces/ISelectItem.interface';
 import { UsuarioService } from '../../../../services/usuario.service';
 import { IUsuarioCreateUpdateResponse } from '../../../../interfaces/response/IUsuarioCreateUpdateResponse.interface';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 
 export interface UsuarioFormData {
@@ -35,7 +36,8 @@ export interface UsuarioFormData {
 		MatSlideToggleModule,
 		MatProgressBarModule,
 		MatSnackBarModule,
-		MatIconModule
+		MatIconModule,
+		MatToolbarModule
 	],
 	templateUrl: './usuario-form.html',
 	styleUrl: './usuario-form.scss'
