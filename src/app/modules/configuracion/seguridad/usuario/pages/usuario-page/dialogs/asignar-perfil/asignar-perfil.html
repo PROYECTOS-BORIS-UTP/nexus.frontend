@@ -1,0 +1,65 @@
+<mat-toolbar class="dialog-header" color="primary">
+    <span mat-dialog-title>Asignar Perfiles</span>
+    <span class="spacer"></span>
+    <button mat-icon-button (click)="onClose()" matTooltip="Cerrar">
+        <mat-icon>close</mat-icon>
+    </button>
+</mat-toolbar>
+
+@if (isLoading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<mat-dialog-content>
+    <p class="usuario-info">
+        Usuario: <strong>{{ data.nombreUsuario }}</strong>
+    </p>
+
+    <form [formGroup]="assignForm" (ngSubmit)="onAssignProfile()" class="assign-form">
+        <mat-form-field appearance="outline" class="select-perfil">
+            <mat-label>Perfiles Disponibles</mat-label>
+            <mat-icon matPrefix>playlist_add</mat-icon>
+            <mat-select formControlName="iIdPerfil" [disabled]="isSubmitting()">
+                @for (perfil of availableProfiles(); track perfil.iIdPerfil) {
+                <mat-option [value]="perfil.iIdPerfil">{{ perfil.vPerfil }}</mat-option>
+                }
+                @if (availableProfiles().length === 0) {
+                <mat-option disabled>No hay más perfiles para asignar</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" class="assign-button" type="submit"
+            [disabled]="assignForm.invalid || isSubmitting()">
+            <mat-icon>add</mat-icon>
+            Asignar
+        </button>
+    </form>
+
+    <mat-divider class="section-divider"></mat-divider>
+
+    <h3 class="assigned-title">Perfiles Asignados</h3>
+    @if (!isLoading() && assignedProfiles().length === 0) {
+    <p class="no-assigned">Este usuario no tiene perfiles asignados en esta compañía.</p>
+    }
+
+    <mat-list role="list" class="assigned-list">
+        @for (perfil of assignedProfiles(); track perfil.iIdPerfil) {
+        <mat-list-item role="listitem" class="assigned-item">
+            <mat-icon matListItemAvatar class="profile-icon">admin_panel_settings</mat-icon>
+            <div matListItemTitle class="item-title">{{ perfil.vPerfil }}</div>
+            <div matListItemLine class="item-line">Compañía: {{ perfil.vCompaniaNombre }}</div>
+
+            <button mat-icon-button color="warn" class="delete-button" [disabled]="isSubmitting()"
+                (click)="onDeleteAssignedProfile(perfil.iIdPerfil)" matTooltip="Quitar perfil">
+                <mat-icon>delete_outline</mat-icon>
+            </button>
+        </mat-list-item>
+        }
+    </mat-list>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button color="primary" (click)="onClose()">Cerrar</button>
+</mat-dialog-actions>

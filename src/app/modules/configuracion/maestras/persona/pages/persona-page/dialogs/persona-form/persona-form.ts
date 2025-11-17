@@ -1,4 +1,4 @@
-import { Component, Inject, inject, OnInit } from '@angular/core';
+import { Component, Inject, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,8 +9,16 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon'; 
+import { MatIconModule } from '@angular/material/icon';
 import { IPersonaCreateUpdateRequest } from '../../../../interfaces/request/IPersonaCreateUpdateRequest.interface';
+import { ISelectItem } from '../../../../../../../../core/interfaces/ISelectItem.interface';
+import { IElementoSistemaListadoPorCodigoRequest } from '../../../../../elemento-sistema/interfaces/request/IElementoSistemaListadoPorCodigoRequest.interface';
+import { ElementoSistemaService } from '../../../../../elemento-sistema/services/elemento-sistema.service';
+import { finalize } from 'rxjs';
+
+export interface PersonaFormData {
+	persona: IPersonaCreateUpdateRequest | null;
+}
 
 @Component({
 	selector: 'app-persona-form',
@@ -35,6 +43,7 @@ export class PersonaForm implements OnInit {
 	// Inyección de dependencias moderna y clásica
 	private fb = inject(FormBuilder);
 	public dialogRef = inject(MatDialogRef<PersonaForm>);
+	private elementoSistemaService = inject(ElementoSistemaService);
 
 	// FormGroup para manejar los datos
 	personaForm: FormGroup;
@@ -46,22 +55,23 @@ export class PersonaForm implements OnInit {
 	public personaExistente: IPersonaCreateUpdateRequest | null = null;
 
 	// --- Datos para Selects (DEBES CARGARLOS DESDE SERVICIOS) ---
-	// Estos son ejemplos, necesitas obtener los datos reales
-	tiposPersona = [{ id: 1, nombre: 'Natural' }, { id: 2, nombre: 'Jurídica' }];
-	generos = [{ id: 1, nombre: 'Masculino' }, { id: 2, nombre: 'Femenino' }];
-	estadosCiviles = [{ id: 1, nombre: 'Soltero/a' }, { id: 2, nombre: 'Casado/a' } /* ... */];
+	isLoadingTipoPersona= false;
+	isLoadingGenero = false;
+	isLoadingEstadoCivil = false;
+
+	selectTipoPersona = signal<ISelectItem[]>([]);
+	selectGenero = signal<ISelectItem[]>([]);
+	selectEstadoCivil = signal<ISelectItem[]>([]);
+
 	// Ubigeos sería una lista más compleja, probablemente cargada dinámicamente
-	ubigeos = [{ id: 150101, nombre: 'Lima' } /* ... */];
+	ubigeos = [{ id: 1, nombre: 'Lima' } /* ... */];
 	// --- Fin Datos para Selects ---
 
 	constructor(
-		@Inject(MAT_DIALOG_DATA) public data: IPersonaCreateUpdateRequest
+		@Inject(MAT_DIALOG_DATA) public data: PersonaFormData
 	) {
-		this.personaExistente = data; // Guarda los datos inyectados
-
-		// Define la estructura del formulario con validaciones iniciales
+		this.personaExistente = data.persona;
 		this.personaForm = this.fb.group({
-			// iIdPersona se maneja internamente, no necesita un control directo si solo se envía
 			iIdTipoPersona: [null, [Validators.required, Validators.min(1)]],
 			vPrimerNombre: ['', [Validators.required, Validators.maxLength(100)]],
 			vSegundoNombre: [null, [Validators.maxLength(100)]], // Opcional
@@ -98,35 +108,103 @@ export class PersonaForm implements OnInit {
 			// this.personaForm.get('vDNI')?.disable();
 			// this.personaForm.get('vRUC')?.disable();
 		}
-		// Aquí deberías llamar a servicios para cargar los datos de los selects (TipoPersona, Genero, etc.)
+		
+		this.cargarTipoPersona();
+		this.cargarEstadoCivil();
+		this.cargarGenero();
 	}
 
-	/**
+	//#region CARGA SELECTS
+	cargarTipoPersona(): void {
+		this.isLoadingTipoPersona = true;
+		const request: IElementoSistemaListadoPorCodigoRequest = { vCodigoPadre: 'TIPO_PERSONA' };
+		this.elementoSistemaService.listarPorCodigoPadre(request)
+			.pipe(finalize(() => this.isLoadingTipoPersona = false))
+			.subscribe({
+				next: (data) => {
+					this.selectTipoPersona.set(
+						data.map(comp => ({
+							iIdElemento: comp.iIdElemento,
+							vDescripcion: comp.vDescripcion
+						}))
+					);
+				},
+				error: (err) => {
+					console.error('Error al cargar los Tipos de Persona:', err);
+					this.selectTipoPersona.set([]);
+				}
+			});
+	}
+
+
+	cargarEstadoCivil(): void {
+		this.isLoadingTipoPersona = true;
+		const request: IElementoSistemaListadoPorCodigoRequest = { vCodigoPadre: 'ESTADO_CIVIL' };
+		this.elementoSistemaService.listarPorCodigoPadre(request)
+			.pipe(finalize(() => this.isLoadingTipoPersona = false))
+			.subscribe({
+				next: (data) => {
+					this.selectEstadoCivil.set(
+						data.map(comp => ({
+							iIdElemento: comp.iIdElemento,
+							vDescripcion: comp.vDescripcion
+						}))
+					);
+				},
+				error: (err) => {
+					console.error('Error al cargar los Estados Civiles:', err);
+					this.selectEstadoCivil.set([]);
+				}
+			});
+	}
+
+	cargarGenero(): void {
+		this.isLoadingGenero = true;
+		const request: IElementoSistemaListadoPorCodigoRequest = { vCodigoPadre: 'GENERO' };
+		this.elementoSistemaService.listarPorCodigoPadre(request)
+			.pipe(finalize(() => this.isLoadingGenero = false))
+			.subscribe({
+				next: (data) => {
+					this.selectGenero.set(
+						data.map(comp => ({
+							iIdElemento: comp.iIdElemento,
+							vDescripcion: comp.vDescripcion
+						}))
+					);
+				},
+				error: (err) => {
+					console.error('Error al cargar los Géneros:', err);
+					this.selectGenero.set([]);
+				}
+			});
+	}
+	//end Region
+
+	//#region CERRAR DIALOG
+	/*
 	 * Cierra el diálogo sin guardar.
 	 */
 	onCancel(): void {
 		this.dialogRef.close(); // No devuelve datos
 	}
 
-	/**
+	//#region GUARDAR PERSONA
+	/*
 	 * Valida el formulario y lo cierra devolviendo los datos.
 	 */
 	onSave(): void {
 		if (this.personaForm.invalid) {
 			this.personaForm.markAllAsTouched(); // Muestra errores si los hay
 			console.warn("Formulario inválido:", this.personaForm.errors);
-			// Opcional: Mostrar un snackbar o mensaje al usuario
-			// inject(MatSnackBar).open('Por favor, revise los campos marcados.', 'Cerrar', { duration: 3000 });
 			return;
 		}
 
 		// Prepara el objeto a devolver, incluyendo el ID si es edición
-		const formData = this.personaForm.getRawValue(); // Usa getRawValue para incluir campos deshabilitados si los hubiera
+		const formData = this.personaForm.getRawValue();
 
 		// Formatea la fecha de vuelta a YYYY-MM-DD si es necesario antes de enviar
 		let fechaNacimientoStr: string | null = null;
 		if (formData.dFechaNacimiento instanceof Date && !isNaN(formData.dFechaNacimiento)) {
-			// Asegura que la fecha se formatee correctamente a YYYY-MM-DD en la zona horaria local
 			const date = formData.dFechaNacimiento;
 			const year = date.getFullYear();
 			const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -137,12 +215,12 @@ export class PersonaForm implements OnInit {
 		// Construye el objeto final asegurando tipos y nulidad
 		const dataToSend: IPersonaCreateUpdateRequest = {
 			iIdPersona: this.personaExistente?.iIdPersona ?? 0,
-			iIdTipoPersona: formData.iIdTipoPersona, // Requerido
-			vPrimerNombre: formData.vPrimerNombre, // Requerido
-			vSegundoNombre: formData.vSegundoNombre || null, // Asegura null si está vacío
-			vApellidoPaterno: formData.vApellidoPaterno, // Requerido
-			vApellidoMaterno: formData.vApellidoMaterno, // Requerido
-			dFechaNacimiento: fechaNacimientoStr, // Fecha formateada o null
+			iIdTipoPersona: formData.iIdTipoPersona,
+			vPrimerNombre: formData.vPrimerNombre,
+			vSegundoNombre: formData.vSegundoNombre || null,
+			vApellidoPaterno: formData.vApellidoPaterno,
+			vApellidoMaterno: formData.vApellidoMaterno,
+			dFechaNacimiento: fechaNacimientoStr,
 			iIdUbigeoNacimiento: formData.iIdUbigeoNacimiento || null,
 			iIdGenero: formData.iIdGenero || null,
 			iIdEstadoCivil: formData.iIdEstadoCivil || null,
@@ -153,11 +231,9 @@ export class PersonaForm implements OnInit {
 			vDNI: formData.vDNI || null,
 			vCE: formData.vCE || null,
 			vRUC: formData.vRUC || null,
-			bActivo: formData.bActivo // Requerido (boolean)
+			bActivo: formData.bActivo 
 		};
 
-		// Opcional: Limpieza final si el backend NO acepta strings vacíos donde espera null
-		// (Este bucle es más seguro que el anterior)
 		for (const key in dataToSend) {
 			if (Object.prototype.hasOwnProperty.call(dataToSend, key)) {
 				const typedKey = key as keyof IPersonaCreateUpdateRequest;
@@ -174,12 +250,10 @@ export class PersonaForm implements OnInit {
 				}
 			}
 		}
-
-		console.log("Datos a enviar:", dataToSend);
-		this.dialogRef.close(dataToSend); // Devuelve los datos del formulario limpios
+		this.dialogRef.close(dataToSend);
 	}
 
-	// --- Helpers para obtener controles (opcional, para templates más limpios) ---
+	// --- Helpers ---
 	get fc() {
 		return this.personaForm.controls;
 	}

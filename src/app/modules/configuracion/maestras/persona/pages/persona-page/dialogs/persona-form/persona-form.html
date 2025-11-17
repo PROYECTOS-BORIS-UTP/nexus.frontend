@@ -7,8 +7,8 @@
             <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Tipo Persona</mat-label>
                 <mat-select formControlName="iIdTipoPersona" required>
-                    @for(tipo of tiposPersona; track tipo.id) {
-                    <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+                    @for(tipo of selectTipoPersona(); track tipo.iIdElemento) {
+                    <mat-option [value]="tipo.iIdElemento">{{ tipo.vDescripcion }}</mat-option>
                     }
                 </mat-select>
                 @if (fc['iIdTipoPersona'].hasError('required')) {
@@ -107,8 +107,8 @@
                 <mat-label>Género</mat-label>
                 <mat-select formControlName="iIdGenero">
                     <mat-option [value]="null">-- Ninguno --</mat-option>
-                    @for(gen of generos; track gen.id) {
-                    <mat-option [value]="gen.id">{{ gen.nombre }}</mat-option>
+                    @for(gen of selectGenero(); track gen.iIdElemento) {
+                    <mat-option [value]="gen.iIdElemento">{{ gen.vDescripcion }}</mat-option>
                     }
                 </mat-select>
             </mat-form-field>
@@ -117,8 +117,8 @@
                 <mat-label>Estado Civil</mat-label>
                 <mat-select formControlName="iIdEstadoCivil">
                     <mat-option [value]="null">-- Ninguno --</mat-option>
-                    @for(ec of estadosCiviles; track ec.id) {
-                    <mat-option [value]="ec.id">{{ ec.nombre }}</mat-option>
+                    @for(ec of selectEstadoCivil(); track ec.iIdElemento) {
+                    <mat-option [value]="ec.iIdElemento">{{ ec.vDescripcion }}</mat-option>
                     }
                 </mat-select>
             </mat-form-field>
