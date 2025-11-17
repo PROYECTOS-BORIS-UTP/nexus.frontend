@@ -17,6 +17,7 @@ import { PerfilService } from '../../../../../perfil/services/perfil.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { Layout } from '../../../../../../../../layout/services/layout';
 
 // Datos que recibe el diálogo
 export interface IAsignarPerfilesDialogData {
@@ -50,6 +51,7 @@ export class AsignarPerfil {
 	public data: IAsignarPerfilesDialogData = inject(MAT_DIALOG_DATA);
 	private dialogRef = inject(MatDialogRef<AsignarPerfil>);
 	private perfilService = inject(PerfilService);
+	private layoutService = inject(Layout);
 	private snackBar = inject(MatSnackBar);
 	private fb = inject(FormBuilder);
 	// #endregion
@@ -137,6 +139,7 @@ export class AsignarPerfil {
 				this.showSnackbar(response.vMensaje, 'snackbar-success');
 				this.loadAllData(); // Recarga ambas listas
 				this.assignForm.reset();
+				this.layoutService.reloadMenu().subscribe();
 			}),
 			catchError(error => {
 				this.showSnackbar(error.message, 'snackbar-error');
@@ -161,7 +164,8 @@ export class AsignarPerfil {
 		).pipe(
 			tap(response => {
 				this.showSnackbar(response.vMensaje, 'snackbar-warn');
-				this.loadAllData(); // Recarga ambas listas
+				this.loadAllData();
+				this.layoutService.reloadMenu().subscribe();
 			}),
 			catchError(error => {
 				this.showSnackbar(error.message, 'snackbar-error');
