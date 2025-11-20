@@ -169,7 +169,7 @@ export class ElementoSistemaForm implements OnInit {
 				},
 				error: (err) => {
 					console.error('Error al cargar Países:', err);
-					this.selectPaises.set([]); 
+					this.selectPaises.set([]);
 				}
 			});
 	}

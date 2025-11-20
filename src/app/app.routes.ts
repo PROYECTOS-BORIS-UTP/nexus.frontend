@@ -10,31 +10,31 @@ export const routes: Routes = [
     {
         path: '',
         children: AUTH_ROUTES
-        ,canActivate: [ publicGuard ]
+        , canActivate: [publicGuard]
     },
     {
         path: 'dashboard'
-        ,children: MAIN_ROUTES
-        ,canActivate: [ authGuard ]
+        , children: MAIN_ROUTES
+        , canActivate: [authGuard]
         , data: { breadcrumb: 'Dashboard', icon: 'dashboard' }
     },
     {
         path: 'seguridad'
-        ,children: SEGURIDAD_ROUTES
-        ,canActivate: [ authGuard ]
-        , data: { breadcrumb: 'Configuración', icon: 'settings' } 
+        , children: SEGURIDAD_ROUTES
+        , canActivate: [authGuard]
+        , data: { breadcrumb: 'Configuración', icon: 'settings' }
     },
     {
-        path: 'maestras'
-        ,children: MAESTRAS_ROUTES
-        ,canActivate: [ authGuard ]
-        , data: { breadcrumb: 'Configuración', icon: 'settings' } 
+        path: 'maestra'
+        , children: MAESTRAS_ROUTES
+        , canActivate: [authGuard]
+        , data: { breadcrumb: 'Configuración', icon: 'settings' }
     },
     {
         path: 'almacen'
-        ,children: ALMACEN_MAIN_ROUTES
-        ,canActivate: [ authGuard ]
-        , data: { breadcrumb: 'Almacén', icon: 'warehouse' } 
+        , children: ALMACEN_MAIN_ROUTES
+        , canActivate: [authGuard]
+        , data: { breadcrumb: 'Almacén', icon: 'warehouse' }
     },
     { path: '', redirectTo: '', pathMatch: 'full' },
     { path: '**', redirectTo: '' }
