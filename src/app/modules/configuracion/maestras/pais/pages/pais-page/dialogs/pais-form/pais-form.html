@@ -1,1 +1,37 @@
-<p>pais-form works!</p>
+
+<h2 mat-dialog-title>{{ tituloDialogo }}</h2>
+
+<mat-dialog-content class="mat-typography">
+    <form [formGroup]="paisForm" class="elemento-sistema-form-container">
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Código</mat-label>
+                <input matInput formControlName="vCodigo" required maxlength="50">
+                @if (fc['vCodigo'].hasError('required')) { <mat-error>Código es requerido.</mat-error> }
+                @if (fc['vCodigo'].hasError('maxlength')) { <mat-error>Máximo 50 caracteres.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="vNombre" required maxlength="50">
+                @if (fc['vNombre'].hasError('required')) { <mat-error>Nombre es requerida.</mat-error> }
+                @if (fc['vNombre'].hasError('maxlength')) { <mat-error>Máximo 11 caracteres.</mat-error> }
+                @if (fc['vNombre'].hasError('minlength')) { <mat-error>Mínimo 11 caracteres.</mat-error> }
+            </mat-form-field>
+
+           
+        </div>
+
+        <div class="form-row">
+            <mat-checkbox formControlName="bActivo" class="form-field-checkbox">Activo</mat-checkbox>
+        </div>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onCancel()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="onSave()" [disabled]="paisForm.invalid">
+        {{ paisExistente ? 'Actualizar' : 'Guardar' }}
+    </button>
+</mat-dialog-actions>

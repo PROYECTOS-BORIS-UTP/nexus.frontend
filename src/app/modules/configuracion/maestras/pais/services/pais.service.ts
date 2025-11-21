@@ -70,7 +70,7 @@ export class PaisService {
          * @param iIdPais ID de la Pais a eliminar.
          * @returns Un Observable con la respuesta del backend.
          */
-        eliminarCompania(iIdPais: number): Observable<IPaisDeleteResponse> {
+        eliminarPais(iIdPais: number): Observable<IPaisDeleteResponse> {
             const url = `${this.apiUrl}/EliminarPais/${iIdPais}`;
             return this.http.delete<IApiResponse<IPaisDeleteResponse>>(url).pipe(
                 map(response => {

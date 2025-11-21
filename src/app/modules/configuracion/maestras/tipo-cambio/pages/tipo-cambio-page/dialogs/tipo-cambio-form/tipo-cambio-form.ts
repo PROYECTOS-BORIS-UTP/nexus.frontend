@@ -76,7 +76,7 @@ export class TipoCambioForm {
     if (this.tipocambioExistente) {
       this.tituloDialogo = 'Editar Tipo de Cambio';
       
-      // 🚨 PUNTO DE CORRECCIÓN: Convertir el string dFecha a un objeto Date 
+      
       const fechaParaFormulario = new Date(this.tipocambioExistente.dFecha);
 
       const patchData = {
