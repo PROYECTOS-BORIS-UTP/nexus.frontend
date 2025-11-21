@@ -1,6 +1,6 @@
 export interface IUnidadMedidaResponse {
     iIdUnidadMedida: number;
-    vNombre: string;
+    vDescripcion: string;
     vAbreviatura: string;
     bActivo: boolean;
 }

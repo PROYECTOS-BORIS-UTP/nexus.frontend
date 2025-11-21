@@ -126,7 +126,7 @@ export class ProductoForm {
             next: (response) => {
                 this.selectUnidades.set(response.aRecords.map(u => ({
                     iIdElemento: u.iIdUnidadMedida,
-                    vDescripcion: u.vNombre
+                    vDescripcion: u.vDescripcion
                 })));
             },
             error: (err) => {

@@ -22,6 +22,10 @@ import { ICompaniaListadoRequest } from '../../../../../../../configuracion/maes
 import { CompaniaService } from '../../../../../../../configuracion/maestras/compania/services/compania.service';
 import { ProductoSelector } from '../../../../../../mantenimiento/almacen/pages/almacen-page/dialogs/almacen-form/dialogs/producto-selector/producto-selector';
 import { IProductoCatalogo } from '../../../../../../mantenimiento/almacen/pages/almacen-page/dialogs/almacen-form/dialogs/interfaces/IProductoCatalogo.interface';
+import { UnidadMedidaService } from '../../../../../../../logistica/mantenimiento/unidad-medida/services/unidad-medida.service';
+import { IUnidadMedidaListadoRequest } from '../../../../../../../logistica/mantenimiento/unidad-medida/interfaces/request/IUnidadMedidaListadoRequest.interface';
+import { CentroCostoService } from '../../../../../../../configuracion/maestras/centro-costo/services/centro-costo.service';
+import { ICentroCostoListadoRequest } from '../../../../../../../configuracion/maestras/centro-costo/interfaces/request/ICentroCostoListadoRequest.interface';
 
 export interface RequerimientoCompraFormData {
 	requerimiento?: IRequerimientoCompraCreateUpdateRequest; // Usa el DTO inferido
@@ -54,8 +58,8 @@ export class RequerimientoCompraForm {
 	private companiaService = inject(CompaniaService);
 	public dialogRef = inject(MatDialogRef<RequerimientoCompraForm>);
 	private dialogService = inject(MatDialog);
-	// (Inyecta servicios para selects)
-	// private centroCostoService = inject(CentroCostoService);
+	private unidadMedidaService = inject(UnidadMedidaService);
+	private centroCostoService = inject(CentroCostoService);
 	// #endregion
 
 	// #region Estado del Componente
@@ -70,13 +74,15 @@ export class RequerimientoCompraForm {
 
 	// #region Datos (Selects) - (Simulados, debes cargarlos)
 	isLoadingCompanias = signal(false);
+	isLoadingUnidades = signal(false);
+
 	selectCompanias = signal<ISelectItem[]>([]);
 	isLoadingCentrosCosto = signal(false);
 	selectCentrosCosto = signal<ISelectItem[]>([]);
 	// #endregion
 
 	selectProductos = signal<ISelectItem[]>([]);
-	selectUnidades = signal<ISelectItem[]>([]);
+	selectUnidadMedida = signal<ISelectItem[]>([]);
 
 	constructor(@Inject(MAT_DIALOG_DATA) public data: RequerimientoCompraFormData) {
 		this.isEdit.set(!!data.requerimiento);
@@ -97,7 +103,8 @@ export class RequerimientoCompraForm {
 
 	ngOnInit(): void {
 		this.cargarCompanias();
-		this.cargarDatosSelects(); // Carga maestros (Compañías, Productos, etc.)
+		this.cargarUnidadesMedida();
+		this.cargarCentrosCosto();
 
 		if (this.isEdit() && this.data.requerimiento) {
 			this.cargarDatosEdicion();
@@ -198,36 +205,62 @@ export class RequerimientoCompraForm {
 			});
 	}
 
-	/*
-	 * Carga datos para los selects (Compañías, Centros de Costo)
-	 * DEBES REEMPLAZAR ESTO con llamadas a servicios reales.
-	 */
-	cargarDatosSelects(): void {
-		// Simulación de carga de datos maestros. 
-		// TODO: Reemplazar con llamadas reales a tus servicios (ProductoService, UnidadMedidaService, etc.)
+	cargarUnidadesMedida(): void {
+		this.isLoadingUnidades.set(true);
+		const request: IUnidadMedidaListadoRequest = {
+			iPageNumber: 1,
+			iPageSize: 1000,
+		};
 
-		this.isLoadingCompanias.set(true);
-		setTimeout(() => {
-			this.selectCentrosCosto.set([{ iIdElemento: 1, vDescripcion: 'Logística' }, { iIdElemento: 2, vDescripcion: 'TI' }]);
+		this.unidadMedidaService.listarUnidadesMedida(request)
+			.pipe(finalize(() => { this.isLoadingUnidades.set(false); }))
+			.subscribe({
+				next: (response) => {
+					const items: ISelectItem[] = response.aRecords.map(unidad => ({
+						iIdElemento: unidad.iIdUnidadMedida,
+						vDescripcion: unidad.vDescripcion
+					}));
 
-			this.selectUnidades.set([
-				{ iIdElemento: 1, vDescripcion: 'UND' },
-				{ iIdElemento: 2, vDescripcion: 'CJA' },
-				{ iIdElemento: 3, vDescripcion: 'MILLAR' }
-			]);
-
-			this.isLoadingCompanias.set(false);
-		}, 300);
+					this.selectUnidadMedida.set(items);
+				},
+				error: (err) => {
+					console.error('Error al cargar Unidades de Medida:', err);
+					this.mostrarSnack('Error al cargar unidades de medida.', 'snackbar-error');
+				}
+			});
 	}
-	// #endregion
+
+
+	cargarCentrosCosto(): void {
+		this.isLoadingCentrosCosto.set(true);
+		const request: ICentroCostoListadoRequest = {
+			iPageNumber: 1,
+			iPageSize: 1000,
+		};
+
+		this.centroCostoService.listarCentrosCosto(request)
+			.pipe(finalize(() => this.isLoadingCentrosCosto.set(false)))
+			.subscribe({
+				next: (response) => {
+					const items: ISelectItem[] = response.aRecords.map(cc => ({
+						iIdElemento: cc.iIdCentroCosto,
+						vDescripcion: cc.vNombre
+					}));
+
+					this.selectCentrosCosto.set(items);
+				},
+				error: (err) => {
+					console.error('Error al cargar Centros de Costo:', err);
+					this.mostrarSnack('Error al cargar centros de costo.', 'snackbar-error');
+				}
+			});
+	}
 
 	cargarDatosEdicion() {
 		const req = this.data.requerimiento!;
 		// 1. Cargar Cabecera
 		this.form.patchValue({
 			...req,
-			// vSerie: req.vSerie,
-			// vNumero: req.vNumero,
 			dFechaSolicitud: req.dFechaSolicitud ? new Date(req.dFechaSolicitud + 'T00:00:00') : null,
 			dFechaNecesidad: req.dFechaNecesidad ? new Date(req.dFechaNecesidad + 'T00:00:00') : null
 		});
