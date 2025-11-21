@@ -210,12 +210,6 @@ export class RequerimientoCompraForm {
 		setTimeout(() => {
 			this.selectCentrosCosto.set([{ iIdElemento: 1, vDescripcion: 'Logística' }, { iIdElemento: 2, vDescripcion: 'TI' }]);
 
-			// Datos para el detalle
-			this.selectProductos.set([
-				{ iIdElemento: 1, vDescripcion: 'Laptop Lenovo' },
-				{ iIdElemento: 2, vDescripcion: 'Papel Bond A4' },
-				{ iIdElemento: 3, vDescripcion: 'Toner Impresora' }
-			]);
 			this.selectUnidades.set([
 				{ iIdElemento: 1, vDescripcion: 'UND' },
 				{ iIdElemento: 2, vDescripcion: 'CJA' },

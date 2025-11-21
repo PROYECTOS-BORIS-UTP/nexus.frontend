@@ -18,13 +18,13 @@ import { Subject, Subscription, tap, catchError, of, finalize, debounceTime, dis
 import { Confirmacion } from '../../../../../../common/components/dialogs/confirmacion/confirmacion';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
 import { TableGeneric, TableAction } from '../../../../../../common/components/table-generic/table-generic';
-import { ICentroCostoListadoRequest } from '../../interfaces/request/ICentroCostoListadoRequest.interface';
-import { ICentroCostoResponse } from '../../interfaces/response/ICentroCostoResponse.interface';
-import { CentroCostoService } from '../../services/centro-costo.service';
-import { CentroCostoForm } from './dialogs/centro-costo-form/centro-costo-form';
+import { IProductoListadoRequest } from '../../interfaces/request/IProductoListadoRequest.interface';
+import { IProductoResponse } from '../../interfaces/response/IProductoResponse.interface';
+import { ProductoService } from '../../services/producto.service';
+import { ProductoForm } from './dialogs/producto-form/producto-form';
 
 @Component({
-	selector: 'app-centro-costo-page',
+	selector: 'app-producto-page',
 	imports: [
 		CommonModule,
 		MatTableModule,
@@ -43,19 +43,19 @@ import { CentroCostoForm } from './dialogs/centro-costo-form/centro-costo-form';
 		MatPaginatorModule,
 		EstadoGeneral
 	],
-	templateUrl: './centro-costo-page.html',
-	styleUrl: './centro-costo-page.scss'
+	templateUrl: './producto-page.html',
+	styleUrl: './producto-page.scss'
 })
-export class CentroCostoPage {
+export class ProductoPage {
 	// #region Inyección de Dependencias
-	private centroCostoService = inject(CentroCostoService);
+	private productoService = inject(ProductoService);
 	public dialog = inject(MatDialog);
 	private snackBar = inject(MatSnackBar);
 	// #endregion
 
 	// #region Estado del Componente
 	isLoading = signal(false);
-	data = signal<ICentroCostoResponse[]>([]);
+	data = signal<IProductoResponse[]>([]);
 	totalRecords = signal(0);
 	pageSizeOptions = [10, 25, 50];
 	currentPageSize = this.pageSizeOptions[0];
@@ -63,15 +63,15 @@ export class CentroCostoPage {
 	// #endregion
 
 	// #region Referencias
-	@ViewChild(TableGeneric) tableGeneric!: TableGeneric<ICentroCostoResponse>;
+	@ViewChild(TableGeneric) tableGeneric!: TableGeneric<IProductoResponse>;
 	// #endregion
 
 	// #region Configuración de la Tabla
-	aDisplayedColumns: string[] = ['select', 'vCodigo', 'vNombre', 'vCompaniaNombre', 'bActivo'];
-	selection = new SelectionModel<ICentroCostoResponse>(true, []);
-	centroCostoActions: TableAction[] = [
-		{ name: 'edit', label: 'Editar Centro Costo', icon: 'edit' },
-		{ name: 'delete', label: 'Eliminar Centro Costo', icon: 'delete' },
+	aDisplayedColumns: string[] = ['select', 'vCodigo', 'vTitulo', 'vFamiliaNombre', 'nStockActual', 'bActivo'];
+	selection = new SelectionModel<IProductoResponse>(true, []);
+	productoActions: TableAction[] = [
+		{ name: 'edit', label: 'Editar Producto', icon: 'edit' },
+		{ name: 'delete', label: 'Eliminar Producto', icon: 'delete' },
 	];
 	// #endregion
 
@@ -83,7 +83,7 @@ export class CentroCostoPage {
 
 	// #region Ciclo de Vida
 	ngOnInit(): void {
-		this.cargarCentrosCosto();
+		this.cargarProductos();
 		this.setupFilterSubscription();
 	}
 
@@ -93,24 +93,22 @@ export class CentroCostoPage {
 	// #endregion
 
 	// #region Carga de Datos
-	cargarCentrosCosto(): void {
+	cargarProductos(): void {
 		this.isLoading.set(true);
 		this.selection.clear();
 
-		const request: ICentroCostoListadoRequest = {
+		const request: IProductoListadoRequest = {
 			iPageNumber: this.currentPageIndex + 1,
 			iPageSize: this.currentPageSize,
-			// Mapeamos el filtro general al nombre (o podrías usar vCodigo)
-			vNombre: this.currentFilterValue || undefined,
+			vTitulo: this.currentFilterValue || undefined,
 		};
 
-		this.centroCostoService.listarCentrosCosto(request).pipe(
+		this.productoService.listarProductos(request).pipe(
 			tap(response => {
 				this.totalRecords.set(response.iTotalRecords);
 				this.data.set(response.aRecords);
 			}),
 			catchError(error => {
-				// El servicio ya muestra el snackbar
 				this.data.set([]);
 				this.totalRecords.set(0);
 				return of(null);
@@ -124,7 +122,7 @@ export class CentroCostoPage {
 	handlePageEvent(event: PageEvent): void {
 		this.currentPageIndex = event.pageIndex;
 		this.currentPageSize = event.pageSize;
-		this.cargarCentrosCosto();
+		this.cargarProductos();
 	}
 	// #endregion
 
@@ -137,7 +135,7 @@ export class CentroCostoPage {
 			this.currentFilterValue = filterValue;
 			this.tableGeneric?.resetPaginator();
 			this.currentPageIndex = 0;
-			this.cargarCentrosCosto();
+			this.cargarProductos();
 		});
 	}
 
@@ -160,13 +158,13 @@ export class CentroCostoPage {
 	// #endregion
 
 	// #region Manejo de Acciones
-	onActionClicked(event: { action: string, element: ICentroCostoResponse }): void {
+	onActionClicked(event: { action: string, element: IProductoResponse }): void {
 		switch (event.action) {
 			case 'edit':
-				this.onEditCentroCosto(event.element);
+				this.onEditProducto(event.element);
 				break;
 			case 'delete':
-				this.onDeleteCentroCosto(event.element);
+				this.onDeleteProducto(event.element);
 				break;
 			default:
 				console.warn(`Acción desconocida: ${event.action}`);
@@ -175,8 +173,8 @@ export class CentroCostoPage {
 	// #endregion
 
 	// #region Apertura de Diálogos
-	onAddCentroCosto(): void {
-		const dialogRef = this.dialog.open(CentroCostoForm, {
+	onAddProducto(): void {
+		const dialogRef = this.dialog.open(ProductoForm, {
 			width: '600px',
 			disableClose: true,
 			data: {}
@@ -184,31 +182,31 @@ export class CentroCostoPage {
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result) {
-				this.cargarCentrosCosto();
+				this.cargarProductos();
 			}
 		});
 	}
 
-	onEditCentroCosto(centroCosto: ICentroCostoResponse): void {
-		const dialogRef = this.dialog.open(CentroCostoForm, {
+	onEditProducto(producto: IProductoResponse): void {
+		const dialogRef = this.dialog.open(ProductoForm, {
 			width: '600px',
 			disableClose: true,
-			data: { centroCosto: centroCosto }
+			data: { producto: producto }
 		});
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result) {
-				this.cargarCentrosCosto();
+				this.cargarProductos();
 			}
 		});
 	}
 
-	onDeleteCentroCosto(centroCosto: ICentroCostoResponse): void {
+	onDeleteProducto(producto: IProductoResponse): void {
 		const dialogRef = this.dialog.open(Confirmacion, {
 			width: '400px',
 			data: {
 				titulo: 'Confirmar Eliminación',
-				mensaje: `¿Estás seguro de eliminar el centro de costo "${centroCosto.vNombre}"?`,
+				mensaje: `¿Estás seguro de eliminar el producto "${producto.vTitulo}"?`,
 				mostrarCampoObservacion: false
 			}
 		});
@@ -216,13 +214,13 @@ export class CentroCostoPage {
 		dialogRef.afterClosed().subscribe(result => {
 			if (result && result.confirmado) {
 				this.isLoading.set(true);
-				this.centroCostoService.eliminarCentroCosto(centroCosto.iIdCentroCosto).pipe(
+				this.productoService.eliminarProducto({ iIdProducto: producto.iIdProducto }).pipe(
 					finalize(() => this.isLoading.set(false)),
 					catchError(error => of(null))
 				).subscribe(response => {
 					if (response && response.bStatus) {
 						this.snackBar.open(response.vMensaje, 'Cerrar', { duration: 3000, panelClass: ['snackbar-warn'] });
-						this.cargarCentrosCosto();
+						this.cargarProductos();
 					}
 				});
 			}
