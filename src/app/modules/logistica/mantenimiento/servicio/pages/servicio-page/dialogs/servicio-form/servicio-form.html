@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>{{ isEdit() ? 'Editar' : 'Crear' }} Servicio</h2>
+
+@if (isLoading()) {
+<mat-progress-bar mode="indeterminate" class="dialog-progress-bar"></mat-progress-bar>
+}
+
+<mat-dialog-content>
+    <form [formGroup]="form" class="servicio-form-container">
+
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Título</mat-label>
+            <input matInput formControlName="vTitulo" required maxlength="255">
+            @if (form.controls['vTitulo'].hasError('required')) {
+            <mat-error>El título es requerido.</mat-error>
+            }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="vDescripcion" maxlength="500" rows="3"></textarea>
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="bActivo" color="primary">
+            Estado: {{ form.value.bActivo ? 'Activo' : 'Inactivo' }}
+        </mat-slide-toggle>
+
+        <input type="hidden" formControlName="iIdServicio">
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onClose()" [disabled]="isLoading()">
+        <mat-icon>cancel</mat-icon> Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="isLoading() || form.invalid">
+        <mat-icon>save</mat-icon> Guardar
+    </button>
+</mat-dialog-actions>

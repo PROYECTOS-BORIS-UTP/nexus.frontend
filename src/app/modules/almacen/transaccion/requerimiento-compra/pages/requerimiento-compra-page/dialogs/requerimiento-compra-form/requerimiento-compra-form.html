@@ -16,7 +16,7 @@
                 <mat-label>Serie</mat-label>
                 <input matInput formControlName="vSerie" placeholder="Ej: 001" maxlength="10">
                 @if (form.get('vSerie')?.hasError('required')) {
-                    <mat-error>Requerido</mat-error>
+                <mat-error>Requerido</mat-error>
                 }
             </mat-form-field>
 
@@ -24,7 +24,7 @@
                 <mat-label>Número</mat-label>
                 <input matInput formControlName="vNumero" placeholder="Ej: 000045" maxlength="20">
                 @if (form.get('vNumero')?.hasError('required')) {
-                    <mat-error>Requerido</mat-error>
+                <mat-error>Requerido</mat-error>
                 }
             </mat-form-field>
         </div>
@@ -86,7 +86,8 @@
             <div class="section-header">
                 <mat-icon>shopping_cart</mat-icon> Detalle de Productos
             </div>
-            <button mat-mini-fab color="primary" type="button" (click)="abrirSelectorProductos()" matTooltip="Agregar ítem">
+            <button mat-mini-fab color="primary" type="button" (click)="abrirSelectorProductos()"
+                matTooltip="Agregar ítem">
                 <mat-icon>add</mat-icon>
             </button>
         </div>
@@ -107,7 +108,8 @@
                     <tr [formGroupName]="$index">
                         <td>
                             <mat-form-field appearance="outline" class="dense-form-field">
-                                <input matInput formControlName="vProductoNombre" readonly [title]="control.get('vProductoNombre')?.value">
+                                <input matInput formControlName="vProductoNombre" readonly
+                                    [title]="control.get('vProductoNombre')?.value">
                                 <input type="hidden" formControlName="iIdProducto">
                             </mat-form-field>
                         </td>
@@ -119,7 +121,7 @@
                         <td>
                             <mat-form-field appearance="outline" class="dense-form-field">
                                 <mat-select formControlName="iIdUnidadMedida" placeholder="U.M.">
-                                    @for(um of selectUnidades(); track um.iIdElemento) {
+                                    @for(um of selectUnidadMedida(); track um.iIdElemento) {
                                     <mat-option [value]="um.iIdElemento">{{ um.vDescripcion }}</mat-option>
                                     }
                                 </mat-select>

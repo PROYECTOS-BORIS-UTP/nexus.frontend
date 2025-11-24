@@ -1,0 +1,66 @@
+<div class="page-container">
+
+    <div class="controls-container">
+
+        <div class="filter-group">
+            <mat-form-field appearance="outline" class="search-field">
+                <mat-label>Buscar servicio...</mat-label>
+                <input matInput (keyup)="applyFilter($event)" placeholder="Ej. Mantenimiento" #input>
+                <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+        </div>
+
+        <div class="actions-container">
+            <button mat-raised-button color="primary" (click)="onAddServicio()" class="btnAgregar">
+                <mat-icon>add</mat-icon>
+                <span>Agregar Servicio</span>
+            </button>
+        </div>
+
+    </div>
+
+    @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <app-table-generic #table [data]="data()" [displayedColumns]="aDisplayedColumns" [selection]="selection"
+        [actions]="servicioActions" [totalRecords]="totalRecords()" [pageSizeOptions]="pageSizeOptions"
+        [initialPageSize]="currentPageSize" (actionClicked)="onActionClicked($event)"
+        (pageChange)="handlePageEvent($event)">
+
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Seleccionar todas las filas">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)" [aria-label]="'Seleccionar servicio ' + row.iIdServicio">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vTitulo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Título </th>
+            <td mat-cell *matCellDef="let element"> <strong>{{element.vTitulo}}</strong> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vDescripcion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Descripción </th>
+            <td mat-cell *matCellDef="let element"> {{element.vDescripcion || '-'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="bActivo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+            <td mat-cell *matCellDef="let element">
+                <app-estado-general [iIdEstado]="element.bActivo ? 1 : 2"
+                    [vNombreEstado]="element.bActivo ? 'Activo' : 'Inactivo'">
+                </app-estado-general>
+            </td>
+        </ng-container>
+
+    </app-table-generic>
+
+</div>
