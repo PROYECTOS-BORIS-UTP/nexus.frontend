@@ -1,0 +1,40 @@
+/* src/app/modules/logistica/requerimiento-compra/pages/requerimiento-compra-page/requerimiento-compra-page.scss */
+
+:host {
+    display: block;
+    padding: 24px;
+}
+
+/* Contenedor principal de controles (flex row) */
+.controls-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 0;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+/* Campo de búsqueda */
+.search-field {
+    flex: 1;
+}
+
+/* Contenedor del botón */
+.actions-container {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Botón Agregar */
+.btnAgregar {
+    padding: 0 24px !important;
+    min-width: auto;
+    height: 48px;
+    font-size: 15px;
+    white-space: nowrap;
+
+    .mat-icon {
+        margin-right: 8px;
+    }
+}

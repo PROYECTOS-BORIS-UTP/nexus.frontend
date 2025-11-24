@@ -276,7 +276,7 @@ export class RequerimientoCompraPage {
 					finalize(() => this.isLoading.set(false)),
 				).subscribe((response: IRequerimientoCompraDeleteResponse) => {
 					if (response && response.bStatus) {
-						this.snackBar.open(response.vMensaje, 'Cerrar', {duration: 3000,panelClass: ['snackbar-success']});
+						this.snackBar.open(response.vMensaje, 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
 						this.cargarRequerimientos();
 					}
 				});
