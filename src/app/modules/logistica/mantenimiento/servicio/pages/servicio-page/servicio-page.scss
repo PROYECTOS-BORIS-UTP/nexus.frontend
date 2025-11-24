@@ -1,0 +1,51 @@
+.page-container {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.controls-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    background-color: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    min-width: 300px;
+}
+
+.search-field {
+    width: 100%;
+    font-size: 14px;
+
+    mat-icon {
+        color: #757575;
+    }
+}
+
+.actions-container {
+    display: flex;
+    gap: 12px;
+}
+
+.btnAgregar {
+    height: 48px;
+    padding: 0 24px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+mat-progress-bar {
+    border-radius: 4px;
+}

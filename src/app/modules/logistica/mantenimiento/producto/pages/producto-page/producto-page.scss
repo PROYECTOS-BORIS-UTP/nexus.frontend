@@ -6,9 +6,12 @@
 .controls-container {
     display: flex;
     justify-content: space-between;
-    padding: 16px 0;
     flex-wrap: wrap;
     gap: 16px;
+    background-color: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .search-field {
