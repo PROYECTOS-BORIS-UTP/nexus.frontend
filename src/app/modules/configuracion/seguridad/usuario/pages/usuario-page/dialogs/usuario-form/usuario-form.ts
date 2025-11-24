@@ -17,6 +17,10 @@ import { ISelectItem } from '../../../../../../../../core/interfaces/ISelectItem
 import { UsuarioService } from '../../../../services/usuario.service';
 import { IUsuarioCreateUpdateResponse } from '../../../../interfaces/response/IUsuarioCreateUpdateResponse.interface';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { PersonaService } from '../../../../../../maestras/persona/services/persona.service';
+import { IPersonaListadoRequest } from '../../../../../../maestras/persona/interfaces/request/IPersonaListadoRequest.interface';
+import { IElementoSistemaListadoPorCodigoRequest } from '../../../../../../maestras/elemento-sistema/interfaces/request/IElementoSistemaListadoPorCodigoRequest.interface';
+import { ElementoSistemaService } from '../../../../../../maestras/elemento-sistema/services/elemento-sistema.service';
 
 
 export interface UsuarioFormData {
@@ -46,6 +50,8 @@ export class UsuarioForm {
 	// #region Inyecciones y Dependencias
 	private fb = inject(FormBuilder);
 	private usuarioService = inject(UsuarioService);
+	private personaService = inject(PersonaService);
+	private elementoSistemaService = inject(ElementoSistemaService);
 	private snackBar = inject(MatSnackBar);
 	public dialogRef = inject(MatDialogRef<UsuarioForm>);
 	// #endregion
@@ -58,9 +64,11 @@ export class UsuarioForm {
 	// #endregion
 
 	// #region Datos (Selects) - Simulados
+	isLoadingTipoPersona = false;
+
 	selectTiposUsuario = signal<ISelectItem[]>([]);
 	selectPersonas = signal<ISelectItem[]>([]);
-	selectTiposPersona = signal<ISelectItem[]>([]);
+	selectTipoPersona = signal<ISelectItem[]>([]);
 	// #endregion
 
 	constructor(@Inject(MAT_DIALOG_DATA) public data: UsuarioFormData) {
@@ -107,20 +115,53 @@ export class UsuarioForm {
 	// #region Carga de Datos (Selects)
 	cargarDatosSelects(): void {
 		// Simulación - REEMPLAZAR CON SERVICIOS REALES
-		setTimeout(() => {
-			this.selectTiposUsuario.set([
-				{ iIdElemento: 1, vDescripcion: 'Administrador' },
-				{ iIdElemento: 2, vDescripcion: 'Operador' }
-			]);
-			this.selectPersonas.set([
-				{ iIdElemento: 101, vDescripcion: 'Juan Perez' },
-				{ iIdElemento: 102, vDescripcion: 'Maria Lopez' }
-			]);
-			this.selectTiposPersona.set([
-				{ iIdElemento: 1, vDescripcion: 'Empleado' },
-				{ iIdElemento: 2, vDescripcion: 'Cliente' }
-			]);
-		}, 300);
+		this.cargarTipoPersona();
+		this.cargarPersonas();
+	}
+
+	cargarPersonas() {
+		const request: IPersonaListadoRequest = {
+			iPageNumber: 1,
+			iPageSize: 100,
+			bActivo: true
+		};
+		this.personaService.listarPersonas(request).subscribe({
+			next: (response) => {
+				if (response && response.aRecords) {
+					const personas: ISelectItem[] = response.aRecords.map(p => ({
+						iIdElemento: p.iIdPersona,
+						vDescripcion: p.vNombreCompleto
+					}));
+					this.selectPersonas.set(personas);
+				}
+			},
+			error: (err) => {
+				console.error('Error al cargar personas', err);
+				this.snackBar.open('Error al cargar lista de personas', 'Cerrar', { duration: 3000 });
+			}
+		});
+	}
+
+	cargarTipoPersona(): void {
+		this.isLoadingTipoPersona = true;
+		const request: IElementoSistemaListadoPorCodigoRequest = { vCodigoPadre: 'TIPO_PERSONA' };
+
+		this.elementoSistemaService.listarPorCodigoPadre(request)
+			.pipe(finalize(() => this.isLoadingTipoPersona = false)) // Asegura que el spinner se oculte
+			.subscribe({
+				next: (data) => {
+					this.selectTipoPersona.set(
+						data.map(comp => ({
+							iIdElemento: comp.iIdElemento,
+							vDescripcion: comp.vDescripcion
+						}))
+					);
+				},
+				error: (err) => {
+					console.error('Error al cargar Tipos de Elemento:', err);
+					this.selectTipoPersona.set([]);
+				}
+			});
 	}
 	// #endregion
 
@@ -144,7 +185,7 @@ export class UsuarioForm {
 		).subscribe((response: IUsuarioCreateUpdateResponse) => {
 			if (response && response.bStatus) {
 
-				this.snackBar.open(response.vMensaje, 'Cerrar', {duration: 3000, panelClass: ['snackbar-success']});
+				this.snackBar.open(response.vMensaje, 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
 				this.dialogRef.close(true);
 			} else {
 				const errorMsg = response?.vMensaje || 'Ocurrió un error inesperado';
