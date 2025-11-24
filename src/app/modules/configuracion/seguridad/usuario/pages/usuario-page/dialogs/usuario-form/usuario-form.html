@@ -34,7 +34,7 @@
 		</div>
 
 		<div class="form-row">
-			<mat-form-field appearance="outline" class="flex-field">
+			<!-- <mat-form-field appearance="outline" class="flex-field">
 				<mat-label>Tipo de Usuario</mat-label>
 				<mat-select formControlName="iIdTipoUsuario" required>
 					@for (item of selectTiposUsuario(); track item.iIdElemento) {
@@ -44,12 +44,12 @@
 				@if (form.controls['iIdTipoUsuario'].hasError('required')) {
 				<mat-error>Requerido.</mat-error>
 				}
-			</mat-form-field>
+			</mat-form-field> -->
 
 			<mat-form-field appearance="outline" class="flex-field">
 				<mat-label>Tipo de Persona</mat-label>
 				<mat-select formControlName="iIdTipoPersona" required>
-					@for (item of selectTiposPersona(); track item.iIdElemento) {
+					@for (item of selectTipoPersona(); track item.iIdElemento) {
 					<mat-option [value]="item.iIdElemento">{{ item.vDescripcion }}</mat-option>
 					}
 				</mat-select>
