@@ -3,6 +3,7 @@ import { Layout } from '../../../layout/layout';
 import { PRODUCTO_ROUTES } from './producto/producto.routes';
 import { UNIDAD_MEDIDA_ROUTES } from './unidad-medida/unidad-medida.routes';
 import { SERVICIO_ROUTES } from './servicio/servicio.routes';
+import { FAMILIA_ROUTES } from './familia/familia.routes';
 
 export const LOGISTICA_MANTENIMIENTO_ROUTES: Routes = [
     {
@@ -14,11 +15,11 @@ export const LOGISTICA_MANTENIMIENTO_ROUTES: Routes = [
                 , children: PRODUCTO_ROUTES
                 , data: { breadcrumb: 'Mantenimiento', icon: 'inventory' }
             },
-            // {
-            //     path: 'familia'
-            //     , children: FAMILIA_ROUTES
-            //     , data: { breadcrumb: 'Mantenimiento', icon: 'inventory' }
-            // },
+            {
+                path: 'familia'
+                , children: FAMILIA_ROUTES
+                , data: { breadcrumb: 'Mantenimiento', icon: 'inventory' }
+            },
             {
                 path: 'unidad-medida'
                 , children: UNIDAD_MEDIDA_ROUTES

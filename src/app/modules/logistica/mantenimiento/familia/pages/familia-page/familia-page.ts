@@ -18,13 +18,13 @@ import { Subject, Subscription, tap, catchError, of, finalize, debounceTime, dis
 import { Confirmacion } from '../../../../../../common/components/dialogs/confirmacion/confirmacion';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
 import { TableGeneric, TableAction } from '../../../../../../common/components/table-generic/table-generic';
-import { IUnidadMedidaListadoRequest } from '../../interfaces/request/IUnidadMedidaListadoRequest.interface';
-import { IUnidadMedidaResponse } from '../../interfaces/response/IUnidadMedidaResponse.interface';
-import { UnidadMedidaService } from '../../services/unidad-medida.service';
-import { UnidadMedidaForm } from './dialogs/unidad-medida-form/unidad-medida-form';
+import { IFamiliaListadoRequest } from '../../interfaces/request/IFamiliaListadoRequest.interface';
+import { IFamiliaResponse } from '../../interfaces/response/IFamiliaResponse.interface';
+import { FamiliaService } from '../../services/familia.service';
+import { FamiliaForm } from './dialogs/familia-form/familia-form';
 
 @Component({
-	selector: 'app-unidad-medida-page',
+	selector: 'app-familia-page',
 	imports: [
 		CommonModule,
 		MatTableModule,
@@ -43,19 +43,19 @@ import { UnidadMedidaForm } from './dialogs/unidad-medida-form/unidad-medida-for
 		MatPaginatorModule,
 		EstadoGeneral
 	],
-	templateUrl: './unidad-medida-page.html',
-	styleUrl: './unidad-medida-page.scss'
+	templateUrl: './familia-page.html',
+	styleUrl: './familia-page.scss'
 })
-export class UnidadMedidaPage {
+export class FamiliaPage {
 	// #region Inyección de Dependencias
-	private unidadMedidaService = inject(UnidadMedidaService);
+	private familiaService = inject(FamiliaService);
 	public dialog = inject(MatDialog);
 	private snackBar = inject(MatSnackBar);
 	// #endregion
 
 	// #region Estado del Componente
 	isLoading = signal(false);
-	data = signal<IUnidadMedidaResponse[]>([]);
+	data = signal<IFamiliaResponse[]>([]);
 	totalRecords = signal(0);
 	pageSizeOptions = [10, 25, 50];
 	currentPageSize = this.pageSizeOptions[0];
@@ -63,15 +63,15 @@ export class UnidadMedidaPage {
 	// #endregion
 
 	// #region Referencias
-	@ViewChild(TableGeneric) tableGeneric!: TableGeneric<IUnidadMedidaResponse>;
+	@ViewChild(TableGeneric) tableGeneric!: TableGeneric<IFamiliaResponse>;
 	// #endregion
 
 	// #region Configuración de la Tabla
-	aDisplayedColumns: string[] = ['select', 'vDescripcion', 'vAbreviatura', 'bActivo'];
-	selection = new SelectionModel<IUnidadMedidaResponse>(true, []);
-	unidadMedidaActions: TableAction[] = [
-		{ name: 'edit', label: 'Editar Unidad de Medida', icon: 'edit' },
-		{ name: 'delete', label: 'Eliminar Unidad de Medida', icon: 'delete' },
+	aDisplayedColumns: string[] = ['select', 'vTitulo', 'vSigla', 'vCuentaContable', 'bActivo'];
+	selection = new SelectionModel<IFamiliaResponse>(true, []);
+	familiaActions: TableAction[] = [
+		{ name: 'edit', label: 'Editar Familia', icon: 'edit' },
+		{ name: 'delete', label: 'Eliminar Familia', icon: 'delete' },
 	];
 	// #endregion
 
@@ -83,7 +83,7 @@ export class UnidadMedidaPage {
 
 	// #region Ciclo de Vida
 	ngOnInit(): void {
-		this.cargarUnidadesMedida();
+		this.cargarFamilias();
 		this.setupFilterSubscription();
 	}
 
@@ -93,17 +93,17 @@ export class UnidadMedidaPage {
 	// #endregion
 
 	// #region Carga de Datos
-	cargarUnidadesMedida(): void {
+	cargarFamilias(): void {
 		this.isLoading.set(true);
 		this.selection.clear();
 
-		const request: IUnidadMedidaListadoRequest = {
+		const request: IFamiliaListadoRequest = {
 			iPageNumber: this.currentPageIndex + 1,
 			iPageSize: this.currentPageSize,
-			vDescripcion: this.currentFilterValue || undefined,
+			vTitulo: this.currentFilterValue || undefined,
 		};
 
-		this.unidadMedidaService.listarUnidadesMedida(request).pipe(
+		this.familiaService.listarFamilias(request).pipe(
 			tap(response => {
 				this.totalRecords.set(response.iTotalRecords);
 				this.data.set(response.aRecords);
@@ -122,7 +122,7 @@ export class UnidadMedidaPage {
 	handlePageEvent(event: PageEvent): void {
 		this.currentPageIndex = event.pageIndex;
 		this.currentPageSize = event.pageSize;
-		this.cargarUnidadesMedida();
+		this.cargarFamilias();
 	}
 	// #endregion
 
@@ -135,7 +135,7 @@ export class UnidadMedidaPage {
 			this.currentFilterValue = filterValue;
 			this.tableGeneric?.resetPaginator();
 			this.currentPageIndex = 0;
-			this.cargarUnidadesMedida();
+			this.cargarFamilias();
 		});
 	}
 
@@ -158,13 +158,13 @@ export class UnidadMedidaPage {
 	// #endregion
 
 	// #region Manejo de Acciones
-	onActionClicked(event: { action: string, element: IUnidadMedidaResponse }): void {
+	onActionClicked(event: { action: string, element: IFamiliaResponse }): void {
 		switch (event.action) {
 			case 'edit':
-				this.onEditUnidadMedida(event.element);
+				this.onEditFamilia(event.element);
 				break;
 			case 'delete':
-				this.onDeleteUnidadMedida(event.element);
+				this.onDeleteFamilia(event.element);
 				break;
 			default:
 				console.warn(`Acción desconocida: ${event.action}`);
@@ -173,8 +173,8 @@ export class UnidadMedidaPage {
 	// #endregion
 
 	// #region Apertura de Diálogos
-	onAddUnidadMedida(): void {
-		const dialogRef = this.dialog.open(UnidadMedidaForm, {
+	onAddFamilia(): void {
+		const dialogRef = this.dialog.open(FamiliaForm, {
 			width: '500px',
 			disableClose: true,
 			data: {}
@@ -182,31 +182,31 @@ export class UnidadMedidaPage {
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result) {
-				this.cargarUnidadesMedida();
+				this.cargarFamilias();
 			}
 		});
 	}
 
-	onEditUnidadMedida(unidadMedida: IUnidadMedidaResponse): void {
-		const dialogRef = this.dialog.open(UnidadMedidaForm, {
+	onEditFamilia(familia: IFamiliaResponse): void {
+		const dialogRef = this.dialog.open(FamiliaForm, {
 			width: '500px',
 			disableClose: true,
-			data: { unidadMedida: unidadMedida }
+			data: { familia: familia }
 		});
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result) {
-				this.cargarUnidadesMedida();
+				this.cargarFamilias();
 			}
 		});
 	}
 
-	onDeleteUnidadMedida(unidadMedida: IUnidadMedidaResponse): void {
+	onDeleteFamilia(familia: IFamiliaResponse): void {
 		const dialogRef = this.dialog.open(Confirmacion, {
 			width: '400px',
 			data: {
 				titulo: 'Confirmar Eliminación',
-				mensaje: `¿Estás seguro de eliminar la unidad de medida "${unidadMedida.vDescripcion}"?`,
+				mensaje: `¿Estás seguro de eliminar la familia "${familia.vTitulo}"?`,
 				mostrarCampoObservacion: false
 			}
 		});
@@ -214,13 +214,13 @@ export class UnidadMedidaPage {
 		dialogRef.afterClosed().subscribe(result => {
 			if (result && result.confirmado) {
 				this.isLoading.set(true);
-				this.unidadMedidaService.eliminarUnidadMedida({ iIdUnidadMedida: unidadMedida.iIdUnidadMedida }).pipe(
+				this.familiaService.eliminarFamilia({ iIdFamilia: familia.iIdFamilia }).pipe(
 					finalize(() => this.isLoading.set(false)),
 					catchError(error => of(null))
 				).subscribe(response => {
 					if (response && response.bStatus) {
 						this.snackBar.open(response.vMensaje, 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-						this.cargarUnidadesMedida();
+						this.cargarFamilias();
 					}
 				});
 			}

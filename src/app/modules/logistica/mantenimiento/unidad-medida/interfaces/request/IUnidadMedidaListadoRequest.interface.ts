@@ -1,6 +1,7 @@
 export interface IUnidadMedidaListadoRequest {
     iIdUnidadMedida?: number;
-    vNombre?: string;
+    vDescripcion?: string;
+    vAbreviatura?: string;
     bActivo?: boolean;
     iPageNumber: number;
     iPageSize: number;

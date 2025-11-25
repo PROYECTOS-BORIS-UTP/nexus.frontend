@@ -1,16 +1,15 @@
 <div class="page-container">
     <div class="controls-container">
         <mat-form-field appearance="outline" class="search-field">
-            <mat-label>Buscar Unidad de Medida</mat-label>
-            <input matInput (input)="applyFilter($event)" placeholder="Escribe descripción o abreviatura..."
-                #inputFilter>
+            <mat-label>Buscar Familia</mat-label>
+            <input matInput (input)="applyFilter($event)" placeholder="Escribe título o sigla..." #inputFilter>
             <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
 
         <div class="actions-container">
-            <button mat-raised-button color="primary" (click)="onAddUnidadMedida()" class="btnAgregar">
+            <button mat-raised-button color="primary" (click)="onAddFamilia()" class="btnAgregar">
                 <mat-icon>add</mat-icon>
-                <span>Agregar Unidad de Medida</span>
+                <span>Agregar Familia</span>
             </button>
         </div>
     </div>
@@ -20,7 +19,7 @@
     }
 
     <app-table-generic #table [data]="data()" [displayedColumns]="aDisplayedColumns" [selection]="selection"
-        [actions]="unidadMedidaActions" [totalRecords]="totalRecords()" [pageSizeOptions]="pageSizeOptions"
+        [actions]="familiaActions" [totalRecords]="totalRecords()" [pageSizeOptions]="pageSizeOptions"
         [initialPageSize]="currentPageSize" (actionClicked)="onActionClicked($event)"
         (pageChange)="handlePageEvent($event)">
 
@@ -33,21 +32,26 @@
             </th>
             <td mat-cell *matCellDef="let row">
                 <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-                    [checked]="selection.isSelected(row)" [aria-label]="'Seleccionar unidad ' + row.vDescripcion">
+                    [checked]="selection.isSelected(row)" [aria-label]="'Seleccionar familia ' + row.vTitulo">
                 </mat-checkbox>
             </td>
         </ng-container>
 
-        <ng-container matColumnDef="vDescripcion">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Descripción </th>
-            <td mat-cell *matCellDef="let element"> {{element.vDescripcion}} </td>
+        <ng-container matColumnDef="vTitulo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Título </th>
+            <td mat-cell *matCellDef="let element"> {{element.vTitulo}} </td>
         </ng-container>
 
-        <ng-container matColumnDef="vAbreviatura">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Abreviatura </th>
+        <ng-container matColumnDef="vSigla">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Sigla </th>
             <td mat-cell *matCellDef="let element">
-                <mat-chip class="chip-abbr">{{element.vAbreviatura}}</mat-chip>
+                <mat-chip class="chip-sigla">{{element.vSigla}}</mat-chip>
             </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vCuentaContable">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Cuenta Contable </th>
+            <td mat-cell *matCellDef="let element"> {{element.vCuentaContable || '-'}} </td>
         </ng-container>
 
         <ng-container matColumnDef="bActivo">
