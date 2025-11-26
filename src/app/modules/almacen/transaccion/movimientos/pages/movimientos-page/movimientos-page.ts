@@ -29,6 +29,10 @@ import { FormsModule } from '@angular/forms';
 import { ISelectItem } from '../../../../../../core/interfaces/ISelectItem.interface';
 import { IAlmacenListadoRequest } from '../../../../mantenimiento/almacen/interfaces/request/IAlmacenListadoRequest.interface';
 import { IMovimientoAnularResponse } from '../../interfaces/response/IMovimientoAnularResponse.interface';
+import { ProductoService } from '../../../../../logistica/mantenimiento/producto/services/producto.service';
+import { IProductoListadoRequest } from '../../../../../logistica/mantenimiento/producto/interfaces/request/IProductoListadoRequest.interface';
+import { IPaginationResponse } from '../../../../../../core/interfaces/IPaginationResponse.interface';
+import { IProductoResponse } from '../../../../../logistica/mantenimiento/producto/interfaces/response/IProductoResponse.interface';
 
 @Component({
 	selector: 'app-movimientos-page',
@@ -61,7 +65,7 @@ export class MovimientosPage {
 	// #region Inyección de Dependencias
 	private movimientosService = inject(MovimientosService);
 	private almacenService = inject(AlmacenService);
-	// private productoService = inject(ProductoService); // <-- AÑADIR
+	private productoService = inject(ProductoService);
 	public dialog = inject(MatDialog);
 	private snackBar = inject(MatSnackBar);
 	// #endregion
@@ -146,25 +150,27 @@ export class MovimientosPage {
 	 */
 	cargarProductos() {
 		this.isLoadingProductos.set(true);
-		// --- LLAMADA SIMULADA (Reemplazar con this.productoService.listarProductos) ---
-		// const request: IProductoListadoRequest = { iPageNumber: 1, iPageSize: 1000, bActivo: true };
-		// this.productoService.listarProductos(request).pipe(...).subscribe({
-		//   next: (paginatedResponse) => {
-		//     this.selectProductos.set(paginatedResponse.aRecords.map(prod => ({
-		//       iIdElemento: prod.iIdProducto,
-		//       vDescripcion: prod.vNombre // Asumiendo que producto tiene vNombre
-		//     })));
-		//   }, ...
-		// });
 
-		// Simulación adaptada a ISelectItem:
-		setTimeout(() => { // Simula demora de red
-			this.selectProductos.set([
-				{ iIdElemento: 1, vDescripcion: 'Producto A (Simulado)' },
-				{ iIdElemento: 2, vDescripcion: 'Producto B (Simulado)' }
-			]);
-			this.isLoadingProductos.set(false);
-		}, 500);
+		const request: IProductoListadoRequest = {
+			iPageNumber: 1,
+			iPageSize: 1000,
+			bActivo: true
+		};
+
+		this.productoService.listarProductos(request).pipe(
+			finalize(() => this.isLoadingProductos.set(false))
+		).subscribe({
+			next: (paginatedResponse: IPaginationResponse<IProductoResponse>) => {
+				this.selectProductos.set(paginatedResponse.aRecords.map((prod: IProductoResponse) => ({
+					iIdElemento: prod.iIdProducto,
+					vDescripcion: prod.vCodigo + ' | ' + prod.vTitulo
+				})));
+			},
+			error: (err) => {
+				console.error('Error al cargar Productos:', err);
+				this.selectProductos.set([]);
+			}
+		});
 	}
 
 	/*
@@ -305,7 +311,7 @@ export class MovimientosPage {
 					finalize(() => this.isLoading.set(false)),
 				).subscribe((response: IMovimientoAnularResponse) => {
 					if (response && response.bStatus) {
-						this.snackBar.open(response.vMensaje, 'Cerrar', {duration: 3000,panelClass: ['snackbar-success']});
+						this.snackBar.open(response.vMensaje, 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
 						this.cargarMovimientos();
 					}
 				});

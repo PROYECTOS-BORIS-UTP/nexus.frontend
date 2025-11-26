@@ -22,7 +22,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { IUsuarioListadoRequest } from '../../interfaces/request/IUsuarioListadoRequest.interface';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
-import { IUsuarioCreateUpdateRequest } from '../../interfaces/request/IUsuarioCreateUpdateRequest.interface';
 import { PerfilService } from '../../../perfil/services/perfil.service';
 import { AsignarPerfil } from './dialogs/asignar-perfil/asignar-perfil';
 

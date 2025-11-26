@@ -9,8 +9,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { debounceTime } from 'rxjs';
+import { debounceTime, forkJoin } from 'rxjs';
 import { IProductoCatalogo } from '../interfaces/IProductoCatalogo.interface';
+import { ProductoService } from '../../../../../../../../../logistica/mantenimiento/producto/services/producto.service';
+import { UnidadMedidaService } from '../../../../../../../../../logistica/mantenimiento/unidad-medida/services/unidad-medida.service';
+import { IProductoResponse } from '../../../../../../../../../logistica/mantenimiento/producto/interfaces/response/IProductoResponse.interface';
+import { IUnidadMedidaResponse } from '../../../../../../../../../logistica/mantenimiento/unidad-medida/interfaces/response/IUnidadMedidaResponse.interface';
 
 @Component({
 	selector: 'app-producto-selector',
@@ -24,6 +28,9 @@ import { IProductoCatalogo } from '../interfaces/IProductoCatalogo.interface';
 export class ProductoSelector {
 	dialogRef = inject(MatDialogRef<ProductoSelector>);
 
+	productoService = inject(ProductoService);
+	unidadMedidaService = inject(UnidadMedidaService);
+
 	// Datos
 	dataSource = new MatTableDataSource<IProductoCatalogo>([]);
 	selection = new SelectionModel<IProductoCatalogo>(true, []); // 'true' permite múltiple selección
@@ -32,15 +39,6 @@ export class ProductoSelector {
 	// Filtro
 	searchControl = new FormControl('');
 	isLoading = signal(false);
-
-	// Datos simulados (Aquí llamarías a tu ProductoService.listarCatalogo())
-	listaMaestra: IProductoCatalogo[] = [
-		{ iIdProducto: 10, vCodigo: 'LP-001', vDescripcion: 'Laptop Lenovo Thinkpad', vUnidadMedida: 'UND', iIdUnidadMedida: 1, vCategoria: 'Tecnología' },
-		{ iIdProducto: 11, vCodigo: 'PAP-002', vDescripcion: 'Papel Bond A4 75gr', vUnidadMedida: 'MILLAR', iIdUnidadMedida: 3, vCategoria: 'Útiles' },
-		{ iIdProducto: 12, vCodigo: 'TON-003', vDescripcion: 'Toner HP 85A', vUnidadMedida: 'UND', iIdUnidadMedida: 1, vCategoria: 'Suministros' },
-		{ iIdProducto: 13, vCodigo: 'GUA-004', vDescripcion: 'Guantes de Seguridad', vUnidadMedida: 'PAR', iIdUnidadMedida: 2, vCategoria: 'EPP' },
-		{ iIdProducto: 14, vCodigo: 'CAS-005', vDescripcion: 'Casco Industrial Amarillo', vUnidadMedida: 'UND', iIdUnidadMedida: 1, vCategoria: 'EPP' },
-	];
 
 	ngOnInit(): void {
 		this.cargarProductos();
@@ -53,11 +51,32 @@ export class ProductoSelector {
 
 	cargarProductos() {
 		this.isLoading.set(true);
-		// Simulación de API
-		setTimeout(() => {
-			this.dataSource.data = this.listaMaestra;
-			this.isLoading.set(false);
-		}, 300);
+
+		forkJoin({
+			productos: this.productoService.listarProductos({ iPageNumber: 1, iPageSize: 1000 }), // Traemos todos por ahora
+			unidades: this.unidadMedidaService.listarUnidadesMedida({ iPageNumber: 1, iPageSize: 1000 })
+		}).subscribe({
+			next: (resp) => {
+				const unidadesMap = new Map<number, string>();
+				resp.unidades.aRecords.forEach((u: IUnidadMedidaResponse) => unidadesMap.set(u.iIdUnidadMedida, u.vAbreviatura || u.vDescripcion));
+
+				const productosMapeados: IProductoCatalogo[] = resp.productos.aRecords.map((p: IProductoResponse) => ({
+					iIdProducto: p.iIdProducto,
+					vCodigo: p.vCodigo,
+					vDescripcion: p.vTitulo, // Mapeamos vTitulo a vDescripcion
+					vUnidadMedida: unidadesMap.get(p.iIdUnidadMedida) || 'UND',
+					iIdUnidadMedida: p.iIdUnidadMedida,
+					vCategoria: p.vFamiliaNombre
+				}));
+
+				this.dataSource.data = productosMapeados;
+				this.isLoading.set(false);
+			},
+			error: (err) => {
+				console.error('Error al cargar catálogo:', err);
+				this.isLoading.set(false);
+			}
+		});
 	}
 
 	// #region Lógica de Selección

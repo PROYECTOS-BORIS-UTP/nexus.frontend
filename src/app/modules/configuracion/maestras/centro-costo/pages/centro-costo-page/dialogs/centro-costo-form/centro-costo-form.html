@@ -1,0 +1,57 @@
+<h2 mat-dialog-title>{{ isEdit() ? 'Editar' : 'Crear' }} Centro de Costo</h2>
+
+@if (isLoading()) {
+<mat-progress-bar mode="indeterminate" class="dialog-progress-bar"></mat-progress-bar>
+}
+
+<mat-dialog-content>
+    <form [formGroup]="form" class="cc-form-container">
+
+        <mat-form-field appearance="outline">
+            <mat-label>Compañía</mat-label>
+            <mat-select formControlName="iIdCompania" required>
+                @if (isLoadingCompanias()) { <mat-option disabled>Cargando...</mat-option> }
+                @for (comp of selectCompanias(); track comp.iIdElemento) {
+                <mat-option [value]="comp.iIdElemento">{{ comp.vDescripcion }}</mat-option>
+                }
+            </mat-select>
+            @if (form.controls['iIdCompania'].hasError('required')) {
+            <mat-error>La compañía es requerida.</mat-error>
+            }
+        </mat-form-field>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Código</mat-label>
+                <input matInput formControlName="vCodigo" required maxlength="50" style="text-transform: uppercase;">
+                @if (form.controls['vCodigo'].hasError('required')) {
+                <mat-error>El código es requerido.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field-2">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="vNombre" required maxlength="255">
+                @if (form.controls['vNombre'].hasError('required')) {
+                <mat-error>El nombre es requerido.</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <mat-slide-toggle formControlName="bActivo" color="primary">
+            Estado: {{ form.value.bActivo ? 'Activo' : 'Inactivo' }}
+        </mat-slide-toggle>
+
+        <input type="hidden" formControlName="iIdCentroCosto">
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onClose()" [disabled]="isLoading()">
+        <mat-icon>cancel</mat-icon> Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="isLoading() || form.invalid">
+        <mat-icon>save</mat-icon> Guardar
+    </button>
+</mat-dialog-actions>
