@@ -1,0 +1,37 @@
+:host {
+    display: block;
+    padding: 24px;
+}
+
+.controls-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    background-color: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.search-field {
+    flex: 1;
+}
+
+.actions-container {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btnAgregar {
+    padding: 0 24px !important;
+    min-width: auto;
+    height: 48px;
+    font-size: 15px;
+    white-space: nowrap;
+
+    .mat-icon {
+        margin-right: 8px;
+    }
+}

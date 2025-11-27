@@ -5,6 +5,6 @@ export const FAMILIA_ROUTES: Routes = [
     {
         path: ''
         , component: FamiliaPage
-        , data: { breadcrumb: 'Almacén', icon: 'forklift' }
+        , data: { breadcrumb: 'Familia', icon: 'forklift' }
     }
 ];
