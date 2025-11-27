@@ -19,9 +19,13 @@ import { TipoCambioService } from '../../services/tipo-cambio.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ITipoCambioListadoRequest } from '../../interfaces/request/ITipoCambioListadoRequest.interface';
+import { ITipoCambioCreateUpdateRequest } from '../../interfaces/request/ITipoCambioCreateUpdateRequest.interface';
+import { TipoCambioForm } from './dialogs/tipo-cambio-form/tipo-cambio-form';
+import { ITipoCambioCreateUpdateResponse } from '../../interfaces/response/ITipoCambioCreateUpdateResponse.interface';
 
 @Component({
 	selector: 'app-tipo-cambio-page',
+	
 	imports: [
 		CommonModule,
 		MatTableModule,
@@ -38,6 +42,9 @@ import { ITipoCambioListadoRequest } from '../../interfaces/request/ITipoCambioL
 		MatSnackBarModule,
 		MatPaginatorModule,
 	],
+	providers: [
+		DatePipe 
+    ],
 	templateUrl: './tipo-cambio-page.html',
 	styleUrl: './tipo-cambio-page.scss'
 })
@@ -47,6 +54,8 @@ export class TipoCambioPage implements OnInit, OnDestroy {
 	private tipoCambioService = inject(TipoCambioService);
 	public dialog = inject(MatDialog);
 	private snackBar = inject(MatSnackBar);
+
+	private datePipe = inject(DatePipe);
 	// #endregion
 
 	// #region Estado del Componente (Signals y Variables)
@@ -80,6 +89,8 @@ export class TipoCambioPage implements OnInit, OnDestroy {
 
 	// #region Ciclo de Vida del Componente
 	ngOnInit(): void {
+
+		
 		this.cargarTiposCambio();
 		this.setupFilterSubscription(); // Considera si este filtro genérico es útil o si necesitas filtros específicos
 	}
@@ -199,36 +210,85 @@ export class TipoCambioPage implements OnInit, OnDestroy {
 	/*
 	 * Abre diálogo para agregar tipo de cambio.
 	 */
+
 	onAddTipoCambio(): void {
-		// Debes crear el componente TipoCambioForm
-		// const dialogRef = this.dialog.open(TipoCambioForm, { width: '500px', disableClose: true, data: {} });
-		// dialogRef.afterClosed().subscribe(result => {
-		//   if (result) {
-		//     console.log('Nuevo tipo de cambio:', result);
-		//     // --- LLAMADA AL SERVICIO PARA CREAR ---
-		//     // this.tipoCambioService.crearActualizarTipoCambio(result).subscribe(...);
-		//     this.snackBar.open('Tipo de cambio creado (simulado).', 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		//     this.cargarTiposCambio();
-		//   }
-		// });
-		alert('Funcionalidad "Agregar Tipo de Cambio" no implementada.'); // Placeholder
+		 const dialogRef = this.dialog.open(TipoCambioForm, {
+					width: '100%',
+					maxWidth: '700px', // Ajusta según necesidad
+					disableClose: true,
+					data: {
+						tipoCambio: null
+					}
+				});
+		
+				dialogRef.afterClosed().subscribe((result: ITipoCambioCreateUpdateRequest| undefined) => {
+					if (result) {
+						this.isLoading.set(true);
+						this.tipoCambioService.crearActualizarTipoCambio(result).pipe(
+							tap((response: ITipoCambioCreateUpdateResponse) => {
+								this.showSnackbar(response.vMensaje, 'snackbar-success');
+								this.cargarTiposCambio();
+							}),
+							catchError(error => { return of(null); }),
+							finalize(() => this.isLoading.set(false))
+						).subscribe();
+					}
+				});
 	}
 
 	/*
 	 * Abre diálogo para editar tipo de cambio.
 	 */
+	
+
 	onEditTipoCambio(tipoCambio: ITipoCambioResponse): void {
-		// const dialogRef = this.dialog.open(TipoCambioForm, { width: '500px', disableClose: true, data: { tipoCambio: tipoCambio } });
-		// dialogRef.afterClosed().subscribe(result => {
-		//   if (result) {
-		//     console.log('Tipo de cambio a actualizar:', result);
-		//     // --- LLAMADA AL SERVICIO PARA ACTUALIZAR ---
-		//     // this.tipoCambioService.crearActualizarTipoCambio(result).subscribe(...);
-		//     this.snackBar.open(`Tipo de cambio del ${this.formatDate(tipoCambio.dFecha)} actualizado (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		//     this.cargarTiposCambio();
-		//   }
-		// });
-		alert(`Funcionalidad "Editar Tipo de Cambio del ${this.formatDate(tipoCambio.dFecha)}" no implementada.`); // Placeholder
+	
+
+			// 1. Formatear la fecha antes de pasarla
+     const fechaFormateada = this.datePipe.transform(tipoCambio.dFecha, 'yyyy-MM-dd');
+
+     // 2. Comprobar que el formato sea válido (nunca debería ser null si viene de la tabla)
+     if (!fechaFormateada) {
+         console.error('Error al formatear la fecha para edición:', tipoCambio.dFecha);
+         return; 
+     }
+
+		 const tipocambioParaEditar: ITipoCambioCreateUpdateRequest= {
+					 dFecha: fechaFormateada
+					,iIdMonedaOrigen: tipoCambio.iIdMonedaOrigen
+					, iIdMonedaDestino: tipoCambio.iIdMonedaDestino
+					, dCompra: tipoCambio.dCompra
+					, dVenta: tipoCambio.dVenta
+					
+				};
+		
+		
+		
+				const dialogRef = this.dialog.open(TipoCambioForm, {
+					width: '100%',
+					maxWidth: '700px',
+					disableClose: true,
+					data: {
+						tipoCambio: tipocambioParaEditar
+					}
+				});
+		
+				dialogRef.afterClosed().subscribe((result: ITipoCambioCreateUpdateRequest| undefined) => {
+					if (result) {
+						this.isLoading.set(true);
+					this.tipoCambioService.crearActualizarTipoCambio(result).pipe(
+					tap((response: ITipoCambioCreateUpdateResponse) => {
+						this.showSnackbar(response.vMensaje, 'snackbar-success');
+						this.cargarTiposCambio();
+					}),
+					catchError(error => {
+						this.showSnackbar(error.message || 'Error al actualizar el elemento.', 'snackbar-error');
+						return of(null);
+					}),
+					finalize(() => this.isLoading.set(false))
+					).subscribe();
+				}
+				});
 	}
 
 	/*
@@ -281,4 +341,12 @@ export class TipoCambioPage implements OnInit, OnDestroy {
 		}
 	}
 	// #endregion
+
+	private showSnackbar(message: string, panelClass: string = 'snackbar-info'): void {
+        this.snackBar.open(message, 'Cerrar', {
+            duration: 5000,
+            panelClass: [panelClass]
+        });
+    }
+
 }

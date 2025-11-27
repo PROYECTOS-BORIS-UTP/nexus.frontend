@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>{{ tituloDialogo }}</h2>
+
+<mat-dialog-content class="mat-typography">
+    <form [formGroup]="monedaForm" class="elemento-sistema-form-container">
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Descripcion</mat-label>
+                <input matInput formControlName="vDescripcion" required maxlength="50">
+                @if (fc['vDescripcion'].hasError('required')) { <mat-error>Descripcion es requerido.</mat-error> }
+                @if (fc['vDescripcion'].hasError('maxlength')) { <mat-error>Máximo 100 caracteres.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Simbolo</mat-label>
+                <input matInput formControlName="vSimbolo" required maxlength="5">
+                @if (fc['vSimbolo'].hasError('required')) { <mat-error>Simbolo es requerido.</mat-error> }
+                @if (fc['vSimbolo'].hasError('maxlength')) { <mat-error>Máximo 5 caracteres.</mat-error> }
+                @if (fc['vSimbolo'].hasError('minlength')) { <mat-error>Mínimo 1 caracteres.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Codigo Sunat</mat-label>
+                <input matInput formControlName="vCodigoSunat" required maxlength="50">
+                @if (fc['vCodigoSunat'].hasError('required')) { <mat-error>Codigo Sunat es requerida.</mat-error> }
+                @if (fc['vCodigoSunat'].hasError('maxlength')) { <mat-error>Máximo 3 caracteres.</mat-error> }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-checkbox formControlName="bActivo" class="form-field-checkbox">Activo</mat-checkbox>
+        </div>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onCancel()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="onSave()" [disabled]="monedaForm.invalid">
+        {{ monedaExistente ? 'Actualizar' : 'Guardar' }}
+    </button>
+</mat-dialog-actions>

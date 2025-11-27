@@ -1,0 +1,68 @@
+<h2 mat-dialog-title>{{ tituloDialogo }}</h2>
+
+<mat-dialog-content class="mat-typography">
+    <form [formGroup]="tipocambioForm" class="elemento-sistema-form-container">
+
+        <div class="form-row">
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Fecha</mat-label>
+                    <input matInput [matDatepicker]="pickerFecha" formControlName="dFecha"required >
+                <mat-datepicker-toggle matSuffix [for]="pickerFecha"></mat-datepicker-toggle>
+                <mat-datepicker #pickerFecha></mat-datepicker>
+
+            @if (fc['dFecha'].hasError('required')) {<mat-error>La fecha es requerida.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Moneda Origen</mat-label>
+                <mat-select formControlName="iIdMonedaOrigen" required>
+                     @if (isLoadingMoneda) { <mat-option disabled>Cargando...</mat-option> }
+                     @for(mon of selectMoneda; track mon.iIdElemento) {
+                       <mat-option [value]="mon.iIdElemento">{{ mon.vDescripcion }}</mat-option>
+                     }
+                     @if (!isLoadingMoneda && selectMoneda.length === 0) { <mat-option disabled>No hay Moneda Origen</mat-option> }
+                </mat-select>
+                @if (fc['iIdMonedaOrigen'].hasError('required')) { <mat-error>Moneda Origen es requerida.</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Moneda Destino</mat-label>
+                <mat-select formControlName="iIdMonedaDestino" required>
+                     @if (isLoadingMoneda) { <mat-option disabled>Cargando...</mat-option> }
+                     @for(mon of selectMoneda; track mon.iIdElemento) {
+                       <mat-option [value]="mon.iIdElemento">{{ mon.vDescripcion }}</mat-option>
+                     }
+                     @if (!isLoadingMoneda && selectMoneda.length === 0) { <mat-option disabled>No hay Moneda Destino</mat-option> }
+                </mat-select>
+                @if (fc['iIdMonedaDestino'].hasError('required')) { <mat-error>Moneda Origen es requerida.</mat-error> }
+            </mat-form-field>
+
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Compra</mat-label>
+                <input matInput type="text" formControlName="dCompra" required>
+                @if (fc['dCompra'].hasError('required')) {<mat-error>Compra es requerida.</mat-error>}
+                 @if (fc['dCompra'].hasError('pattern')) {<mat-error>Debe ser un número con máximo 4 decimales.</mat-error> }
+                @if (fc['dCompra'].hasError('min')) {<mat-error>Debe ser mayor a 0.</mat-error> } 
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Venta</mat-label>
+                <input matInput type="text" formControlName="dVenta" required>
+                 @if (fc['dVenta'].hasError('required')) {<mat-error>Venta es requerida.</mat-error>}
+                @if (fc['dVenta'].hasError('pattern')) {<mat-error>Debe ser un número con máximo 4 decimales.</mat-error>}
+                @if (fc['dVenta'].hasError('min')) { <mat-error>Debe ser mayor a 0.</mat-error>  }
+            </mat-form-field>
+        </div>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onCancel()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="onSave()" [disabled]="tipocambioForm.invalid">
+        {{ tipocambioExistente ? 'Actualizar' : 'Guardar' }}
+    </button>
+</mat-dialog-actions>

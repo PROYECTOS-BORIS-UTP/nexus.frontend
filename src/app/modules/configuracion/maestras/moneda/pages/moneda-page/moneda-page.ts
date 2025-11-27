@@ -21,6 +21,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { IMonedaListadoRequest } from '../../interfaces/request/IMonedaListadoRequest.interface';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
+import { IMonedaCreateUpdateRequest } from '../../interfaces/request/IMonedaCreateUpdateRequest.interface';
+import { IMonedaCreateUpdateResponse } from '../../interfaces/response/IMonedaCreateUpdateResponse.interface';
+import { IMonedaDeleteResponse } from '../../interfaces/response/IMonedaDeleteResponse.interface';
+import { MonedaForm } from './dialogs/moneda-form/moneda-form';
 
 @Component({
 	selector: 'app-moneda-page',
@@ -204,35 +208,70 @@ export class MonedaPage implements OnInit, OnDestroy {
 	 * Abre diálogo para agregar moneda.
 	 */
 	onAddMoneda(): void {
-		// Debes crear el componente MonedaForm
-		// const dialogRef = this.dialog.open(MonedaForm, { width: '500px', disableClose: true, data: {} });
-		// dialogRef.afterClosed().subscribe(result => {
-		//   if (result) {
-		//     console.log('Nueva moneda:', result);
-		//     // --- LLAMADA AL SERVICIO PARA CREAR ---
-		//     // this.monedaService.crearActualizarMoneda(result).subscribe(...);
-		//     this.snackBar.open('Moneda creada (simulado).', 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		//     this.cargarMonedas();
-		//   }
-		// });
-		alert('Funcionalidad "Agregar Moneda" no implementada.'); // Placeholder
+		const dialogRef = this.dialog.open(MonedaForm, {
+					width: '100%',
+					maxWidth: '700px', // Ajusta según necesidad
+					disableClose: true,
+					data: {
+						moneda: null
+					}
+				});
+		
+				dialogRef.afterClosed().subscribe((result: IMonedaCreateUpdateRequest | undefined) => {
+					if (result) {
+						this.isLoading.set(true);
+						this.monedaService.crearActualizarMoneda(result).pipe(
+							tap((response: IMonedaCreateUpdateResponse) => {
+								this.showSnackbar(response.vMensaje, 'snackbar-success');
+								this.cargarMonedas();
+							}),
+							catchError(error => { return of(null); }),
+							finalize(() => this.isLoading.set(false))
+						).subscribe();
+					}
+				});
 	}
 
 	/*
 	 * Abre diálogo para editar moneda.
 	 */
 	onEditMoneda(moneda: IMonedaResponse): void {
-		// const dialogRef = this.dialog.open(MonedaForm, { width: '500px', disableClose: true, data: { moneda: moneda } });
-		// dialogRef.afterClosed().subscribe(result => {
-		//   if (result) {
-		//     console.log('Moneda a actualizar:', result);
-		//     // --- LLAMADA AL SERVICIO PARA ACTUALIZAR ---
-		//     // this.monedaService.crearActualizarMoneda(result).subscribe(...);
-		//     this.snackBar.open(`Moneda "${moneda.vDescripcion}" actualizada (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		//     this.cargarMonedas();
-		//   }
-		// });
-		alert(`Funcionalidad "Editar Moneda: ${moneda.vDescripcion}" no implementada.`); // Placeholder
+		
+	const monedaParaEditar: IMonedaCreateUpdateRequest = {
+				iIdMoneda: moneda.iIdMoneda
+				, vDescripcion: moneda.vDescripcion
+				, vSimbolo: moneda.vSimbolo
+				, vCodigoSunat: moneda.vCodigoSunat
+				, bActivo: moneda.bActivo
+			};
+	
+	
+	
+			const dialogRef = this.dialog.open(MonedaForm, {
+				width: '100%',
+				maxWidth: '700px',
+				disableClose: true,
+				data: {
+					moneda: monedaParaEditar
+				}
+			});
+	
+			dialogRef.afterClosed().subscribe((result: IMonedaCreateUpdateRequest | undefined) => {
+				if (result) {
+					this.isLoading.set(true);
+					this.monedaService.crearActualizarMoneda(result).pipe(
+						tap((response: IMonedaCreateUpdateResponse) => {
+							this.showSnackbar(response.vMensaje, 'snackbar-success');
+							this.cargarMonedas();
+						}),
+						catchError(error => {
+							this.showSnackbar(error.message || 'Error al actualizar la moneda.', 'snackbar-error');
+							return of(null);
+						}),
+						finalize(() => this.isLoading.set(false))
+					).subscribe();
+				}
+			});
 	}
 
 	/*
@@ -240,23 +279,36 @@ export class MonedaPage implements OnInit, OnDestroy {
 	 */
 	onDeleteMoneda(moneda: IMonedaResponse): void {
 		const dialogRef = this.dialog.open(Confirmacion, {
-			width: '400px',
-			data: {
-				titulo: 'Confirmar Eliminación',
-				mensaje: `¿Estás seguro de eliminar la moneda "${moneda.vDescripcion}"?`,
-				mostrarCampoObservacion: false // O true si tu API lo requiere
-			}
-		});
-
-		dialogRef.afterClosed().subscribe(result => {
-			if (result && result.confirmado) {
-				console.log('Eliminando moneda:', moneda.iIdMoneda, 'Observación:', result.observacion);
-				// --- LLAMADA AL SERVICIO PARA ELIMINAR ---
-				// this.monedaService.eliminarMoneda(moneda.iIdMoneda, result.observacion).subscribe(...);
-				this.snackBar.open(`Moneda "${moneda.vDescripcion}" eliminada (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-warn'] });
-				this.cargarMonedas();
-			}
-		});
-	}
+					width: '400px',
+					data: {
+						titulo: 'Confirmar Eliminación',
+						mensaje: `¿Estás seguro de eliminar la moneda "${moneda.vDescripcion}"?`,
+						mostrarCampoObservacion: false // O true si tu API lo requiere
+					}
+				});
+		
+				dialogRef.afterClosed().subscribe(result => {
+					if (result && result.confirmado) {
+						this.isLoading.set(true);moneda
+						this.monedaService.eliminarMoneda(moneda.iIdMoneda).pipe(
+							tap((response: IMonedaDeleteResponse) => {
+								this.showSnackbar(response.vMensaje, 'snackbar-warn');
+								this.cargarMonedas();
+							}),
+							catchError(error => {
+								this.showSnackbar(error.message || 'Error al eliminar el elemento.', 'snackbar-error');
+								return of(null);
+							}),
+							finalize(() => this.isLoading.set(false))
+						).subscribe();
+					}
+				});
 	// #endregion
+}
+private showSnackbar(message: string, panelClass: string = 'snackbar-info'): void {
+        this.snackBar.open(message, 'Cerrar', {
+            duration: 5000,
+            panelClass: [panelClass]
+        });
+    }
 }
