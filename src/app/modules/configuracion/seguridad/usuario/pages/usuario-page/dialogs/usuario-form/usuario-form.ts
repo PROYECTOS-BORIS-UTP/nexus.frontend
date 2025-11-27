@@ -5,8 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { IUsuarioCreateUpdateRequest } from '../../../../interfaces/request/IUsuarioCreateUpdateRequest.interface';
 import { IUsuarioResponse } from '../../../../interfaces/response/IUsuarioResponse.interface';

@@ -9,6 +9,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { IUbigeoCreateUpdateRequest } from '../../../interfaces/request/IUbigeoCreateUpdateRequest.interface'; 
+import { PaisService } from '../../../../pais/services/pais.service';
+import { ISelectItem } from '../../../../../../../core/interfaces/ISelectItem.interface';
+import { IPaisListadoRequest } from '../../../../pais/interfaces/request/IPaisListadoRequest.interface';
+import { finalize } from 'rxjs';
+import { UbigeoService } from '../../../services/ubigeo.service';
 
 // Nuevas interfaces para los catálogos (ajustar según tu API real)
 export interface TipoUbigeo { iIdTipoUbigeo: number; vDescripcion: string; }
@@ -39,17 +44,27 @@ export class UbigeoForm implements OnInit {
 
 	private fb = inject(FormBuilder);
 	public dialogRef = inject(MatDialogRef<UbigeoForm>);
+	private paisService = inject(PaisService);
+
+	private ubigeoService = inject(UbigeoService);
+
+
 
 	// --- Propiedades para Catálogos ---
     // En un proyecto real, estas listas se cargarían desde un servicio.
-    public tiposUbigeo: TipoUbigeo[] = [];
-    public paises: Pais[] = [];
-    public isLoadingLists = true;
+
+public tiposUbigeo: TipoUbigeo[] = []; 
+public paises: Pais[] = []; 
+public isLoadingLists = true;
+
     // ----------------------------------
 
 	ubigeoForm: FormGroup;
 	tituloDialogo = 'Agregar Ubigeo';
 	public ubigeoExistente: IUbigeoCreateUpdateRequest | null = null;
+
+	selectPais : ISelectItem[]=[];
+	isLoadingPais  = false;
 
 	constructor(
 		@Inject(MAT_DIALOG_DATA) public data: UbigeoFormData
@@ -70,38 +85,69 @@ export class UbigeoForm implements OnInit {
 	}
 
 	ngOnInit(): void {
-        // Cargar catálogos primero
-        this.loadCatalogs(); 
+        if (this.ubigeoExistente) {
+      this.tituloDialogo = 'Editar Ubigeo';
+      
+    
 
-		if (this.ubigeoExistente) {
-			this.tituloDialogo = 'Editar Ubigeo';
-			
-            // Simplemente parcheamos los valores, ya que provienen del IUbigeoCreateUpdateRequest
-			this.ubigeoForm.patchValue(this.ubigeoExistente);
-		} else {
-			this.tituloDialogo = 'Crear Ubigeo';
-		}
+      const patchData = {
+        ...this.ubigeoExistente
+       
+      };
+
+      this.ubigeoForm.patchValue(patchData);
+    } else {
+      this.tituloDialogo = 'Crear Ubigeo';
+    }
+
+	
+    //CARGAR DATOS MONEDA
+    this.cargarPais();
+	this.cargarTiposUbigeoSimulado();
 	}
 
-    // Lógica para cargar los datos de los selectores
-    private loadCatalogs(): void {
-        // *** ESTA ES LA SIMULACIÓN DE LA LLAMADA AL SERVICIO ***
-        // *** DEBES REEMPLAZAR ESTO POR LA LÓGICA DE TU API ***
-        this.isLoadingLists = true;
-        setTimeout(() => { // Simula un retraso de API
-            this.tiposUbigeo = [
-                { iIdTipoUbigeo: 1, vDescripcion: 'DEPARTAMENTO' }, 
-                { iIdTipoUbigeo: 2, vDescripcion: 'PROVINCIA' },
-                { iIdTipoUbigeo: 3, vDescripcion: 'DISTRITO' }
-            ];
-            this.paises = [
-                { iIdPais: 1, vNombre: 'PERU' }, 
-                { iIdPais: 2, vNombre: 'COLOMBIA' }
-            ];
-            this.isLoadingLists = false;
-        }, 100); 
-        // *******************************************************
-    }
+private cargarTiposUbigeoSimulado(): void {
+  this.tiposUbigeo = [
+    { iIdTipoUbigeo: 1, vDescripcion: 'DEPARTAMENTO' },
+    { iIdTipoUbigeo: 2, vDescripcion: 'PROVINCIA' },
+    { iIdTipoUbigeo: 3, vDescripcion: 'DISTRITO' }
+  ];
+
+  // 👇 Aplicar parche cuando hay edición
+  if (this.ubigeoExistente?.iIdTipoUbigeo) {
+    this.ubigeoForm.patchValue({
+      iIdTipoUbigeo: this.ubigeoExistente.iIdTipoUbigeo
+    });
+  }
+}
+
+
+
+		
+   cargarPais(): void {
+		 this.isLoadingPais = true;
+
+		 const request: IPaisListadoRequest= {
+		   iPageNumber: 1,
+		   iPageSize: 1000,
+		 };
+	 
+		 this.paisService.listarPaises(request)
+		   .pipe(finalize(() => this.isLoadingPais= false))
+		   .subscribe({
+			 next: (paginatedResponse) => {
+			   this.selectPais= paginatedResponse.aRecords.map(pai=> ({
+				 iIdElemento: pai.iIdPais,
+				 vDescripcion: pai.vNombre
+			   }));
+			 },
+			 error: (err) => {
+			   console.error('Error al cargar Pais:', err);
+			   this.selectPais= [];
+			 }
+		   });
+	   }
+
     
 	// Getter para acceder fácilmente a los controles del formulario
 	get fc() { return this.ubigeoForm.controls; }

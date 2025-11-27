@@ -3,7 +3,7 @@ export interface ITipoCambioCreateUpdateRequest {
    
     iIdMonedaOrigen: number;
     iIdMonedaDestino: number;
-    dFecha: string; 
+    dFecha: string ; 
     dCompra: number;
     dVenta: number;
 

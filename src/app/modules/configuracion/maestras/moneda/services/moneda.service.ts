@@ -6,6 +6,10 @@ import { IMonedaResponse } from '../interfaces/response/IMonedaResponse.interfac
 import { environment } from '../../../../../../environments/environments';
 import { IApiResponse } from '../../../../../core/interfaces/IApiResponse.interface';
 import { IPaginationResponse } from '../../../../../core/interfaces/IPaginationResponse.interface';
+import { handleHttpError } from '../../../../../core/utils/error-handler.utils';
+import { IMonedaCreateUpdateRequest } from '../interfaces/request/IMonedaCreateUpdateRequest.interface';
+import { IMonedaCreateUpdateResponse } from '../interfaces/response/IMonedaCreateUpdateResponse.interface';
+import { IMonedaDeleteResponse } from '../interfaces/response/IMonedaDeleteResponse.interface';
 
 
 @Injectable({
@@ -40,4 +44,52 @@ export class MonedaService {
             })
         );
     }
+
+    /*
+         * Envía una solicitud para crear o actualizar una Moneda.
+         * @param request DTO con los datos de la moneda.
+         * @returns Un Observable con la respuesta del backend.
+         */
+        crearActualizarMoneda(request: IMonedaCreateUpdateRequest): Observable<IMonedaCreateUpdateResponse> {
+            const url = `${this.apiUrl}/CrearActualizarMoneda`;
+            return this.http.post<IApiResponse<IMonedaCreateUpdateResponse>>(url, request).pipe(
+                map(response => {                
+                    if (response && typeof response.bStatus === 'boolean') {
+                        if (response.bStatus) {
+                            return response.aData;
+                        } else {
+                            throw new Error(response.vMessage || 'El backend indicó un error al crear/actualizar la moneda.');
+                        }
+                    } else {
+                        console.error('Respuesta inesperada del backend:', response);
+                        throw new Error('Respuesta inesperada del servidor al crear/actualizar.');
+                    }
+                }),
+                catchError(handleHttpError)
+            );
+        }
+    
+        /*
+         * Envía una solicitud para eliminar (baja lógica) una moneda.
+         * @param iIdCompania ID de la moneda a eliminar.
+         * @returns Un Observable con la respuesta del backend.
+         */
+        eliminarMoneda(iIdMoneda: number): Observable<IMonedaDeleteResponse> {
+            const url = `${this.apiUrl}/EliminarMoneda/${iIdMoneda}`;
+            return this.http.delete<IApiResponse<IMonedaDeleteResponse>>(url).pipe(
+                map(response => {
+                    if (response && typeof response.bStatus === 'boolean') {
+                        if (response.bStatus) {
+                            return response.aData;
+                        } else {
+                            throw new Error(response.vMessage || 'El backend indicó un error al eliminar la moneda.');
+                        }
+                    } else {
+                        console.error('Respuesta inesperada del backend:', response);
+                        throw new Error('Respuesta inesperada del servidor al eliminar.');
+                    }
+                }),
+                catchError(handleHttpError)
+            );
+        }
 }

@@ -21,6 +21,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { IPaisListadoRequest } from '../../interfaces/request/IPaisListadoRequest.interface';
 import { EstadoGeneral } from '../../../../../../common/components/estado-general/estado-general/estado-general';
+import { PaisForm } from './dialogs/pais-form/pais-form';
+import { IPaisCreateUpdateRequest } from '../../interfaces/request/IPaisCreateUpdateRequest.interface';
+import { IPaisCreateUpdateResponse } from '../../interfaces/response/IPaisCreateUpdateResponse.interface';
+import { IPaisDeleteResponse } from '../../interfaces/response/IPaisDeleteResponse.interface';
 
 
 @Component({
@@ -205,59 +209,106 @@ export class PaisPage implements OnInit, OnDestroy {
 	 * Abre diálogo para agregar país.
 	 */
 	onAddPais(): void {
-		// Debes crear el componente PaisForm
-		// const dialogRef = this.dialog.open(PaisForm, { width: '500px', disableClose: true, data: {} });
-		// dialogRef.afterClosed().subscribe(result => {
-		//   if (result) {
-		//     console.log('Nuevo país:', result);
-		//     // --- LLAMADA AL SERVICIO PARA CREAR ---
-		//     // this.paisService.crearActualizarPais(result).subscribe(...);
-		//     this.snackBar.open('País creado (simulado).', 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		//     this.cargarPaises();
-		//   }
-		// });
-		alert('Funcionalidad "Agregar País" no implementada.'); // Placeholder
+		 const dialogRef = this.dialog.open(PaisForm, {
+					width: '100%',
+					maxWidth: '700px', // Ajusta según necesidad
+					disableClose: true,
+					data: {
+						pais: null
+					}
+				});
+		
+				dialogRef.afterClosed().subscribe((result: IPaisCreateUpdateRequest | undefined) => {
+					if (result) {
+						this.isLoading.set(true);
+						this.paisService.crearActualizarCompania(result).pipe(
+							tap((response: IPaisCreateUpdateResponse) => {
+								this.showSnackbar(response.vMensaje, 'snackbar-success');
+								this.cargarPaises();
+							}),
+							catchError(error => { return of(null); }),
+							finalize(() => this.isLoading.set(false))
+						).subscribe();
+					}
+				});
 	}
 
 	/*
 	 * Abre diálogo para editar país.
 	 */
 	onEditPais(pais: IPaisResponse): void {
-		// const dialogRef = this.dialog.open(PaisForm, { width: '500px', disableClose: true, data: { pais: pais } });
-		// dialogRef.afterClosed().subscribe(result => {
-		//   if (result) {
-		//     console.log('País a actualizar:', result);
-		//     // --- LLAMADA AL SERVICIO PARA ACTUALIZAR ---
-		//     // this.paisService.crearActualizarPais(result).subscribe(...);
-		//     this.snackBar.open(`País "${pais.vNombre}" actualizado (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-success'] });
-		//     this.cargarPaises();
-		//   }
-		// });
-		alert(`Funcionalidad "Editar País: ${pais.vNombre}" no implementada.`); // Placeholder
+		const paisParaEditar: IPaisCreateUpdateRequest = {
+					iIdPais: pais.iIdPais
+					, vCodigo: pais.vCodigo
+					, vNombre: pais.vNombre
+					, bActivo: pais.bActivo
+				};
+		
+		
+		
+				const dialogRef = this.dialog.open(PaisForm, {
+					width: '100%',
+					maxWidth: '700px',
+					disableClose: true,
+					data: {
+						pais: paisParaEditar
+					}
+				});
+		
+				dialogRef.afterClosed().subscribe((result: IPaisCreateUpdateRequest | undefined) => {
+					if (result) {
+						this.isLoading.set(true);
+						this.paisService.crearActualizarCompania(result).pipe(
+							tap((response: IPaisCreateUpdateResponse) => {
+								this.showSnackbar(response.vMensaje, 'snackbar-success');
+								this.cargarPaises();
+							}),
+							catchError(error => {
+								this.showSnackbar(error.message || 'Error al actualizar la pais.', 'snackbar-error');
+								return of(null);
+							}),
+							finalize(() => this.isLoading.set(false))
+						).subscribe();
+					}
+				});
 	}
 
 	/*
 	 * Abre diálogo de confirmación para eliminar país.
 	 */
 	onDeletePais(pais: IPaisResponse): void {
-		const dialogRef = this.dialog.open(Confirmacion, {
-			width: '400px',
-			data: {
-				titulo: 'Confirmar Eliminación',
-				mensaje: `¿Estás seguro de eliminar el país "${pais.vNombre}"?`,
-				mostrarCampoObservacion: false // O true si tu API lo requiere
-			}
-		});
-
-		dialogRef.afterClosed().subscribe(result => {
-			if (result && result.confirmado) {
-				console.log('Eliminando país:', pais.iIdPais, 'Observación:', result.observacion);
-				// --- LLAMADA AL SERVICIO PARA ELIMINAR ---
-				// this.paisService.eliminarPais(pais.iIdPais, result.observacion).subscribe(...);
-				this.snackBar.open(`País "${pais.vNombre}" eliminado (simulado).`, 'Cerrar', { duration: 3000, panelClass: ['snackbar-warn'] });
-				this.cargarPaises();
-			}
-		});
+		 const dialogRef = this.dialog.open(Confirmacion, {
+					width: '400px',
+					data: {
+						titulo: 'Confirmar Eliminación',
+						mensaje: `¿Estás seguro de eliminar la pais "${pais.vNombre}"?`,
+						mostrarCampoObservacion: false // O true si tu API lo requiere
+					}
+				});
+		
+				dialogRef.afterClosed().subscribe(result => {
+					if (result && result.confirmado) {
+						this.isLoading.set(true);
+						this.paisService.eliminarPais(pais.iIdPais).pipe(
+							tap((response: IPaisDeleteResponse) => {
+								this.showSnackbar(response.vMensaje, 'snackbar-warn');
+								this.cargarPaises();
+							}),
+							catchError(error => {
+								this.showSnackbar(error.message || 'Error al eliminar el elemento.', 'snackbar-error');
+								return of(null);
+							}),
+							finalize(() => this.isLoading.set(false))
+						).subscribe();
+					}
+				});
 	}
 	// #endregion
+
+	 private showSnackbar(message: string, panelClass: string = 'snackbar-info'): void {
+        this.snackBar.open(message, 'Cerrar', {
+            duration: 5000,
+            panelClass: [panelClass]
+        });
+    }
 }
