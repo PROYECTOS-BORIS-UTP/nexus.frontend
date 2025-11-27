@@ -7,6 +7,10 @@ import { IPaginationResponse } from '../../../../../core/interfaces/IPaginationR
 import { handleHttpError } from '../../../../../core/utils/error-handler.utils';
 import { IUnidadMedidaListadoRequest } from '../interfaces/request/IUnidadMedidaListadoRequest.interface';
 import { IUnidadMedidaResponse } from '../interfaces/response/IUnidadMedidaResponse.interface';
+import { IUnidadMedidaCreateUpdateRequest } from '../interfaces/request/IUnidadMedidaCreateUpdateRequest.interface';
+import { IUnidadMedidaCreateUpdateResponse } from '../interfaces/response/IUnidadMedidaCreateUpdateResponse.interface';
+import { IUnidadMedidaDeleteRequest } from '../interfaces/request/IUnidadMedidaDeleteRequest.interface';
+import { IUnidadMedidaDeleteResponse } from '../interfaces/response/IUnidadMedidaDeleteResponse.interface';
 
 @Injectable({
     providedIn: 'root'
@@ -27,6 +31,38 @@ export class UnidadMedidaService {
                     return response.aData;
                 } else {
                     throw new Error(response.vMessage || 'Error desconocido al obtener unidades de medida');
+                }
+            }),
+            catchError(handleHttpError)
+        );
+    }
+    // #endregion
+
+    // #region Crear/Actualizar
+    crearActualizarUnidadMedida(request: IUnidadMedidaCreateUpdateRequest): Observable<IUnidadMedidaCreateUpdateResponse> {
+        const url = `${this.apiUrl}/CrearActualizarUnidadMedida`;
+        return this.http.post<IApiResponse<IUnidadMedidaCreateUpdateResponse>>(url, request).pipe(
+            map(response => {
+                if (response.bStatus && response.aData) {
+                    return response.aData;
+                } else {
+                    throw new Error(response.vMessage || 'Error al guardar la unidad de medida');
+                }
+            }),
+            catchError(handleHttpError)
+        );
+    }
+    // #endregion
+
+    // #region Eliminar
+    eliminarUnidadMedida(request: IUnidadMedidaDeleteRequest): Observable<IUnidadMedidaDeleteResponse> {
+        const url = `${this.apiUrl}/EliminarUnidadMedida/${request.iIdUnidadMedida}`;
+        return this.http.delete<IApiResponse<IUnidadMedidaDeleteResponse>>(url).pipe(
+            map(response => {
+                if (response.bStatus && response.aData) {
+                    return response.aData;
+                } else {
+                    throw new Error(response.vMessage || 'Error al eliminar la unidad de medida');
                 }
             }),
             catchError(handleHttpError)

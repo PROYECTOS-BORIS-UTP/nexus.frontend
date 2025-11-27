@@ -5,6 +5,6 @@ export const PRODUCTO_ROUTES: Routes = [
     {
         path: ''
         , component: ProductoPage
-        , data: { breadcrumb: 'Almacén', icon: 'forklift' }
+        , data: { breadcrumb: 'Producto', icon: 'forklift' }
     }
 ];
