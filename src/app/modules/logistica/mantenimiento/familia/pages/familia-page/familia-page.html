@@ -1,0 +1,67 @@
+<div class="page-container">
+    <div class="controls-container">
+        <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar Familia</mat-label>
+            <input matInput (input)="applyFilter($event)" placeholder="Escribe título o sigla..." #inputFilter>
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="actions-container">
+            <button mat-raised-button color="primary" (click)="onAddFamilia()" class="btnAgregar">
+                <mat-icon>add</mat-icon>
+                <span>Agregar Familia</span>
+            </button>
+        </div>
+    </div>
+
+    @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <app-table-generic #table [data]="data()" [displayedColumns]="aDisplayedColumns" [selection]="selection"
+        [actions]="familiaActions" [totalRecords]="totalRecords()" [pageSizeOptions]="pageSizeOptions"
+        [initialPageSize]="currentPageSize" (actionClicked)="onActionClicked($event)"
+        (pageChange)="handlePageEvent($event)">
+
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Seleccionar todas las filas">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)" [aria-label]="'Seleccionar familia ' + row.vTitulo">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vTitulo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Título </th>
+            <td mat-cell *matCellDef="let element"> {{element.vTitulo}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vSigla">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Sigla </th>
+            <td mat-cell *matCellDef="let element">
+                <mat-chip class="chip-sigla">{{element.vSigla}}</mat-chip>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vCuentaContable">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Cuenta Contable </th>
+            <td mat-cell *matCellDef="let element"> {{element.vCuentaContable || '-'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="bActivo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+            <td mat-cell *matCellDef="let element">
+                <app-estado-general [iIdEstado]="element.bActivo ? 1 : 2"
+                    [vNombreEstado]="element.bActivo ? 'Activo' : 'Inactivo'">
+                </app-estado-general>
+            </td>
+        </ng-container>
+
+    </app-table-generic>
+</div>

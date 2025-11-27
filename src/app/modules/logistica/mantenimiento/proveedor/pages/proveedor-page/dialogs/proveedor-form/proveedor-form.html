@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>{{ isEdit() ? 'Editar' : 'Crear' }} Proveedor</h2>
+
+@if (isLoading()) {
+<mat-progress-bar mode="indeterminate" class="dialog-progress-bar"></mat-progress-bar>
+}
+
+<mat-dialog-content>
+    <form [formGroup]="form" class="proveedor-form-container">
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>RUC</mat-label>
+                <input matInput formControlName="vRUC" required maxlength="11" style="text-transform: uppercase;">
+                @if (form.controls['vRUC'].hasError('required')) {
+                <mat-error>El RUC es requerido.</mat-error>
+                }
+                @if (form.controls['vRUC'].hasError('maxlength')) {
+                <mat-error>El RUC no puede exceder 11 caracteres.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field-2">
+                <mat-label>Razón Social</mat-label>
+                <input matInput formControlName="vRazonSocial" required maxlength="255">
+                @if (form.controls['vRazonSocial'].hasError('required')) {
+                <mat-error>La razón social es requerida.</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Dirección</mat-label>
+            <input matInput formControlName="vDireccion" maxlength="500">
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="bActivo" color="primary">
+            Estado: {{ form.value.bActivo ? 'Activo' : 'Inactivo' }}
+        </mat-slide-toggle>
+
+        <input type="hidden" formControlName="iIdProveedor">
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onClose()" [disabled]="isLoading()">
+        <mat-icon>cancel</mat-icon> Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="isLoading() || form.invalid">
+        <mat-icon>save</mat-icon> Guardar
+    </button>
+</mat-dialog-actions>
