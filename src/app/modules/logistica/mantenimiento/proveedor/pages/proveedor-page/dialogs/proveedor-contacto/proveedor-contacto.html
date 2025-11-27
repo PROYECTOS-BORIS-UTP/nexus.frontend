@@ -1,0 +1,91 @@
+<div class="contactos-dialog-container">
+    <h2 mat-dialog-title>
+        <mat-icon>contacts</mat-icon>
+        Contactos de {{ proveedor.vRazonSocial }}
+    </h2>
+
+    <mat-dialog-content>
+        <div class="contactos-page-container">
+            <!-- Barra de búsqueda -->
+            <div class="search-bar">
+                <mat-form-field appearance="outline" class="search-field">
+                    <mat-label>Buscar por nombre</mat-label>
+                    <input matInput (keyup)="applyFilter($event)" placeholder="Nombre del contacto">
+                    <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+
+                <button mat-raised-button color="primary" (click)="onAddContacto()">
+                    <mat-icon>add</mat-icon>
+                    Agregar Contacto
+                </button>
+            </div>
+
+            <!-- Barra de carga -->
+            @if (isLoading()) {
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            }
+
+            <!-- Tabla de contactos -->
+            <app-table-generic [data]="data()" [displayedColumns]="aDisplayedColumns" [totalRecords]="totalRecords()"
+                [initialPageSize]="currentPageSize" [pageSizeOptions]="pageSizeOptions" [selection]="selection"
+                [actions]="contactoActions" (pageChange)="handlePageEvent($event)"
+                (actionClicked)="onActionClicked($event)">
+
+                <!-- Columna Select -->
+                <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                            [checked]="selection.hasValue() && isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()"
+                            aria-label="Seleccionar todas las filas">
+                        </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)"
+                            [aria-label]="'Seleccionar contacto ' + row.vNombreCompleto">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
+
+                <!-- Columna Nombre -->
+                <ng-container matColumnDef="vNombreCompleto">
+                    <th mat-header-cell *matHeaderCellDef>Nombre Completo</th>
+                    <td mat-cell *matCellDef="let element">{{ element.vNombreCompleto }}</td>
+                </ng-container>
+
+                <!-- Columna Cargo -->
+                <ng-container matColumnDef="vCargo">
+                    <th mat-header-cell *matHeaderCellDef>Cargo</th>
+                    <td mat-cell *matCellDef="let element">{{ element.vCargo }}</td>
+                </ng-container>
+
+                <!-- Columna Celular -->
+                <ng-container matColumnDef="vCelular">
+                    <th mat-header-cell *matHeaderCellDef>Celular</th>
+                    <td mat-cell *matCellDef="let element">{{ element.vCelular }}</td>
+                </ng-container>
+
+                <!-- Columna Correo -->
+                <ng-container matColumnDef="vCorreo">
+                    <th mat-header-cell *matHeaderCellDef>Correo</th>
+                    <td mat-cell *matCellDef="let element">{{ element.vCorreo }}</td>
+                </ng-container>
+
+                <!-- Columna Estado -->
+                <ng-container matColumnDef="bActivo">
+                    <th mat-header-cell *matHeaderCellDef>Estado</th>
+                    <td mat-cell *matCellDef="let element">
+                        <app-estado-general [iIdEstado]="element.bActivo ? 1 : 2"
+                            [vNombreEstado]="element.bActivo ? 'Activo' : 'Inactivo'">
+                        </app-estado-general>
+                    </td>
+                </ng-container>
+            </app-table-generic>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="onClose()">Cerrar</button>
+    </mat-dialog-actions>
+</div>

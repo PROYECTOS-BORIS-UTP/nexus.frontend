@@ -5,6 +5,6 @@ export const SERVICIO_ROUTES: Routes = [
     {
         path: ''
         , component: ServicioPage
-        , data: { breadcrumb: 'Almacén', icon: 'forklift' }
+        , data: { breadcrumb: 'Servicios', icon: 'forklift' }
     }
 ];

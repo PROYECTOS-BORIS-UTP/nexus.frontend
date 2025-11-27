@@ -1,0 +1,49 @@
+<h2 mat-dialog-title>{{ isEdit() ? 'Editar' : 'Crear' }} Unidad de Medida</h2>
+
+@if (isLoading()) {
+<mat-progress-bar mode="indeterminate" class="dialog-progress-bar"></mat-progress-bar>
+}
+
+<mat-dialog-content>
+    <form [formGroup]="form" class="unidad-medida-form-container">
+
+        <mat-form-field appearance="outline">
+            <mat-label>Descripción</mat-label>
+            <input matInput formControlName="vDescripcion" required maxlength="100">
+            @if (form.controls['vDescripcion'].hasError('required')) {
+            <mat-error>La descripción es requerida.</mat-error>
+            }
+            @if (form.controls['vDescripcion'].hasError('maxlength')) {
+            <mat-error>La descripción no puede exceder 100 caracteres.</mat-error>
+            }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Abreviatura</mat-label>
+            <input matInput formControlName="vAbreviatura" required maxlength="20" style="text-transform: uppercase;">
+            @if (form.controls['vAbreviatura'].hasError('required')) {
+            <mat-error>La abreviatura es requerida.</mat-error>
+            }
+            @if (form.controls['vAbreviatura'].hasError('maxlength')) {
+            <mat-error>La abreviatura no puede exceder 20 caracteres.</mat-error>
+            }
+            <mat-hint>Ej: KG, M, UND, L</mat-hint>
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="bActivo" color="primary">
+            Estado: {{ form.value.bActivo ? 'Activo' : 'Inactivo' }}
+        </mat-slide-toggle>
+
+        <input type="hidden" formControlName="iIdUnidadMedida">
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onClose()" [disabled]="isLoading()">
+        <mat-icon>cancel</mat-icon> Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="isLoading() || form.invalid">
+        <mat-icon>save</mat-icon> Guardar
+    </button>
+</mat-dialog-actions>

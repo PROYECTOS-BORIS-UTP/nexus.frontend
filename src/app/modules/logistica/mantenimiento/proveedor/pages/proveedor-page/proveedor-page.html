@@ -1,0 +1,65 @@
+<div class="page-container">
+    <div class="controls-container">
+        <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar Proveedor</mat-label>
+            <input matInput (input)="applyFilter($event)" placeholder="Escribe RUC o Razón Social..." #inputFilter>
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="actions-container">
+            <button mat-raised-button color="primary" (click)="onAddProveedor()" class="btnAgregar">
+                <mat-icon>add</mat-icon>
+                <span>Agregar Proveedor</span>
+            </button>
+        </div>
+    </div>
+
+    @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <app-table-generic #table [data]="data()" [displayedColumns]="aDisplayedColumns" [selection]="selection"
+        [actions]="proveedorActions" [totalRecords]="totalRecords()" [pageSizeOptions]="pageSizeOptions"
+        [initialPageSize]="currentPageSize" (actionClicked)="onActionClicked($event)"
+        (pageChange)="handlePageEvent($event)">
+
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Seleccionar todas las filas">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)" [aria-label]="'Seleccionar proveedor ' + row.vRazonSocial">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vRUC">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> RUC </th>
+            <td mat-cell *matCellDef="let element"> {{element.vRUC}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vRazonSocial">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Razón Social </th>
+            <td mat-cell *matCellDef="let element"> {{element.vRazonSocial}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vDireccion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Dirección </th>
+            <td mat-cell *matCellDef="let element"> {{element.vDireccion || 'N/A'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="bActivo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+            <td mat-cell *matCellDef="let element">
+                <app-estado-general [iIdEstado]="element.bActivo ? 1 : 2"
+                    [vNombreEstado]="element.bActivo ? 'Activo' : 'Inactivo'">
+                </app-estado-general>
+            </td>
+        </ng-container>
+
+    </app-table-generic>
+</div>

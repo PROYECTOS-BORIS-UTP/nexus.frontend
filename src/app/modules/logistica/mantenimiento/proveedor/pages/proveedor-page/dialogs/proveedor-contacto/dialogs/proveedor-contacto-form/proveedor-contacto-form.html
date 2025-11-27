@@ -1,0 +1,76 @@
+<div class="contacto-form-container">
+    <h2 mat-dialog-title>
+        <mat-icon>{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
+        {{ titulo }}
+    </h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSave()">
+        <mat-dialog-content>
+            <div class="form-grid">
+                <!-- Nombre Completo -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Nombre Completo</mat-label>
+                    <input matInput formControlName="vNombreCompleto" placeholder="Ej: Juan Pérez" required>
+                    @if (form.get('vNombreCompleto')?.hasError('required')) {
+                    <mat-error>El nombre es obligatorio</mat-error>
+                    }
+                    @if (form.get('vNombreCompleto')?.hasError('maxlength')) {
+                    <mat-error>Máximo 255 caracteres</mat-error>
+                    }
+                </mat-form-field>
+
+                <!-- Cargo -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Cargo</mat-label>
+                    <input matInput formControlName="vCargo" placeholder="Ej: Gerente de Ventas">
+                    @if (form.get('vCargo')?.hasError('maxlength')) {
+                    <mat-error>Máximo 100 caracteres</mat-error>
+                    }
+                </mat-form-field>
+
+                <!-- Celular -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Celular</mat-label>
+                    <input matInput formControlName="vCelular" placeholder="Ej: 999888777">
+                    @if (form.get('vCelular')?.hasError('maxlength')) {
+                    <mat-error>Máximo 20 caracteres</mat-error>
+                    }
+                </mat-form-field>
+
+                <!-- Correo -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Correo Electrónico</mat-label>
+                    <input matInput formControlName="vCorreo" placeholder="Ej: juan.perez@empresa.com" type="email">
+                    @if (form.get('vCorreo')?.hasError('email')) {
+                    <mat-error>Ingrese un correo válido</mat-error>
+                    }
+                    @if (form.get('vCorreo')?.hasError('maxlength')) {
+                    <mat-error>Máximo 100 caracteres</mat-error>
+                    }
+                </mat-form-field>
+
+                <!-- Activo -->
+                <div class="checkbox-container">
+                    <mat-checkbox formControlName="bActivo" color="primary">
+                        Contacto Activo
+                    </mat-checkbox>
+                </div>
+            </div>
+        </mat-dialog-content>
+
+        <mat-dialog-actions align="end">
+            <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading()">
+                Cancelar
+            </button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || isLoading()">
+                @if (!isLoading()) {
+                <mat-icon>save</mat-icon>
+                }
+                @if (isLoading()) {
+                <mat-progress-bar mode="indeterminate" class="btn-spinner"></mat-progress-bar>
+                }
+                <span>{{ isEditMode ? 'Actualizar' : 'Guardar' }}</span>
+            </button>
+        </mat-dialog-actions>
+    </form>
+</div>
