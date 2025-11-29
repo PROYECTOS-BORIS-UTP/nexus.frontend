@@ -7,6 +7,11 @@ import { IPaginationResponse } from '../../../../../core/interfaces/IPaginationR
 import { handleHttpError } from '../../../../../core/utils/error-handler.utils';
 import { IFamiliaListadoRequest } from '../interfaces/request/IFamiliaListadoRequest.interface';
 import { IFamiliaResponse } from '../interfaces/response/IFamiliaResponse.interface';
+import { IFamiliaCreateUpdateRequest } from '../interfaces/request/IFamiliaCreateUpdateRequest.interface';
+import { IFamiliaCreateUpdateResponse } from '../interfaces/response/IFamiliaCreateUpdateResponse.interface';
+import { IFamiliaDeleteRequest } from '../interfaces/request/IFamiliaDeleteRequest.interface';
+import { IFamiliaDeleteResponse } from '../interfaces/response/IFamiliaDeleteResponse.interface';
+
 
 @Injectable({
     providedIn: 'root'
@@ -33,4 +38,38 @@ export class FamiliaService {
         );
     }
     // #endregion
+
+
+    // #region Crear/Actualizar
+    crearActualizarFamilia(request: IFamiliaCreateUpdateRequest): Observable<IFamiliaCreateUpdateResponse> {
+        const url = `${this.apiUrl}/CrearActualizarFamilia`;
+        return this.http.post<IApiResponse<IFamiliaCreateUpdateResponse>>(url, request).pipe(
+            map(response => {
+                if (response.bStatus && response.aData) {
+                    return response.aData;
+                } else {
+                    throw new Error(response.vMessage || 'Error al guardar la familia');
+                }
+            }),
+            catchError(handleHttpError)
+        );
+    }
+    // #endregion
+
+    // #region Eliminar
+    eliminarFamilia(request: IFamiliaDeleteRequest): Observable<IFamiliaDeleteResponse> {
+        const url = `${this.apiUrl}/EliminarFamilia/${request.iIdFamilia}`;
+        return this.http.delete<IApiResponse<IFamiliaDeleteResponse>>(url).pipe(
+            map(response => {
+                if (response.bStatus && response.aData) {
+                    return response.aData;
+                } else {
+                    throw new Error(response.vMessage || 'Error al eliminar la familia');
+                }
+            }),
+            catchError(handleHttpError)
+        );
+    }
+    // #endregion
+
 }
