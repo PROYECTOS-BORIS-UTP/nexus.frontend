@@ -170,27 +170,53 @@ export class OrdenCompraPage implements OnInit, OnDestroy {
 			case 'delete':
 				this.onDeleteOrdenCompra(event.element);
 				break;
-				dFechaEntrega: (ordenCompra.dFechaEntrega as any),
-					iIdMoneda: ordenCompra.iIdMoneda,
-						nTipoCambio: ordenCompra.nTipoCambio,
-							iIdFormaPago: ordenCompra.iIdFormaPago,
-								nSubTotal: ordenCompra.nSubTotal,
-									nIGV: ordenCompra.nIGV,
-										nTotal: ordenCompra.nTotal,
-											vObservacion: ordenCompra.vObservacion,
-												vLugarEntrega: ordenCompra.vLugarEntrega,
-													iIdEstado: ordenCompra.iIdEstado,
-														bActivo: ordenCompra.bActivo
-		};
+			default:
+				console.warn(`Acción desconocida: ${event.action}`);
+		}
+	}
+	// #endregion
 
-		// Parche temporal: Asignar iIdProveedor si viniera en 'any' o si modifico la interfaz.
-		// Voy a modificar la interfaz IOrdenCompraResponse para agregar iIdProveedor.
+	// #region Apertura de Diálogos
+	onAddOrdenCompra(): void {
+		const dialogRef = this.dialog.open(OrdenCompraForm, {
+			width: '100%',
+			maxWidth: '1050px',
+			disableClose: true,
+			data: {}
+		});
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result) {
+				this.cargarOrdenesCompra();
+			}
+		});
+	}
+
+	onEditOrdenCompra(ordenCompra: IOrdenCompraResponse): void {
+		const dataParaForm: IOrdenCompraCreateUpdateRequest = {
+			iIdOrdenCompra: ordenCompra.iIdOrdenCompra,
+			iIdCompania: ordenCompra.iIdCompania,
+			iIdProveedor: ordenCompra.iIdProveedor,
+			vNumeroOrden: ordenCompra.vNumeroOrden,
+			dFechaEmision: (ordenCompra.dFechaEmision as any),
+			dFechaEntrega: (ordenCompra.dFechaEntrega as any),
+			iIdMoneda: ordenCompra.iIdMoneda,
+			nTipoCambio: ordenCompra.nTipoCambio,
+			iIdFormaPago: ordenCompra.iIdFormaPago,
+			nSubTotal: ordenCompra.nSubTotal,
+			nIGV: ordenCompra.nIGV,
+			nTotal: ordenCompra.nTotal,
+			vObservacion: ordenCompra.vObservacion,
+			vLugarEntrega: ordenCompra.vLugarEntrega,
+			iIdEstado: ordenCompra.iIdEstado,
+			bActivo: ordenCompra.bActivo
+		};
 
 		const dialogRef = this.dialog.open(OrdenCompraForm, {
 			width: '100%',
 			maxWidth: '1050px',
 			disableClose: true,
-			data: { ordenCompra: { ...dataParaForm, iIdProveedor: (ordenCompra as any).iIdProveedor } }
+			data: { ordenCompra: dataParaForm }
 		});
 
 		dialogRef.afterClosed().subscribe(result => {
