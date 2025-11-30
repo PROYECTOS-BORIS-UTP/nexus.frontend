@@ -1,0 +1,219 @@
+<h2 mat-dialog-title>{{ isEdit() ? 'Editar' : 'Crear' }} Orden de Servicio</h2>
+
+@if (isLoading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<mat-dialog-content class="custom-dialog-content">
+    <form [formGroup]="form" class="oc-form-container">
+
+        <div class="section-header">
+            <mat-icon>info</mat-icon> Datos Generales
+        </div>
+
+        <!-- Fila 1: Serie, Numero, Fecha Emision -->
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>N° Orden</mat-label>
+                <input matInput formControlName="vNumeroOrden" placeholder="Generado Autom." readonly>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>F. Emisión</mat-label>
+                <input matInput [matDatepicker]="pickerEmi" formControlName="dFechaEmision" readonly>
+                <mat-datepicker-toggle matSuffix [for]="pickerEmi"></mat-datepicker-toggle>
+                <mat-datepicker #pickerEmi></mat-datepicker>
+                @if (form.get('dFechaEmision')?.hasError('required')) {
+                <mat-error>Requerido</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>F. Inicio</mat-label>
+                <input matInput [matDatepicker]="pickerIni" formControlName="dFechaInicio" readonly>
+                <mat-datepicker-toggle matSuffix [for]="pickerIni"></mat-datepicker-toggle>
+                <mat-datepicker #pickerIni></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>F. Fin</mat-label>
+                <input matInput [matDatepicker]="pickerFin" formControlName="dFechaFin" readonly>
+                <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+                <mat-datepicker #pickerFin></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <!-- Fila 2: Compania, Proveedor -->
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Compañía</mat-label>
+                <mat-select formControlName="iIdCompania">
+                    @if (isLoadingCompanias()) { <mat-option disabled>Cargando...</mat-option> }
+                    @for(item of selectCompanias(); track item.iIdElemento) {
+                    <mat-option [value]="item.iIdElemento">{{ item.vDescripcion }}</mat-option>
+                    }
+                </mat-select>
+                @if (form.get('iIdCompania')?.hasError('required')) {
+                <mat-error>Requerido</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Proveedor</mat-label>
+                <mat-select formControlName="iIdProveedor">
+                    @if (isLoadingProveedores()) { <mat-option disabled>Cargando...</mat-option> }
+                    @for(item of selectProveedores(); track item.iIdElemento) {
+                    <mat-option [value]="item.iIdElemento">{{ item.vDescripcion }}</mat-option>
+                    }
+                </mat-select>
+                @if (form.get('iIdProveedor')?.hasError('required')) {
+                <mat-error>Requerido</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <!-- Fila 3: Moneda, Tipo Cambio, Forma Pago -->
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Moneda</mat-label>
+                <mat-select formControlName="iIdMoneda">
+                    @if (isLoadingMonedas()) { <mat-option disabled>Cargando...</mat-option> }
+                    @for(item of selectMonedas(); track item.iIdElemento) {
+                    <mat-option [value]="item.iIdElemento">{{ item.vDescripcion }}</mat-option>
+                    }
+                </mat-select>
+                @if (form.get('iIdMoneda')?.hasError('required')) {
+                <mat-error>Requerido</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Tipo Cambio</mat-label>
+                <input matInput type="number" formControlName="nTipoCambio" min="0">
+                @if (form.get('nTipoCambio')?.hasError('required')) {
+                <mat-error>Requerido</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Forma Pago</mat-label>
+                <mat-select formControlName="iIdFormaPago">
+                    @if (isLoadingFormasPago()) { <mat-option disabled>Cargando...</mat-option> }
+                    @for(item of selectFormasPago(); track item.iIdElemento) {
+                    <mat-option [value]="item.iIdElemento">{{ item.vDescripcion }}</mat-option>
+                    }
+                </mat-select>
+                @if (form.get('iIdFormaPago')?.hasError('required')) {
+                <mat-error>Requerido</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <!-- Fila 5: Observacion -->
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Observación</mat-label>
+            <textarea matInput formControlName="vObservacion" rows="2" maxlength="1000"></textarea>
+        </mat-form-field>
+
+
+        <div class="detail-actions-container">
+            <div class="section-header">
+                <mat-icon>shopping_cart</mat-icon> Detalle de Servicios
+            </div>
+            <button mat-mini-fab color="primary" type="button" (click)="agregarDetalle()" matTooltip="Agregar Servicio">
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
+
+        <div class="table-wrapper" formArrayName="detalles">
+            <table class="detail-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Servicio</th>
+                        <th style="width: 25%;">Descripción</th>
+                        <th style="width: 10%;">Cant.</th>
+                        <th style="width: 15%;">P. Unit.</th>
+                        <th style="width: 15%;">Total</th>
+                        <th style="width: 10%;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (control of detallesArr.controls; track $index) {
+                    <tr [formGroupName]="$index">
+                        <td>
+                            <mat-form-field appearance="outline" class="dense-form-field">
+                                <mat-select formControlName="iIdServicio" placeholder="Seleccionar Servicio">
+                                    @for(item of selectServicios(); track item.iIdElemento) {
+                                    <mat-option [value]="item.iIdElemento">{{ item.vDescripcion }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field appearance="outline" class="dense-form-field">
+                                <input matInput formControlName="vDescripcionEspecifica" placeholder="Detalle...">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field appearance="outline" class="dense-form-field">
+                                <input matInput type="number" formControlName="dCantidad" min="0"
+                                    (input)="calcularTotales()">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field appearance="outline" class="dense-form-field">
+                                <input matInput type="number" formControlName="dPrecioUnitario" min="0"
+                                    (input)="calcularTotales()">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field appearance="outline" class="dense-form-field">
+                                <input matInput type="number" formControlName="dTotalLinea" readonly>
+                            </mat-form-field>
+                        </td>
+                        <td class="text-center">
+                            <button mat-icon-button color="warn" type="button" (click)="eliminarDetalle($index)"
+                                matTooltip="Eliminar">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </td>
+                    </tr>
+                    }
+
+                    @if (detallesArr.length === 0) {
+                    <tr>
+                        <td colspan="6" class="empty-message">
+                            No hay servicios agregados. Haga clic en "+" para añadir.
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="totales-container">
+            <div class="total-row">
+                <span>SubTotal:</span>
+                <span class="amount">{{ form.get('nSubTotal')?.value | number:'1.2-2' }}</span>
+            </div>
+            <div class="total-row">
+                <span>IGV (18%):</span>
+                <span class="amount">{{ form.get('nIGV')?.value | number:'1.2-2' }}</span>
+            </div>
+            <div class="total-row main-total">
+                <span>TOTAL:</span>
+                <span class="amount">{{ form.get('nTotal')?.value | number:'1.2-2' }}</span>
+            </div>
+        </div>
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onClose()" [disabled]="isLoading()">
+        <mat-icon>cancel</mat-icon> Cerrar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="isLoading()">
+        <mat-icon>save</mat-icon> Guardar
+    </button>
+</mat-dialog-actions>

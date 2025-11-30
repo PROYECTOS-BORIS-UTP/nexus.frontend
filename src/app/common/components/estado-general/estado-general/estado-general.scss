@@ -33,21 +33,24 @@
 
         &.status-active {
             background-color: var(--status-active-bg) !important;
-            .mdc-evolution-chip__text-label{
+
+            .mdc-evolution-chip__text-label {
                 color: var(--status-active-text) !important;
             }
         }
 
         &.status-inactive {
             background-color: var(--status-inactive-bg) !important;
-            .mdc-evolution-chip__text-label{
+
+            .mdc-evolution-chip__text-label {
                 color: var(--status-inactive-text) !important;
             }
         }
 
         &.status-pending {
             background-color: var(--status-pending-bg) !important;
-            .mdc-evolution-chip__text-label{
+
+            .mdc-evolution-chip__text-label {
                 color: var(--status-pending-text) !important;
             }
         }

@@ -1,1 +1,70 @@
-<p>orden-servicio-page works!</p>
+<div class="page-container">
+    <div class="controls-container">
+        <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar Orden de Servicio</mat-label>
+            <input matInput (input)="applyFilter($event)" placeholder="Escribe N° de orden..." #inputFilter>
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="actions-container">
+            <button mat-raised-button color="primary" (click)="onAddOrdenServicio()" class="btnAgregar">
+                <mat-icon>add</mat-icon>
+                <span>Nueva Orden de Servicio</span>
+            </button>
+        </div>
+    </div>
+
+    @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <app-table-generic #table [data]="data()" [displayedColumns]="aDisplayedColumns" [selection]="selection"
+        [actions]="ordenServicioActions" [totalRecords]="totalRecords()" [pageSizeOptions]="pageSizeOptions"
+        [initialPageSize]="currentPageSize" (actionClicked)="onActionClicked($event)"
+        (pageChange)="handlePageEvent($event)">
+
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Seleccionar todas las filas">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)" [aria-label]="'Seleccionar O.S. ' + row.vNumeroOrden">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vNumeroOrden">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Número </th>
+            <td mat-cell *matCellDef="let element"> {{element.vNumeroOrden}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dFechaEmision">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> F. Emisión </th>
+            <td mat-cell *matCellDef="let element"> {{element.dFechaEmision | date:'dd/MM/yyyy'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vProveedorNombre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Proveedor </th>
+            <td mat-cell *matCellDef="let element"> {{element.vProveedorNombre}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="nTotal">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total </th>
+            <td mat-cell *matCellDef="let element"> {{element.nTotal | currency:'PEN':'symbol-narrow':'1.2-2'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="iIdEstado">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+            <td mat-cell *matCellDef="let element">
+                <app-estado-general [iIdEstado]="element.iIdEstado">
+                </app-estado-general>
+            </td>
+        </ng-container>
+
+    </app-table-generic>
+
+</div>
