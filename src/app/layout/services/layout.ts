@@ -9,7 +9,7 @@ import { ENDPOINTS, OPCION } from '../../core/config/endpoints';
 @Injectable({
 	providedIn: 'root'
 })
-export class Layout {
+export class LayoutService {
 
 	private URL_BASE = environment.UrlBase;
 	private readonly http = inject(HttpClient);
