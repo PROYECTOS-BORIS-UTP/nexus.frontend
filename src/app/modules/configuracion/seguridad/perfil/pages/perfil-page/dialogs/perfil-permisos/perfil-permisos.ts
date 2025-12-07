@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Layout } from '../../../../../../../../layout/services/layout';
+import { LayoutService } from '../../../../../../../../layout/services/layout';
 
 export interface PerfilPermisosData {
 	iIdPerfil: number;
@@ -50,7 +50,7 @@ export class PerfilPermisos {
 	private dialogRef = inject(MatDialogRef<PerfilPermisos>);
 	private perfilService = inject(PerfilService);
 	private snackBar = inject(MatSnackBar);
-	private layoutService = inject(Layout);
+	private layoutService = inject(LayoutService);
 	// #endregion
 
 	// #region Estado del Componente

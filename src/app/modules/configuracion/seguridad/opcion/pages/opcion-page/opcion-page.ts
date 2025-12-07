@@ -33,7 +33,7 @@ export class OpcionPage {
 	private opcionService = inject(OpcionService);
 	private dialog = inject(MatDialog);
 	private snackBar = inject(MatSnackBar);
-	
+
 	// Títulos para cada nivel de columna
 	private columnTitles: string[] = ['NIVEL 1 - MENÚ', 'NIVEL 2', 'NIVEL 3'];
 	// Arreglo que contendrá todas nuestras columnas
@@ -56,7 +56,7 @@ export class OpcionPage {
 		const request: IOpcionListadoRequest = {
 			...this.defaultPagination,
 			iIdOpcionP: parentId,
-			bActivo: true
+			// bActivo: true
 		};
 
 		this.opcionService.listarOpciones(request).subscribe({

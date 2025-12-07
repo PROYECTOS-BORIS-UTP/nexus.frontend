@@ -1,33 +1,53 @@
-<mat-toolbar color="primary">
-	<button
-		mat-button 
-		[matMenuTriggerFor]="uiKitMenu" 
-		#menuTrigger="matMenuTrigger"
-	>
-		UI Kits
-		<mat-icon>expand_more</mat-icon>
-	</button>
+<mat-toolbar class="navbar">
+	<div class="navbar-container">
+		<!-- Search Section (Left) -->
+		<div class="search-section">
+			<div class="search-bar">
+				<mat-icon>search</mat-icon>
+				<input type="text" placeholder="Search..." />
+			</div>
+		</div>
 
-	<span class="spacer"></span>
-	<span>Quantum App</span>
-</mat-toolbar>
+		<span class="spacer"></span>
 
-<mat-menu
-	#uiKitMenu="matMenu"
-	class="mega-menu-panel" 
-	(mouseleave)="closeMegaMenu(menuTrigger)"
->	
-	<div (click)="$event.stopPropagation()">
-		<mat-list>
-		<a mat-list-item routerLink="/ui-kits/alerts">
-			<mat-icon>notifications</mat-icon> Alerts
-		</a>
-		<a mat-list-item routerLink="/ui-kits/accordions">
-			<mat-icon>view_day</mat-icon> Accordions
-		</a>
-		<a mat-list-item routerLink="/ui-kits/badges">
-			<mat-icon>badge</mat-icon> Badges
-		</a>
-		</mat-list>
+		<!-- Right Actions -->
+		<div class="actions-section">
+			<button mat-icon-button class="action-btn">
+				<mat-icon>notifications_none</mat-icon>
+			</button>
+
+			<button mat-icon-button class="action-btn" [matMenuTriggerFor]="settingsMenu">
+				<mat-icon>settings</mat-icon>
+			</button>
+
+			<mat-menu #settingsMenu="matMenu">
+				<button mat-menu-item (click)="setTheme('default')">
+					<mat-icon class="color-icon" style="color: #8b5cf6">circle</mat-icon>
+					<span>Violet (Default)</span>
+				</button>
+				<button mat-menu-item (click)="setTheme('theme-indigo')">
+					<mat-icon class="color-icon" style="color: #6366f1">circle</mat-icon>
+					<span>Indigo</span>
+				</button>
+				<button mat-menu-item (click)="setTheme('theme-rose')">
+					<mat-icon class="color-icon" style="color: #f43f5e">circle</mat-icon>
+					<span>Rose</span>
+				</button>
+				<button mat-menu-item (click)="setTheme('theme-azure')">
+					<mat-icon class="color-icon" style="color: #0ea5e9">circle</mat-icon>
+					<span>Azure</span>
+				</button>
+				<button mat-menu-item (click)="setTheme('theme-cyan')">
+					<mat-icon class="color-icon" style="color: #06b6d4">circle</mat-icon>
+					<span>Cyan</span>
+				</button>
+			</mat-menu>
+
+			<button mat-button class="profile-btn">
+				<img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" alt="Avatar"
+					class="avatar">
+				<span>Admin</span>
+			</button>
+		</div>
 	</div>
-</mat-menu>
+</mat-toolbar>
