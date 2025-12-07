@@ -12,8 +12,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from '../../../shared/components/dialogs/confirm-dialog/confirm-dialog';
 
 import { IOpcionByUserRequest, IOpcionByUserResponse } from '../../interfaces/ISideBar.interface';
-import { Layout } from '../../services/layout';
 import { Observable } from 'rxjs';
+import { LayoutService } from '../../services/layout';
 
 @Component({
 	selector: 'app-sidebar',
@@ -35,7 +35,7 @@ export class Sidebar {
 	// Inyección de dependencias moderna con inject()
 	private readonly dialog = inject(MatDialog);
 	private readonly authService = inject(Auth);
-	private readonly layoutService = inject(Layout);
+	private readonly layoutService = inject(LayoutService);
 	private readonly router = inject(Router);
 
 	isSubmenuOpen = false;
@@ -101,7 +101,7 @@ export class Sidebar {
 		if (!item.children || item.children.length === 0) {
 			this.isSubmenuOpen = false;
 			this.selectedMenu = null;
-			if(item.vRuta) {
+			if (item.vRuta) {
 				this.router.navigate([item.vRuta]);
 			}
 			return;
@@ -133,7 +133,7 @@ export class Sidebar {
 	}
 
 	closeSubmenu(): void {
-        this.isSubmenuOpen = false;
-        this.selectedMenu = null;
-    }
+		this.isSubmenuOpen = false;
+		this.selectedMenu = null;
+	}
 }

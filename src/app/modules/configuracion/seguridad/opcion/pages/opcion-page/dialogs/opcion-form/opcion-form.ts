@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
+import { LayoutService } from '../../../../../../../../layout/services/layout';
 
 export interface IOpcionFormData {
 	opcion?: IOpcionListadoResponse;
@@ -36,6 +37,7 @@ export interface IOpcionFormData {
 export class OpcionForm {
 	private fb = inject(FormBuilder);
 	private opcionService = inject(OpcionService);
+	private layoutService = inject(LayoutService);
 	public dialogRef = inject(MatDialogRef<OpcionForm>);
 	public data: IOpcionFormData = inject(MAT_DIALOG_DATA);
 
@@ -95,6 +97,7 @@ export class OpcionForm {
 		this.opcionService.crearActualizarOpcion(request).subscribe({
 			next: (response) => {
 				this.dialogRef.close(true);
+				this.layoutService.reloadMenu().subscribe();
 			},
 			error: (err) => {
 				console.error('Error al guardar', err);
