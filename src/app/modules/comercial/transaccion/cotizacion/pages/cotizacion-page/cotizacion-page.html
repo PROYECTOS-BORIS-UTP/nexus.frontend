@@ -1,1 +1,116 @@
-<p>cotizacion-page works!</p>
+<div class="page-container animate__animated animate__fadeIn">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                <mat-icon class="text-indigo-600 dark:text-indigo-400">request_quote</mat-icon>
+                Gestión de Cotizaciones
+            </h1>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                Administra las cotizaciones de servicios para tus clientes
+            </p>
+        </div>
+    </div>
+
+    <!-- Controls (Search & Actions) -->
+    <div class="controls-container">
+        <div class="filter-group">
+            <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+                <mat-label>Buscar por Nro. Cotización</mat-label>
+                <input matInput (keyup)="applyFilter($event)" placeholder="Ej. COT-2023-001" #input autocomplete="off">
+                <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+        </div>
+
+        <div class="actions-container">
+            <button mat-raised-button color="primary" class="btnAgregar" (click)="onAddCotizacion()">
+                <mat-icon>add</mat-icon>
+                Nueva Cotización
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading Bar -->
+    @if(isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <!-- Table -->
+    <app-table-generic [data]="data()" [displayedColumns]="aDisplayedColumns" [selection]="selection"
+        [actions]="cotizacionActions" [totalRecords]="totalRecords()" [pageSizeOptions]="pageSizeOptions"
+        [initialPageSize]="currentPageSize" (actionClicked)="onActionClicked($event)"
+        (pageChange)="handlePageEvent($event)">
+
+        <!-- Select Column -->
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Seleccionar todas las filas">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)"
+                    [aria-label]="'Seleccionar cotización ' + row.vNumeroCotizacion">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <!-- Columns -->
+        <ng-container matColumnDef="vNumeroCotizacion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Nro. Cotización </th>
+            <td mat-cell *matCellDef="let element"> {{element.vNumeroCotizacion}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dFechaEmision">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> F. Emisión </th>
+            <td mat-cell *matCellDef="let element">
+                <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                    <mat-icon class="text-xs text-gray-400 icon-xs">calendar_today</mat-icon>
+                    {{ element.dFechaEmision | date:'dd/MM/yyyy' }}
+                </div>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="vClienteNombre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Cliente </th>
+            <td mat-cell *matCellDef="let element"> {{element.vClienteNombre}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dFechaVencimiento">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> F. Vencimiento </th>
+            <td mat-cell *matCellDef="let element">
+                <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                    <mat-icon class="text-xs text-gray-400 icon-xs">event</mat-icon>
+                    {{ element.dFechaVencimiento | date:'dd/MM/yyyy' }}
+                </div>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="nTotal">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total </th>
+            <td mat-cell *matCellDef="let element">
+                <span class="font-semibold text-gray-800 dark:text-gray-100">
+                    {{ element.nTotal | number:'1.2-2' }}
+                </span>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="iIdEstado">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+            <td mat-cell *matCellDef="let element">
+                <span class="px-3 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                                    'bg-yellow-100 text-yellow-800': element.iIdEstado === 1,
+                                    'bg-green-100 text-green-800': element.iIdEstado === 2,
+                                    'bg-red-100 text-red-800': element.iIdEstado === 3
+                                  }">
+                    {{ element.iIdEstado === 1 ? 'Pendiente' : (element.iIdEstado === 2 ? 'Aprobado' : 'Otro')
+                    }}
+                </span>
+            </td>
+        </ng-container>
+
+    </app-table-generic>
+
+</div>
