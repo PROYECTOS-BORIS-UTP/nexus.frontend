@@ -1,0 +1,93 @@
+.page-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.controls-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    background-color: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+        flex-direction: column;
+        align-items: stretch;
+
+        .filter-group,
+        .actions-container {
+            width: 100%;
+        }
+
+        .btnAgregar {
+            width: 100%;
+        }
+    }
+}
+
+.filter-group {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    min-width: 300px;
+}
+
+.search-field {
+    width: 100%;
+    font-size: 14px;
+
+    /* Ensure mat-form-field takes full height/width efficiently */
+    mat-form-field {
+        width: 100%;
+    }
+
+    mat-icon {
+        color: #757575;
+    }
+}
+
+.actions-container {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btnAgregar {
+    height: 48px;
+    padding: 0 24px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+mat-progress-bar {
+    border-radius: 4px;
+}
+
+/* Custom styles specific to CotizacionPage if any, preserving the icon style */
+.icon-xs {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+}
+
+/* Dark mode support if applicable based on HTML classes seen previously */
+:host-context(.dark) {
+    .controls-container {
+        background-color: #1f2937;
+        /* gray-800 */
+        border: 1px solid #374151;
+        /* gray-700 */
+    }
+
+    .search-field mat-icon {
+        color: #9ca3af;
+        /* gray-400 */
+    }
+}

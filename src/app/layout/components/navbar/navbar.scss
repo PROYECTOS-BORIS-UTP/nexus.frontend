@@ -1,18 +1,109 @@
+.navbar {
+    background: #ffffff;
+    color: #333;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 0;
+    height: 70px;
+    position: relative;
+    z-index: 2;
+}
+
+.navbar-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 24px;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+/* Search Section - Now on the left */
+.search-section {
+    display: flex;
+    align-items: center;
+
+    .search-bar {
+        position: relative;
+        background: #f3f4f6;
+        border-radius: 8px;
+        padding: 0 12px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s ease;
+        width: 300px;
+        /* Wider search bar */
+
+        &:focus-within {
+            background: white;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            width: 320px;
+        }
+
+        mat-icon {
+            color: #9ca3af;
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            color: #374151;
+            width: 100%;
+
+            &::placeholder {
+                color: #9ca3af;
+            }
+        }
+    }
+}
+
 .spacer {
     flex: 1 1 auto;
-    /* Empuja los elementos a los lados */
 }
 
-mat-toolbar {
-    height: 95px;
-}
+.actions-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 
-/* Aplica estilos directamente al panel del mega menú */
-::ng-deep .mega-menu-panel {
-    min-width: 250px;
+    .action-btn {
+        color: #6b7280;
 
-    // Quita el padding por defecto del panel de menú para que la lista o tarjeta ocupe todo
-    .mat-mdc-menu-content {
-        padding: 0;
+        &:hover {
+            color: #1f2937;
+            background: #f3f4f6;
+        }
+    }
+
+    .profile-btn {
+        display: flex;
+        align-items: center;
+        padding-left: 4px;
+        padding-right: 12px;
+        margin-left: 8px;
+        border-radius: 20px;
+        border: 1px solid #e5e7eb;
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        span {
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+            bottom: 6px;
+            position: relative;
+        }
     }
 }
