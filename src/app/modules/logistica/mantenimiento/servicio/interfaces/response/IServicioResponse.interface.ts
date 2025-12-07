@@ -7,4 +7,7 @@ export interface IServicioResponse {
     dFechaCrea: Date;
     iUsuarioModifica: number;
     dFechaModifica: Date;
+
+    iIdUnidadMedida: number;
+    vUnidadMedida: string;
 }

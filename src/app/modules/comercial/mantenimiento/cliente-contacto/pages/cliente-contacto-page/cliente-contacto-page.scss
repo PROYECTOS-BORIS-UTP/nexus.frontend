@@ -1,0 +1,55 @@
+.contacto-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 1.5rem;
+        border-bottom: 1px solid #e0e0e0;
+
+        h2[mat-dialog-title] {
+            margin: 0;
+            padding: 1.5rem 0;
+            font-size: 1.25rem;
+            color: #333;
+        }
+    }
+
+    mat-dialog-content {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow-y: auto;
+        margin: 0;
+        /* Reset margin */
+
+        .controls-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+
+            .search-field {
+                flex: 1;
+                margin-bottom: -1.25em;
+                /* Compensate for mat-form-field padding */
+            }
+
+            .btnAgregar {
+                height: 56px;
+                margin-bottom: 0px;
+            }
+        }
+
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+    }
+}

@@ -1,0 +1,228 @@
+<h2 mat-dialog-title>{{ isEdit() ? 'Editar' : 'Crear' }} Cotización</h2>
+
+@if (isLoading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<mat-dialog-content class="custom-dialog-content">
+    <form [formGroup]="form" class="cotizacion-form-container">
+
+        <div class="section-header">
+            <mat-icon>info</mat-icon> Información General
+        </div>
+
+        <!-- Fila 1: Compañía, Nro Cotizacion, Fechas -->
+        <div class="form-row">
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Nro. Cotización</mat-label>
+                <input matInput formControlName="vNumeroCotizacion" placeholder="---">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Compañía</mat-label>
+                <mat-select formControlName="iIdCompania">
+                    @for (item of selectCompanias(); track item.iIdElemento) {
+                    <mat-option [value]="item.iIdElemento">{{ item.vDescripcion }}</mat-option>
+                    }
+                </mat-select>
+                @if (isLoadingCompanias()) { <mat-icon matSuffix class="animate-spin text-gray-400">sync</mat-icon> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Fecha Emisión</mat-label>
+                <input matInput [matDatepicker]="pickerEmision" formControlName="dFechaEmision">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerEmision"></mat-datepicker-toggle>
+                <mat-datepicker #pickerEmision></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Fecha Vencimiento</mat-label>
+                <input matInput [matDatepicker]="pickerVenc" formControlName="dFechaVencimiento">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerVenc"></mat-datepicker-toggle>
+                <mat-datepicker #pickerVenc></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <!-- Fila 2: Cliente, Contacto -->
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Cliente</mat-label>
+                <mat-select formControlName="iIdCliente">
+                    @for (item of selectClientes(); track item.iIdElemento) {
+                    <mat-option [value]="item.iIdElemento">{{ item.vDescripcion }}</mat-option>
+                    }
+                </mat-select>
+                @if (isLoadingClientes()) { <mat-icon matSuffix class="animate-spin text-gray-400">sync</mat-icon> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Contacto</mat-label>
+                <mat-select formControlName="iIdClienteContacto">
+                    @if (selectContactos().length === 0) {
+                    <mat-option disabled>Seleccione Cliente primero</mat-option>
+                    }
+                    @for (item of selectContactos(); track item.iIdElemento) {
+                    <mat-option [value]="item.iIdElemento">{{ item.vDescripcion }}</mat-option>
+                    }
+                </mat-select>
+                @if (isLoadingContactos()) { <mat-icon matSuffix class="animate-spin text-gray-400">sync</mat-icon> }
+            </mat-form-field>
+        </div>
+
+        <!-- Fila 3: Moneda, Tipo Cambio -->
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Moneda</mat-label>
+                <mat-select formControlName="iIdMoneda">
+                    @for (item of selectMonedas(); track item.iIdElemento) {
+                    <mat-option [value]="item.iIdElemento">{{ item.vDescripcion }}</mat-option>
+                    }
+                </mat-select>
+                @if (isLoadingMonedas()) { <mat-icon matSuffix class="animate-spin text-gray-400">sync</mat-icon> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Tipo Cambio</mat-label>
+                <input matInput type="number" formControlName="nTipoCambio" min="0">
+            </mat-form-field>
+        </div>
+
+        <!-- Observaciones y Condiciones -->
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Observaciones</mat-label>
+                <textarea matInput formControlName="vObservacion" rows="2"
+                    placeholder="Observaciones generales..."></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Condiciones Comerciales</mat-label>
+                <textarea matInput formControlName="vCondicionesComerciales" rows="2"
+                    placeholder="Pago a 30 días..."></textarea>
+            </mat-form-field>
+        </div>
+
+
+        <!-- Detalles / Servicios -->
+        <div class="detail-actions-container">
+            <div class="section-header">
+                <mat-icon>shopping_cart</mat-icon> Detalle de Servicios
+            </div>
+            <button mat-mini-fab color="primary" type="button" (click)="abrirSelectorServicios()"
+                matTooltip="Agregar servicio">
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
+
+
+        <div class="table-wrapper">
+            <table class="detail-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Servicio</th>
+                        <th style="width: 25%;">Descripción Adicional</th>
+                        <th style="width: 10%;">Und.</th>
+                        <th style="width: 10%;" class="text-right">Cant.</th>
+                        <th style="width: 10%;" class="text-right">P. Unit.</th>
+                        <th style="width: 10%;" class="text-right">Total</th>
+                        <th style="width: 5%;"></th>
+                    </tr>
+                </thead>
+                <tbody formArrayName="detalles">
+                    @for (control of detallesArr.controls; track control; let i = $index) {
+                    <tr [formGroupName]="i">
+
+                        <!-- Nombre Servicio -->
+                        <td>
+                            <span class="font-medium text-gray-900 dark:text-white block">
+                                {{ control.get('vServicioNombre')?.value }}
+                            </span>
+                        </td>
+
+                        <!-- Descripción -->
+                        <td>
+                            <mat-form-field appearance="outline" class="dense-form-field">
+                                <input matInput formControlName="vDescripcion" placeholder="Detalle...">
+                            </mat-form-field>
+                        </td>
+
+                        <!-- Unidad -->
+                        <td>
+                            <mat-form-field appearance="outline" class="dense-form-field">
+                                <mat-select formControlName="iIdUnidadMedida" placeholder="U.M.">
+                                    @for(um of selectUnidadMedida(); track um.iIdElemento) {
+                                    <mat-option [value]="um.iIdElemento">{{ um.vDescripcion }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </td>
+
+                        <!-- Cantidad -->
+                        <td>
+                            <mat-form-field appearance="outline" class="dense-form-field">
+                                <input matInput type="number" class="text-right" formControlName="dCantidad" min="0.01">
+                            </mat-form-field>
+                        </td>
+
+                        <!-- Precio Unit. -->
+                        <td>
+                            <mat-form-field appearance="outline" class="dense-form-field">
+                                <input matInput type="number" class="text-right" formControlName="dPrecioUnitario"
+                                    min="0">
+                            </mat-form-field>
+                        </td>
+
+                        <!-- Total Linea -->
+                        <td class="text-right font-semibold">
+                            {{ control.get('dTotalLinea')?.value | number:'1.2-2' }}
+                        </td>
+
+                        <!-- Delete -->
+                        <td class="text-center">
+                            <button mat-icon-button color="warn" class="scale-75" (click)="eliminarDetalle(i)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                    @if (detallesArr.length === 0) {
+                    <tr>
+                        <td colspan="7" class="empty-message">
+                            No hay servicios agregados.
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totales -->
+        <div class="totales-container">
+            <div class="total-row">
+                <span class="text-gray-600 dark:text-gray-400">Sub Total:</span>
+                <span class="amount">{{ form.get('nSubTotal')?.value | number:'1.2-2' }}</span>
+            </div>
+            <div class="total-row">
+                <span class="text-gray-600 dark:text-gray-400">IGV (18%):</span>
+                <span class="amount">{{ form.get('nIGV')?.value | number:'1.2-2' }}</span>
+            </div>
+            <div class="total-row main-total">
+                <span class="text-indigo-800 dark:text-indigo-300">TOTAL:</span>
+                <span class="amount text-indigo-700 dark:text-indigo-300">{{ form.get('nTotal')?.value | number:'1.2-2'
+                    }}</span>
+            </div>
+        </div>
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="onClose()" [disabled]="isLoading()">
+        <mat-icon>cancel</mat-icon> Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="isLoading() || form.invalid">
+        <mat-icon>save</mat-icon>
+        {{ isEdit() ? 'Actualizar' : 'Guardar' }}
+    </button>
+</mat-dialog-actions>

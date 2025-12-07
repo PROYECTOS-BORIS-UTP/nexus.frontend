@@ -1,0 +1,106 @@
+:host {
+    display: block;
+    padding: 24px;
+}
+
+/* Contenedor principal de controles (flex row) */
+.controls-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 0;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+/* Campo de búsqueda */
+.search-field {
+    flex: 1;
+}
+
+/* Contenedor del botón */
+.actions-container {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Botón Agregar */
+.btnAgregar {
+    padding: 0 24px !important;
+    min-width: auto;
+    height: 48px;
+    font-size: 15px;
+    white-space: nowrap;
+
+    .mat-icon {
+        margin-right: 8px;
+    }
+}
+
+/* Tabla */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    position: relative;
+}
+
+/* Utilidades de Texto */
+.text-medium {
+    font-weight: 500;
+    color: #334155;
+}
+
+.text-bold {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.text-truncated {
+    display: block;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Estado Vacío */
+.no-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    color: #94a3b8;
+
+    mat-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    p {
+        margin: 0;
+        font-size: 16px;
+    }
+}
+
+/* Animaciones */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
