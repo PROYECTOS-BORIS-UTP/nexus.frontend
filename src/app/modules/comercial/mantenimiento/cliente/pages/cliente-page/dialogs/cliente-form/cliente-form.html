@@ -1,0 +1,102 @@
+<h2 mat-dialog-title>{{ isEdit() ? 'Editar' : 'Crear' }} Cliente</h2>
+
+@if (isLoading()) {
+<mat-progress-bar mode="indeterminate" class="dialog-progress-bar"></mat-progress-bar>
+}
+
+<mat-dialog-content>
+    <form [formGroup]="form" class="cliente-form-container">
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Compañía ID</mat-label>
+                <input matInput type="number" formControlName="iIdCompania" required>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Tipo Doc ID</mat-label>
+                <input matInput type="number" formControlName="iIdTipoDocumento" required>
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Nro Documento</mat-label>
+                <input matInput formControlName="vNumeroDocumento" required maxlength="20">
+                @if (form.controls['vNumeroDocumento'].hasError('required')) {
+                <mat-error>El Nro Documento es requerido.</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field-2">
+                <mat-label>Razón Social</mat-label>
+                <input matInput formControlName="vRazonSocial" required maxlength="255">
+                @if (form.controls['vRazonSocial'].hasError('required')) {
+                <mat-error>La razón social es requerida.</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Nombre Comercial</mat-label>
+            <input matInput formControlName="vNombreComercial" maxlength="255">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Dirección Fiscal</mat-label>
+            <input matInput formControlName="vDireccionFiscal" maxlength="500">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Dirección Entrega</mat-label>
+            <input matInput formControlName="vDireccionEntrega" maxlength="500">
+        </mat-form-field>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Teléfono</mat-label>
+                <input matInput formControlName="vTelefono" maxlength="50">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="flex-field-2">
+                <mat-label>Correo Facturación</mat-label>
+                <input matInput formControlName="vCorreoFacturacion" maxlength="150">
+                @if (form.controls['vCorreoFacturacion'].hasError('email')) {
+                <mat-error>Correo inválido</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Linea Credito</mat-label>
+                <input matInput type="number" formControlName="nLineaCredito">
+            </mat-form-field>
+            <!-- Placeholder for Vendedor and CondicionPago IDs as inputs for now since we don't have selects -->
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Vendedor ID</mat-label>
+                <input matInput type="number" formControlName="iIdVendedor">
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Cond. Pago ID</mat-label>
+                <input matInput type="number" formControlName="iIdCondicionPago">
+            </mat-form-field>
+        </div>
+
+        <mat-slide-toggle formControlName="bActivo" color="primary">
+            Estado: {{ form.value.bActivo ? 'Activo' : 'Inactivo' }}
+        </mat-slide-toggle>
+
+        <input type="hidden" formControlName="iIdCliente">
+
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onClose()" [disabled]="isLoading()">
+        <mat-icon>cancel</mat-icon> Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="isLoading() || form.invalid">
+        <mat-icon>save</mat-icon> Guardar
+    </button>
+</mat-dialog-actions>

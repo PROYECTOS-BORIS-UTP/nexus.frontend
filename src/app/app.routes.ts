@@ -7,6 +7,7 @@ import { SEGURIDAD_ROUTES } from './modules/configuracion/seguridad/seguridad.ro
 import { MAESTRAS_ROUTES } from './modules/configuracion/maestras/maestras.routes';
 import { ALMACEN_MAIN_ROUTES } from './modules/almacen/almacen-main.routes';
 import { LOGISTICA_ROUTES } from './modules/logistica/logistica.routes';
+import { COMERCIAL_ROUTES } from './modules/comercial/comercial.routes';
 export const routes: Routes = [
     {
         path: '',
@@ -42,6 +43,12 @@ export const routes: Routes = [
         , children: LOGISTICA_ROUTES
         , canActivate: [authGuard]
         , data: { breadcrumb: 'Logística', icon: 'warehouse' }
+    },
+    {
+        path: 'comercial'
+        , children: COMERCIAL_ROUTES
+        , canActivate: [authGuard]
+        , data: { breadcrumb: 'Comercial', icon: 'warehouse' }
     },
     { path: '', redirectTo: '', pathMatch: 'full' },
     { path: '**', redirectTo: '' }
