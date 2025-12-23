@@ -2,9 +2,10 @@ import { Routes } from '@angular/router';
 import { ProductoPage } from './pages/producto-page/producto-page';
 
 export const PRODUCTO_ROUTES: Routes = [
-    {
-        path: ''
-        , component: ProductoPage
-        , data: { breadcrumb: 'Producto', icon: 'forklift' }
-    }
+  {
+    path: '',
+    component: ProductoPage,
+
+    data: { breadcrumb: 'Producto', icon: 'forklift' },
+  },
 ];

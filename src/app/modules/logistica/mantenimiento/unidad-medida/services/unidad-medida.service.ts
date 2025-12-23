@@ -12,6 +12,7 @@ import { IUnidadMedidaCreateUpdateResponse } from '../interfaces/response/IUnida
 import { IUnidadMedidaDeleteRequest } from '../interfaces/request/IUnidadMedidaDeleteRequest.interface';
 import { IUnidadMedidaDeleteResponse } from '../interfaces/response/IUnidadMedidaDeleteResponse.interface';
 
+
 @Injectable({
     providedIn: 'root'
 })
@@ -37,7 +38,6 @@ export class UnidadMedidaService {
         );
     }
     // #endregion
-
     // #region Crear/Actualizar
     crearActualizarUnidadMedida(request: IUnidadMedidaCreateUpdateRequest): Observable<IUnidadMedidaCreateUpdateResponse> {
         const url = `${this.apiUrl}/CrearActualizarUnidadMedida`;
@@ -69,4 +69,5 @@ export class UnidadMedidaService {
         );
     }
     // #endregion
+
 }

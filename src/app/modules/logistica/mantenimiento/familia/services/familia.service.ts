@@ -12,6 +12,7 @@ import { IFamiliaCreateUpdateResponse } from '../interfaces/response/IFamiliaCre
 import { IFamiliaDeleteRequest } from '../interfaces/request/IFamiliaDeleteRequest.interface';
 import { IFamiliaDeleteResponse } from '../interfaces/response/IFamiliaDeleteResponse.interface';
 
+
 @Injectable({
     providedIn: 'root'
 })
@@ -37,6 +38,7 @@ export class FamiliaService {
         );
     }
     // #endregion
+
 
     // #region Crear/Actualizar
     crearActualizarFamilia(request: IFamiliaCreateUpdateRequest): Observable<IFamiliaCreateUpdateResponse> {
@@ -69,4 +71,5 @@ export class FamiliaService {
         );
     }
     // #endregion
+
 }

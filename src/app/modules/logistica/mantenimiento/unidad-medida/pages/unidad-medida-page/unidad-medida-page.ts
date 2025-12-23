@@ -1,3 +1,4 @@
+
 import { SelectionModel } from '@angular/cdk/collections';
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal, ViewChild } from '@angular/core';
@@ -227,4 +228,5 @@ export class UnidadMedidaPage {
 		});
 	}
 	// #endregion
+
 }

@@ -16,11 +16,13 @@ export const LOGISTICA_MANTENIMIENTO_ROUTES: Routes = [
                 , children: PRODUCTO_ROUTES
                 , data: { breadcrumb: 'Mantenimiento', icon: 'inventory' }
             },
+
             {
                 path: 'familia'
                 , children: FAMILIA_ROUTES
                 , data: { breadcrumb: 'Mantenimiento', icon: 'inventory' }
             },
+
             {
                 path: 'unidad-medida'
                 , children: UNIDAD_MEDIDA_ROUTES
@@ -31,11 +33,13 @@ export const LOGISTICA_MANTENIMIENTO_ROUTES: Routes = [
                 , children: SERVICIO_ROUTES
                 , data: { breadcrumb: 'Mantenimiento', icon: 'inventory' }
             },
+
             {
                 path: 'proveedor'
                 , children: PROVEEDOR_ROUTES
                 , data: { breadcrumb: 'Mantenimiento', icon: 'inventory' }
             },
+
         ],
     }
 ];
