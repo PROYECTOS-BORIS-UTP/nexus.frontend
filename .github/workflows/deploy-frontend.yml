@@ -31,6 +31,8 @@ jobs:
 
       - name: Desplegar con PM2 Serve
         shell: powershell
+        env:
+          PM2_HOME: C:\actions-runner-frontend\.pm2
         run: |
           # 1. Detenemos y borramos el proceso anterior (si existe) para refrescar configuración
           pm2 delete nexus-frontend 2> $null
