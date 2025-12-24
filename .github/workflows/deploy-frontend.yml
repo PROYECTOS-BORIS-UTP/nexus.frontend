@@ -1,0 +1,45 @@
+name: Deploy Frontend Angular
+
+on:
+  push:
+    branches: [ "DESARROLLO" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, frontend] # Tu etiqueta personalizada
+
+    steps:
+      - name: Chequear código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Construir proyecto (Build)
+        # Esto crea la carpeta 'dist'
+        run: npm run build -- --configuration production
+
+      - name: Desplegar con PM2 Serve
+        shell: powershell
+        run: |
+          # 1. Detenemos y borramos el proceso anterior (si existe) para refrescar configuración
+          pm2 delete nexus-frontend 2> $null
+          if ($LASTEXITCODE -ne 0) { Write-Host "El proceso no existía, continuando..." }
+
+          # 2. Servimos la carpeta 'dist' como una SPA
+          # OJO: Verifica si tu carpeta build termina en /browser (Angular 17+) o no.
+          # Si tu build crea dist/nexus.frontend/browser, usa esta línea:
+          pm2 serve dist/nexus.frontend/browser 4200 --spa --name "nexus-frontend"
+          
+          # Si tu build crea solo dist/nexus.frontend, borra la línea de arriba y usa esta:
+          # pm2 serve dist/nexus.frontend 4200 --spa --name "nexus-frontend"
+
+          # 3. Guardamos la lista de procesos
+          pm2 save
