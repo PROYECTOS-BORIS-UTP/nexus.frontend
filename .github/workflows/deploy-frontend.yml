@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: [self-hosted, frontend] # Tu etiqueta personalizada
+    runs-on: [self-hosted, frontend]
 
     steps:
       - name: Chequear código
@@ -22,32 +22,38 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
+      # No es estrictamente necesario instalar pm2 cada vez si ya está en el servidor,
+      # pero no hace daño dejarlo por seguridad.
       - name: Instalar PM2 Globalmente
         run: npm install -g pm2
 
       - name: Construir proyecto (Build)
-        # Esto crea la carpeta 'dist'
         run: npm run build -- --configuration production
 
-      - name: Desplegar con PM2 Serve
+      - name: Desplegar con PM2 Serve (Producción)
         shell: powershell
         env:
           PM2_HOME: C:\actions-runner-frontend\.pm2
         run: |
-          # 1. Obtenemos la lista actual de procesos
-          $pm2List = pm2 list
+          # 1. Capturamos la ruta ABSOLUTA de donde estamos parados
+          # Esto evita errores de "ruta no encontrada"
+          $AbsPath = (Get-Location).Path
+          $DistPath = "$AbsPath\dist\nexus.frontend\browser"
+          
+          Write-Host "📂 La ruta del build es: $DistPath"
 
-          # 2. Preguntamos: ¿La lista contiene el nombre "nexus-frontend"?
+          # 2. Manejo del proceso en PM2
+          $pm2List = pm2 list
           if ($pm2List -match "nexus-frontend") {
               Write-Host "🔄 El proceso existe. Eliminando para actualizar..."
               pm2 delete nexus-frontend
           } else {
-              Write-Host "✨ El proceso NO existe. Es un despliegue limpio."
+              Write-Host "✨ El proceso NO existe. Creando uno nuevo..."
           }
 
-          # 3. Levantamos el servicio con la ruta CORRECTA
-          # Agregamos '/browser' al final
-          pm2 serve dist/nexus.frontend/browser 4200 --spa --name "nexus-frontend"
+          # 3. IMPORTANTE: Usamos 'pm2 serve' porque estamos sirviendo la carpeta dist.
+          # --spa asegura que si recargas la página en una ruta interna, Angular maneje el ruteo.
+          pm2 serve $DistPath 4200 --spa --name "nexus-frontend"
 
-          # 4. Guardamos la configuración
+          # 4. Guardar configuración para que reviva si se reinicia el servidor
           pm2 save
