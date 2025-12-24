@@ -36,24 +36,23 @@ jobs:
           PM2_HOME: C:\actions-runner-frontend\.pm2
         run: |
           # 1. Capturamos la ruta ABSOLUTA de donde estamos parados
-          # Esto evita errores de "ruta no encontrada"
           $AbsPath = (Get-Location).Path
           $DistPath = "$AbsPath\dist\nexus.frontend\browser"
           
-          Write-Host "📂 La ruta del build es: $DistPath"
+          Write-Host "Ruta del build: $DistPath"
 
           # 2. Manejo del proceso en PM2
           $pm2List = pm2 list
           if ($pm2List -match "nexus-frontend") {
-              Write-Host "🔄 El proceso existe. Eliminando para actualizar..."
+              Write-Host "El proceso existe. Eliminando para actualizar..."
               pm2 delete nexus-frontend
           } else {
-              Write-Host "✨ El proceso NO existe. Creando uno nuevo..."
+              Write-Host "El proceso NO existe. Creando uno nuevo..."
           }
 
-          # 3. IMPORTANTE: Usamos 'pm2 serve' porque estamos sirviendo la carpeta dist.
-          # --spa asegura que si recargas la página en una ruta interna, Angular maneje el ruteo.
+          # 3. IMPORTANTE: Usamos pm2 serve porque estamos sirviendo la carpeta dist.
+          # --spa asegura que Angular maneje el ruteo interno.
           pm2 serve $DistPath 4200 --spa --name "nexus-frontend"
 
-          # 4. Guardar configuración para que reviva si se reinicia el servidor
+          # 4. Guardar configuracion
           pm2 save
