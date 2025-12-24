@@ -45,9 +45,9 @@ jobs:
               Write-Host "✨ El proceso NO existe. Es un despliegue limpio."
           }
 
-          # 3. Levantamos el servicio (Esto se ejecuta en ambos casos)
-          # NOTA: Confirmé en tus logs que tu build genera 'dist/nexus.frontend' sin la carpeta /browser
-          pm2 serve dist/nexus.frontend 4200 --spa --name "nexus-frontend"
+          # 3. Levantamos el servicio con la ruta CORRECTA
+          # Agregamos '/browser' al final
+          pm2 serve dist/nexus.frontend/browser 4200 --spa --name "nexus-frontend"
 
           # 4. Guardamos la configuración
           pm2 save
