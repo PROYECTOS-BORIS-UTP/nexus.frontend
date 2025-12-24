@@ -34,8 +34,10 @@ jobs:
         shell: powershell
         env:
           PM2_HOME: C:\actions-runner-frontend\.pm2
+          # ESTE ES EL TRUCO: Al poner esto vacío, el runner no rastrea ni mata el proceso
+          RUNNER_TRACKING_ID: ""
         run: |
-          # 1. Capturamos la ruta ABSOLUTA de donde estamos parados
+          # 1. Capturamos la ruta ABSOLUTA
           $AbsPath = (Get-Location).Path
           $DistPath = "$AbsPath\dist\nexus.frontend\browser"
           
@@ -50,9 +52,10 @@ jobs:
               Write-Host "El proceso NO existe. Creando uno nuevo..."
           }
 
-          # 3. IMPORTANTE: Usamos pm2 serve porque estamos sirviendo la carpeta dist.
-          # --spa asegura que Angular maneje el ruteo interno.
+          # 3. Levantamos el servicio
+          # Usamos Start-Process para desacoplarlo aún más por si acaso, 
+          # aunque el env var de arriba suele bastar.
           pm2 serve $DistPath 4200 --spa --name "nexus-frontend"
 
-          # 4. Guardar configuracion
+          # 4. Guardar configuración
           pm2 save
