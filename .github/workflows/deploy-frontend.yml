@@ -1,4 +1,4 @@
-name: Deploy Frontend Angular
+name: Deploy Frontend (Dedicated Folder)
 
 on:
   push:
@@ -10,52 +10,71 @@ jobs:
     runs-on: [self-hosted, frontend]
 
     steps:
+      # 1. Bajar código
       - name: Chequear código
         uses: actions/checkout@v4
 
+      # 2. Configurar Node
       - name: Instalar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
-      - name: Instalar dependencias
-        run: npm ci
-
-      # No es estrictamente necesario instalar pm2 cada vez si ya está en el servidor,
-      # pero no hace daño dejarlo por seguridad.
-      - name: Instalar PM2 Globalmente
-        run: npm install -g pm2
-
-      - name: Construir proyecto (Build)
-        run: npm run build -- --configuration production
-
-      - name: Desplegar con PM2 Serve (Producción)
-        shell: powershell
-        env:
-          PM2_HOME: C:\actions-runner-frontend\.pm2
-          # ESTE ES EL TRUCO: Al poner esto vacío, el runner no rastrea ni mata el proceso
-          RUNNER_TRACKING_ID: ""
+      # 3. Build (En el Runner)
+      - name: Instalar y Construir
         run: |
-          # 1. Capturamos la ruta ABSOLUTA
-          $AbsPath = (Get-Location).Path
-          $DistPath = "$AbsPath\dist\nexus.frontend\browser"
-          
-          Write-Host "Ruta del build: $DistPath"
+          npm ci
+          npm run build -- --configuration production
 
-          # 2. Manejo del proceso en PM2
-          $pm2List = pm2 list
-          if ($pm2List -match "nexus-frontend") {
-              Write-Host "El proceso existe. Eliminando para actualizar..."
-              pm2 delete nexus-frontend
-          } else {
-              Write-Host "El proceso NO existe. Creando uno nuevo..."
+      # 4. MOVER A RUTA DEDICADA (Súper Rápido en Frontend)
+      - name: Publicar en C:\proyectos\NEXUS\nexus.frontend
+        shell: powershell
+        run: |
+          # Definimos la ruta destino
+          $dest = "C:\proyectos\NEXUS\nexus.frontend"
+
+          # Si no existe, la creamos
+          if (!(Test-Path -Path $dest)) {
+              New-Item -ItemType Directory -Force -Path $dest | Out-Null
           }
 
-          # 3. Levantamos el servicio
-          # Usamos Start-Process para desacoplarlo aún más por si acaso, 
-          # aunque el env var de arriba suele bastar.
-          pm2 serve $DistPath 4200 --spa --name "nexus-frontend"
+          Write-Host "📦 Copiando archivos compilados..."
+          
+          # Copiamos SOLO la carpeta 'dist' (que es lo único que importa en Angular)
+          # Esto es muy rápido porque son pocos archivos ya comprimidos
+          Copy-Item -Path "dist" -Destination $dest -Recurse -Force
+          
+          Write-Host "✅ Archivos movidos a $dest"
 
-          # 4. Guardar configuración
+      # 5. GESTIÓN PM2 (Desde la nueva ruta)
+      - name: Desplegar con PM2 Serve
+        shell: powershell
+        env:
+          # TRUCO: Evita que el runner mate el proceso
+          RUNNER_TRACKING_ID: ""
+        run: |
+          # Definimos la ruta EXACTA donde Angular dejó el index.html
+          # OJO: Angular 17+ suele crear dist/nombre-proyecto/browser
+          $ServePath = "C:\proyectos\NEXUS\nexus.frontend\dist\nexus.frontend\browser"
+          
+          Write-Host "🚀 Sirviendo desde: $ServePath"
+
+          # Aseguramos PM2
+          npm install -g pm2
+
+          # -- GESTIÓN DEL PROCESO --
+          
+          # 1. Verificamos si existe para borrarlo y recrearlo limpio
+          $pm2List = pm2 list
+          if ($pm2List -match "nexus-frontend") {
+              Write-Host "🔄 Actualizando proceso existente..."
+              pm2 delete nexus-frontend
+          }
+
+          # 2. Levantamos el servidor estático
+          # --spa es vital para que Angular maneje las rutas
+          pm2 serve $ServePath 4200 --spa --name "nexus-frontend"
+
+          # 3. Guardar configuración
           pm2 save
