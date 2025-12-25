@@ -39,13 +39,12 @@ jobs:
               New-Item -ItemType Directory -Force -Path $dest | Out-Null
           }
 
-          Write-Host "📦 Copiando archivos compilados..."
+          Write-Host "Copiando archivos compilados..."
           
-          # Copiamos SOLO la carpeta 'dist' (que es lo único que importa en Angular)
-          # Esto es muy rápido porque son pocos archivos ya comprimidos
+          # Copiamos SOLO la carpeta 'dist'
           Copy-Item -Path "dist" -Destination $dest -Recurse -Force
           
-          Write-Host "✅ Archivos movidos a $dest"
+          Write-Host "Archivos movidos correctamente a $dest"
 
       # 5. GESTIÓN PM2 (Desde la nueva ruta)
       - name: Desplegar con PM2 Serve
