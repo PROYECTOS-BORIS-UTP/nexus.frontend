@@ -31,10 +31,10 @@
                 <div class="boxFoot">
                     <a class="forgotLink" href="#">Forget your password?</a>
                     @if (errorMessage) {
-                        <div class="error-message">
-                            {{ errorMessage }}
-                        </div>
-                    }                    
+                    <div class="error-message">
+                        {{ errorMessage }}
+                    </div>
+                    }
                     <button mat-flat-button color="primary" class="btnSubmit" (click)="onAuthentication()">
                         Sign In
                     </button>
@@ -49,11 +49,12 @@
 
 <mat-grid-tile class="boxShapeSecondary" [class.shrink]="isAnimated">
     <div class="boxShapeSecondaryText">
-        <h1>BIENVENIDO DE NUEVO</h1>
+        <h1>BIENVENIDO DE NUEVO A NEXUS</h1>
         <h4>Mantente conentado con nosotros</h4>
         <h4>Incia sesión con tu cuenta</h4>
     </div>
     <div>
-        <button matButton="outlined" extended color="primary" class="btnIniciarAnimation" (click)="onStartClick()"> <mat-icon>favorite</mat-icon> INICIAR </button>
+        <button matButton="outlined" extended color="primary" class="btnIniciarAnimation" (click)="onStartClick()">
+            <mat-icon>favorite</mat-icon> INICIAR </button>
     </div>
 </mat-grid-tile>
